@@ -1,0 +1,11 @@
+matplotlib==1.4.3
+numpy==1.9.2
+pandas==0.16.2
+nose==1.3.7
+
+
+
+# References
+# ----- ---------                           -------------
+# (001) Pinning Dependencies                http://nvie.com/posts/pin-your-packages/
+# (002) Improved Pacage Management          http://nvie.com/posts/better-package-management/
