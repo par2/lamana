@@ -1,14 +1,15 @@
-from distutils.core import setup
+from setuptools import setup
+#from distutils.core import setup
 
 setup(
     name='lamana',
     packages=['lamana'],                   # this must be the same as the name above
-    version='0.4.6',                       ### edit
+    version='0.4.7',                       ### edit
     description='An extensible Python package for Laminate Analysis.',
     author='P. Robinson II',
     author_email='par2.get@gmail.com',
     url='https://github.com/par2/lamana',  # use the URL to the github repo
-    download_url='https://github.com/par2/lamana/tarball/0.4.6',
+    download_url='https://github.com/par2/lamana/tarball/0.4.7',
     keywords=['laminate analysis', 'visualization'],
     classifiers=[
         'Framework :: IPython',
