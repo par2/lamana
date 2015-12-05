@@ -5,16 +5,16 @@ except ImportError:
 
 setup(
     name='lamana',
-    version='0.4.7',                                  ### edit
+    version='0.4.8-dev',                                  ### edit
     description='An extensible Python package for Laminate Analysis.',
     author='P. Robinson II',
     author_email='par2.get@gmail.com',
-    url='https://github.com/par2/lamana',             # use the URL to the github repo
-    download_url='https://github.com/par2/lamana/tarball/0.4.7',
+    url='https://github.com/par2/lamana',
+    download_url='https://github.com/par2/lamana/tarball/0.4.8-dev',
     packages=['lamana', 'lamana.models', 'lamana.utils', 'lamana.tests',
               'lamana.tests.controls_LT', 'lamana.models.tests'],
     keywords=['laminate analysis', 'visualization'],
-    #install_requires=['matplotlib', 'pandas', 'numpy'],
+    install_requires=['matplotlib', 'pandas', 'numpy'],
     classifiers=[
         'Framework :: IPython',
         'Intended Audience :: Science/Research',
@@ -37,3 +37,5 @@ setup(
 # (007) packages                            Python Cookbook, 3rd ed, p. 435
 # (008) install_requires                    https://python-packaging-user-guide.readthedocs.org/en/latest/requirements/
 # (009) distutils vs. setuptools            http://stackoverflow.com/questions/25337706/setuptools-vs-distutils-why-is-distutils-still-a-thing
+# (010) Pinning Dependencies                http://nvie.com/posts/pin-your-packages/
+# (011) Improved Package Management         http://nvie.com/posts/better-package-management/
