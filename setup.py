@@ -5,12 +5,12 @@ except ImportError:
 
 setup(
     name='lamana',
-    version='0.4.7',                                  ### edit
+    version='0.4.8-dev',                                  ### edit
     description='An extensible Python package for Laminate Analysis.',
     author='P. Robinson II',
     author_email='par2.get@gmail.com',
     url='https://github.com/par2/lamana',
-    download_url='https://github.com/par2/lamana/tarball/0.4.7',
+    download_url='https://github.com/par2/lamana/tarball/0.4.8-dev',
     packages=['lamana', 'lamana.models', 'lamana.utils', 'lamana.tests',
               'lamana.tests.controls_LT', 'lamana.models.tests'],
     keywords=['laminate analysis', 'visualization'],
