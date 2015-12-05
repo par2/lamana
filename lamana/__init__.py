@@ -3,8 +3,8 @@
 __title__ = 'lamana'
 __version__ = '0.4.8-dev'
 __author__ = 'P. Robinson II'
-__license__ = 'BSD3'
-__copyright__ = 'Copyright 2015 P. Robinson II'
+__license__ = 'BSD'
+__copyright__ = 'Copyright 2015, P. Robinson II'
 
 import lamana.input_
 import lamana.distributions

@@ -1,3 +1,6 @@
+# Copyright (c) P. Robinson II.
+# Distributed under the terms of the Modified BSD License.
+
 try:
     from setuptools import setup
 except ImportError:
@@ -14,7 +17,12 @@ setup(
     packages=['lamana', 'lamana.models', 'lamana.utils', 'lamana.tests',
               'lamana.tests.controls_LT', 'lamana.models.tests'],
     keywords=['laminate analysis', 'visualization'],
-    install_requires=['matplotlib', 'pandas', 'numpy'],
+    install_requires=[
+        'matplotlib',
+        'pandas',
+        'numpy'
+    ],
+    license = 'BSD',
     classifiers=[
         'Framework :: IPython',
         'Intended Audience :: Science/Research',
@@ -39,3 +47,4 @@ setup(
 # (009) distutils vs. setuptools            http://stackoverflow.com/questions/25337706/setuptools-vs-distutils-why-is-distutils-still-a-thing
 # (010) Pinning Dependencies                http://nvie.com/posts/pin-your-packages/
 # (011) Improved Package Management         http://nvie.com/posts/better-package-management/
+# (012) Modified BSD License                https://opensource.org/licenses/BSD-3-Clause
