@@ -48,6 +48,7 @@ class Reference(object):
     # (042) Example of regex patterns           https://hg.python.org/cpython/file/2.7/Lib/tokenize.py#l108
     # (043) Interactive, regex visualization    https://regex101.com/r/lL0cW7/4
     # (044) regex to find comma inside (),[]    https://stackoverflow.com/questions/33793037/python-regex-to-find-special-characters-between-delimiters/33793322#33793322
-
+    # (045) Good integreation practices         https://pytest.org/latest/goodpractises.html
+    
     pass
 #------------------------------------------------------------------------------

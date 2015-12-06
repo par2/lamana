@@ -1,0 +1,2 @@
+include lamana/tests/controls_LT/*.csv
+include LICENSE
