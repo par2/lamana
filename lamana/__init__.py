@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 
 __title__ = 'lamana'
-__version__ = '0.4.8-dev'
+__version__ = '0.4.8'
 __author__ = 'P. Robinson II'
 __license__ = 'BSD'
 __copyright__ = 'Copyright 2015, P. Robinson II'
