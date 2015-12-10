@@ -57,3 +57,4 @@ setup(
 # (010) Pinning Dependencies                http://nvie.com/posts/pin-your-packages/
 # (011) Improved Package Management         http://nvie.com/posts/better-package-management/
 # (012) Modified BSD License                https://opensource.org/licenses/BSD-3-Clause
+# (023) On package_data                     https://pythonhosted.org/setuptools/setuptools.html#including-data-files
