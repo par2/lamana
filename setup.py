@@ -2,26 +2,35 @@
 # Distributed under the terms of the Modified BSD License.
 
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
 
 setup(
     name='lamana',
-    version='0.4.8',                                  ### edit
+    version='0.4.8-dev',                                  ### edit
     description='An extensible Python package for Laminate Analysis.',
     author='P. Robinson II',
     author_email='par2.get@gmail.com',
     url='https://github.com/par2/lamana',
-    download_url='https://github.com/par2/lamana/tarball/0.4.8',
-    packages=['lamana', 'lamana.models', 'lamana.utils', 'lamana.tests',
-              'lamana.tests.controls_LT', 'lamana.models.tests'],
-    keywords=['laminate analysis', 'visualization'],
+    download_url='https://github.com/par2/lamana/tarball/0.4.8-dev',
+    packages=find_packages(),
+    # Include everything in source control or MANIFEST.in
+    include_package_data=True,
+    #package_data={
+        # If any package contains *.txt, include them:
+        #'': ['*.txt'],
+        # And include any *.csv files found in the 'controls_LT' package, too:
+        #'lamana': ['tests/controls_LT/*.csv'],
+    #},
+    #packages=['lamana', 'lamana.models', 'lamana.utils', 'lamana.tests',
+    #          'lamana.tests.controls_LT', 'lamana.models.tests'],
     install_requires=[
         'matplotlib',
         'pandas',
         'numpy'
     ],
+    keywords=['laminate analysis', 'visualization'],
     license = 'BSD',
     classifiers=[
         'Framework :: IPython',
