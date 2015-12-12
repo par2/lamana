@@ -1,2 +1,2 @@
 include requirements.txt
-recursive-include ./lamana/tests/controls_LT *
+recursive-include ./lamana/tests/ *
