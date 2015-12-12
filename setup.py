@@ -17,12 +17,12 @@ setup(
     packages=find_packages(),
     # Include everything in source control or MANIFEST.in
     include_package_data=True,
-    #package_data={
-        # If any package contains *.txt, include them:
-        #'': ['*.txt'],
+    package_data={
+        # If include requirements.txt in any package:
+        '.': ['requirements.txt'],
         # And include any *.csv files found in the 'controls_LT' package, too:
-        #'lamana': ['tests/controls_LT/*.csv'],
-    #},
+        'lamana': ['tests/controls_LT/*.csv'],
+    },
     #packages=['lamana', 'lamana.models', 'lamana.utils', 'lamana.tests',
     #          'lamana.tests.controls_LT', 'lamana.models.tests'],
     install_requires=[
@@ -31,7 +31,7 @@ setup(
         'numpy'
     ],
     keywords=['laminate analysis', 'visualization'],
-    license = 'BSD',
+    license='BSD',
     classifiers=[
         'Framework :: IPython',
         'Intended Audience :: Science/Research',
