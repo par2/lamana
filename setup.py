@@ -14,17 +14,21 @@ setup(
     author_email='par2.get@gmail.com',
     url='https://github.com/par2/lamana',
     download_url='https://github.com/par2/lamana/tarball/0.4.8-dev',
+    # Search all sub directories; specifics commented below
     packages=find_packages(),
-    # Include everything in source control or MANIFEST.in
-    include_package_data=True,
-    package_data={
-        # If include requirements.txt in any package:
-        '.': ['requirements.txt'],
-        # And include any *.csv files found in the 'controls_LT' package, too:
-        'lamana': ['tests/controls_LT/*.csv'],
-    },
     #packages=['lamana', 'lamana.models', 'lamana.utils', 'lamana.tests',
     #          'lamana.tests.controls_LT', 'lamana.models.tests'],
+    # Include everything in source control or MANIFEST.in
+    # Currently, MANIFEST.in is not implemented
+    include_package_data=True,
+    package_data={
+        # Include requirements.txt if found in any package
+        '.': ['requirements.txt'],
+        # Include test *.py files and *.csv files in 'controls_LT' directory
+        'lamana': ['tests/*.py'. 'tests/controls_LT/*.csv'],
+    },
+    # Install latest dependencies; "hands-off" approach
+    # Invoke `-r requirements.txt` to install pinned dependencies; "hands-on"
     install_requires=[
         'matplotlib',
         'pandas',
