@@ -25,7 +25,7 @@ setup(
         # Include requirements.txt if found in any package
         '.': ['requirements.txt'],
         # Include test *.py files and *.csv files in 'controls_LT' directory
-        'lamana': ['tests/*.py'. 'tests/controls_LT/*.csv'],
+        'lamana': ['tests/*.py', 'tests/controls_LT/*.csv'],
     },
     # Install latest dependencies; "hands-off" approach
     # Invoke `-r requirements.txt` to install pinned dependencies; "hands-on"
