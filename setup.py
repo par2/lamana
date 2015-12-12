@@ -19,8 +19,9 @@ setup(
     #packages=['lamana', 'lamana.models', 'lamana.utils', 'lamana.tests',
     #          'lamana.tests.controls_LT', 'lamana.models.tests'],
     # Include everything in source control or MANIFEST.in
-    # Currently, MANIFEST.in is not implemented
+    # MANIFEST.in is required to add files to source distributions
     include_package_data=True,
+    # Required to add files to wheels
     package_data={
         # Include requirements.txt if found in any package
         '.': ['requirements.txt'],
