@@ -1,13 +1,11 @@
-#LamAna
+# LamAna
 
 An extensible Python package for Laminate Analysis.
 
-###Installation
+## Installation
 
-The recommended option for installing a reproducibly-safe package is shown
-below.  Be aware that this option uses "pinned" dependencies, which may
-downgrade existing dependencies in your local environment.
+The recommended option for installing a reproducibly-safe package is simply:
 
-`pip install lamana -r requirements.txt     # source (Recommended)`
+    $ pip install lamana -r requirements.txt
 
-See the documentation for more details and alternative installation options.  
+*NOTE: this option installs a source distribution using "pinned" dependencies, which may upgrade/downgrade existing packages in your local environment.  See the documentation for more details and alternative installation options.*
