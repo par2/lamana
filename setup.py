@@ -23,8 +23,9 @@ setup(
     include_package_data=True,
     # Required to add files to wheels
     package_data={
-        # Include requirements.txt if found in any package
-        '.': ['requirements.txt'],
+        # Include root level items
+        # (Uncertain how this is adds to wheels...)
+        '': ['LICENSE', 'requirements.txt'],
         # Include test *.py files and *.csv files in 'controls_LT' directory
         'lamana': ['tests/*.py', 'tests/controls_LT/*.csv'],
     },
