@@ -1,4 +1,3 @@
-
 language: python
 python:
   - "2.7"
@@ -6,11 +5,19 @@ python:
   - "3.4"
   - "3.5"
 #  - "3.5-dev" # 3.5 development branch
-# command to install dependencies
-install: "pip install -r requirements.txt"
-# command to run tests
+
+# Command to install source and dependencies
+# Also build and install wheels
+install:
+  - "pip install ."
+  - "pip install -r requirements.txt"
+  - "pip install wheel"
+  - "python setup.py bdist_wheel"
+  - "pip install dist/*.whl"
+
+# Command to run tests
 script: nosetests
-#
+
 branches:
   only:
     - master
