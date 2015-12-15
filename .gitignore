@@ -53,6 +53,7 @@ docs/_build/
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
+*.onetoc2
 
 # Folder config file
 Desktop.ini
