@@ -10,8 +10,8 @@ python:
 # Command to install source and build/install wheels
 install:
   - "pip install -r requirements.txt"
-  - "pip install ."
-  - "pip install wheel"
+  #- "pip install ."
+  #- "pip install wheel"
   #- "python setup.py bdist_wheel"
   #- "pip install dist/*.whl"
 
