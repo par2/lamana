@@ -6,14 +6,15 @@ python:
   - "3.5"
 #  - "3.5-dev" # 3.5 development branch
 
+# Command to pre-install pinned dependencies
 # Command to install source and build/install wheels
-# Command to post-install pinned dependencies
 install:
+  - "pip install -r requirements.txt"
   - "pip install ."
   - "pip install wheel"
-  - "python setup.py bdist_wheel"
-  - "pip install dist/*.whl"
-  - "pip install -r requirements.txt"
+  #- "python setup.py bdist_wheel"
+  #- "pip install dist/*.whl"
+
 
 # Command to run tests
 script: nosetests
