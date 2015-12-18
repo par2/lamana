@@ -1,7 +1,7 @@
 # Install requirements
 matplotlib==1.4.3
 nose==1.3.7
-numpy==1.9.2
+#numpy==1.9.2                    # throws compile error in py35
 pandas==0.16.2
 
 # Build requirements
