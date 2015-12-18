@@ -2,6 +2,7 @@
 matplotlib==1.4.3
 nose==1.3.7
 #numpy==1.9.2                    # throws compile error in py35
+numpy==1.10.1                    # not original, but works on 27,33,34,35
 pandas==0.16.2
 
 # Build requirements

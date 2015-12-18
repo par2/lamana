@@ -4,13 +4,14 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+  - "3.5.1"
 #  - "3.5-dev" # 3.5 development branch
 
 # Command to pre-install pinned dependencies
 # Command to install source and build/install wheels
 install:
   - "pip install -r requirements.txt"
-  #- "pip install ."
+  - "pip install ."
   #- "pip install wheel"
   #- "python setup.py bdist_wheel"
   #- "pip install dist/*.whl"
