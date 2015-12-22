@@ -1,6 +1,6 @@
 # LamAna
 
-An extensible Python package for Laminate Analysis.
+An extensible Python package for laminate analysis
 
 ## Installation
 
