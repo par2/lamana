@@ -9,6 +9,7 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+  - "3.5.1"
 #  - "3.5-dev" # 3.5 development branch
 
 notifications:
@@ -47,17 +48,17 @@ before_install:
   ##- ln -s /run/shm /dev/shm
 
 install:
+  # Pre-installing major dependencies; (improves install time?)
   # Ensure pip and nose will install in the conda env
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas
   - source activate test-environment
   ##- python setup.py install
-  #- "pip install -r requirements.txt"                    # Command to pre-install pinned dependencies
-  # Command to install source and build/install wheels
-  - "pip install ."
+  - pip install -r requirements.txt                     # pre-install pinned dependencies
+  - pip install .                                       # install source and build/install wheels
   #- "pip install wheel"
   #- "python setup.py bdist_wheel"
   #- "pip install dist/*.whl"
-  - "pip list"
+  - pip list
 
 
 # Command to run tests
