@@ -21,7 +21,7 @@ install:
 # Command to run tests
 script: nosetests
 
-branches:
-  only:
-    - master
-    - develop
+#branches:
+#  only:
+#    - master
+#    - develop
