@@ -42,8 +42,8 @@ before_install:
     # Useful for debugging any issues with conda
   - conda info -a
   # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
-  - sudo rm -rf /dev/shm
-  - sudo ln -s /run/shm /dev/shm
+  ##- sudo rm -rf /dev/shm
+  ##- sudo ln -s /run/shm /dev/shm
 
 install:
   # Ensure pip and nose will install in the conda env
