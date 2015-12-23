@@ -8,8 +8,7 @@ python:
   - "2.7"
   - "3.3"
   - "3.4"
-  #- "3.5"
-  #- "3.5.1"
+  - "3.5"
 #  - "3.5-dev" # 3.5 development branch
 
 notifications:
@@ -38,12 +37,14 @@ before_install:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
-  - conda update --yes conda                               # update since mini lags behind conda
+  - conda config --set always_yes yes --set changeps1 no   # say yes to prompts
+  - conda update -q conda
+  ##- conda update --yes conda                               # update since mini lags behind conda
     # Useful for debugging any issues with conda
   - conda info -a
   # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
-  ##- sudo rm -rf /dev/shm
-  ##- sudo ln -s /run/shm /dev/shm
+  ##- rm -rf /dev/shm
+  ##- ln -s /run/shm /dev/shm
 
 install:
   # Ensure pip and nose will install in the conda env
