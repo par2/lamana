@@ -2,7 +2,7 @@
 # numpy, pandas and matplotlib are required dependencies; care is needed
 # in improving build time and reproducibilty.
 
-sudo: false                                              # works w/Docker
+sudo: false                                                 # works w/Docker
 language: python
 python:
   - "2.7"
@@ -15,7 +15,7 @@ python:
 notifications:
   email: false
 
-# Useful packages for building numpy; turned off for now
+# Necessary packages for building numpy; turned off for now sincr added by conda
 #cache: apt
 #addons:
 #  apt:
@@ -38,9 +38,8 @@ before_install:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
-  - conda config --set always_yes yes --set changeps1 no   # say yes to prompts
-  - conda update -q conda
-  ##- conda update --yes conda                               # update since mini lags behind conda
+  - conda config --set always_yes yes --set changeps1 no     # say yes to prompts
+  - conda update -q conda                                    # update since mini lags behind conda; say "yes"
     # Useful for debugging any issues with conda
   - conda info -a
   # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
@@ -48,13 +47,15 @@ before_install:
   ##- ln -s /run/shm /dev/shm
 
 install:
-  # Pre-installing major dependencies; (improves install time?)
-  # Ensure pip and nose will install in the conda env
+  # Pre-building major dependencies with conda (much faster and easier)
+  # Ensure pip and nose will install within the conda env
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas
   - source activate test-environment
   ##- python setup.py install
-  - pip install -r requirements.txt                     # pre-install pinned dependencies
-  - pip install .                                       # install source and build/install wheels
+  # Note: `pip` used inplace of `conda`; reason uncertain (REF 003)
+  # Uses conda's pip on Travis' pip
+  - pip install -r requirements.txt                          # pre-install pinned dependencies
+  - pip install .                                            # install source and build/install wheels
   #- "pip install wheel"
   #- "python setup.py bdist_wheel"
   #- "pip install dist/*.whl"
