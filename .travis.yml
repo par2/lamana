@@ -6,6 +6,7 @@ sudo: false                                                 # works w/Docker
 language: python
 python:
   - "2.7"
+  - "2.7.10"
   - "3.3"
   - "3.4"
   - "3.5"
@@ -27,17 +28,16 @@ notifications:
 
 # Setup conda
 before_install:
-  # We do this conditionally because it saves us some downloading if the
-  # version is the same.
+  # Do this conditionally since it saves downloading time if the version is the same.
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
       wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
     else
       wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
     fi
     ##- chmod +x miniconda.sh                                # release permissions
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
+  - bash miniconda.sh -b -p $HOME/miniconda                  # assign conda program to HOME dir
+  - export PATH="$HOME/miniconda/bin:$PATH"                  # enable `conda` command
+  - hash -r                                                  # reset llinks
   - conda config --set always_yes yes --set changeps1 no     # say yes to prompts
   - conda update -q conda                                    # update since mini lags behind conda; say "yes"
     # Useful for debugging any issues with conda
