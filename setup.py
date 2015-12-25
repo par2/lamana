@@ -8,12 +8,12 @@ except ImportError:
 
 setup(
     name='lamana',
-    version='0.4.8-dev',                                  ### edit
+    version='0.4.8',                                  ### edit
     description='An extensible Python package for laminate analysis',
     author='P. Robinson II',
     author_email='par2.get@gmail.com',
     url='https://github.com/par2/lamana',
-    download_url='https://github.com/par2/lamana/tarball/0.4.8-dev',
+    download_url='https://github.com/par2/lamana/tarball/0.4.8',
     # Search all sub directories; specifics commented below
     packages=find_packages(),
     #packages=['lamana', 'lamana.models', 'lamana.utils', 'lamana.tests',
