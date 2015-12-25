@@ -37,7 +37,7 @@ before_install:
     ##- chmod +x miniconda.sh                                # release permissions
   - bash miniconda.sh -b -p $HOME/miniconda                  # assign conda program to HOME dir
   - export PATH="$HOME/miniconda/bin:$PATH"                  # enable `conda` command
-  - hash -r                                                  # reset llinks
+  - hash -r                                                  # reset links
   - conda config --set always_yes yes --set changeps1 no     # say yes to prompts
   - conda update -q conda                                    # update since mini lags behind conda; say "yes"
     # Useful for debugging any issues with conda
