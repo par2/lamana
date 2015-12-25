@@ -1,2 +1,4 @@
-include lamana/tests/controls_LT/*.csv
 include LICENSE
+include requirements.txt
+include lamana/tests/*.py
+include lamana/tests/controls_LT/*.csv

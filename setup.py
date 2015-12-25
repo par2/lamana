@@ -2,27 +2,42 @@
 # Distributed under the terms of the Modified BSD License.
 
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
 
 setup(
     name='lamana',
     version='0.4.8',                                  ### edit
-    description='An extensible Python package for Laminate Analysis.',
+    description='An extensible Python package for laminate analysis',
     author='P. Robinson II',
     author_email='par2.get@gmail.com',
     url='https://github.com/par2/lamana',
     download_url='https://github.com/par2/lamana/tarball/0.4.8',
-    packages=['lamana', 'lamana.models', 'lamana.utils', 'lamana.tests',
-              'lamana.tests.controls_LT', 'lamana.models.tests'],
-    keywords=['laminate analysis', 'visualization'],
+    # Search all sub directories; specifics commented below
+    packages=find_packages(),
+    #packages=['lamana', 'lamana.models', 'lamana.utils', 'lamana.tests',
+    #          'lamana.tests.controls_LT', 'lamana.models.tests'],
+    # Include everything in source control or MANIFEST.in
+    # MANIFEST.in is required to add files to source distributions
+    include_package_data=True,
+    # Required to add files to wheels
+    package_data={
+        # Include root level items
+        # (Uncertain how this is adds to wheels...)
+        '': ['LICENSE', 'requirements.txt'],
+        # Include test *.py files and *.csv files in 'controls_LT' directory
+        'lamana': ['tests/*.py', 'tests/controls_LT/*.csv'],
+    },
+    # Install latest dependencies; "hands-off" approach
+    # Invoke `-r requirements.txt` to install pinned dependencies; "hands-on"
     install_requires=[
         'matplotlib',
         'pandas',
         'numpy'
     ],
-    license = 'BSD',
+    keywords=['laminate analysis', 'visualization'],
+    license='BSD',
     classifiers=[
         'Framework :: IPython',
         'Intended Audience :: Science/Research',
@@ -48,3 +63,4 @@ setup(
 # (010) Pinning Dependencies                http://nvie.com/posts/pin-your-packages/
 # (011) Improved Package Management         http://nvie.com/posts/better-package-management/
 # (012) Modified BSD License                https://opensource.org/licenses/BSD-3-Clause
+# (023) On package_data                     https://pythonhosted.org/setuptools/setuptools.html#including-data-files
