@@ -1,3 +1,4 @@
+# -----------------------------------------------------------------------------
 # Copyright (c) P. Robinson II.
 # Distributed under the terms of the Modified BSD License.
 import codecs
@@ -9,6 +10,8 @@ try:
 except ImportError:
     from distutils.core import setup
 
+
+# Utility Code ----------------------------------------------------------------
 '''Add to utils'''
 here = os.path.abspath(os.path.dirname(__file__))     # REF 024
 
@@ -29,17 +32,22 @@ def find_version(*file_paths):
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
 
-VERSION = find_version('lamana', '__init__.py')
+# -----------------------------------------------------------------------------
+NAME = 'lamana'
+VERSION = find_version(NAME, '__init__.py')
+URL = 'https://github.com/par2/lamana'
 
 setup(
-    name='lamana',
+    name=NAME,
     version=VERSION,
     ##version='0.4.9-dev',                                  ### edit
     description='An extensible Python package for laminate analysis',
     author='P. Robinson II',
     author_email='par2.get@gmail.com',
-    url='https://github.com/par2/lamana',
-    download_url=''.join(['https://github.com/par2/lamana/tarball/', VERSION]),
+    url=URL,
+    ##url='https://github.com/par2/lamana',
+    download_url='/'.join([URL, 'tarball', VERSION]),
+    ##download_url=''.join(['https://github.com/par2/lamana/tarball/', VERSION]),
     ##download_url='https://github.com/par2/lamana/tarball/0.4.9-dev',
     # Search all sub directories; specifics commented below
     packages=find_packages(),
