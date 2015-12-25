@@ -33,7 +33,7 @@ VERSION = find_version('lamana', '__init__.py')
 
 setup(
     name='lamana',
-    version=VERSION
+    version=VERSION,
     ##version='0.4.9-dev',                                  ### edit
     description='An extensible Python package for laminate analysis',
     author='P. Robinson II',
