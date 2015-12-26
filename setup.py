@@ -100,3 +100,4 @@ setup(
 # (012) Modified BSD License                https://opensource.org/licenses/BSD-3-Clause
 # (023) On package_data                     https://pythonhosted.org/setuptools/setuptools.html#including-data-files
 # (024) find_version code                   https://github.com/pypa/pip/blob/develop/setup.py
+# (025) Use pkg_resources to find version   https://stackoverflow.com/questions/2058802/how-can-i-get-the-version-defined-in-setup-py-setuptools-in-my-package
