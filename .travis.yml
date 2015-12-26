@@ -69,10 +69,10 @@ script:
 # after_success:
 #  - coveralls
 
-#branches:
-#  only:
-    #- master
-    #- develop
+branches:
+  only:
+    - master
+    - develop
 
 
 # References

@@ -98,6 +98,6 @@ setup(
 # (010) Pinning Dependencies                http://nvie.com/posts/pin-your-packages/
 # (011) Improved Package Management         http://nvie.com/posts/better-package-management/
 # (012) Modified BSD License                https://opensource.org/licenses/BSD-3-Clause
-# (023) On package_data                     https://pythonhosted.org/setuptools/setuptools.html#including-data-files
-# (024) find_version code                   https://github.com/pypa/pip/blob/develop/setup.py
-# (025) Use pkg_resources to find version   https://stackoverflow.com/questions/2058802/how-can-i-get-the-version-defined-in-setup-py-setuptools-in-my-package
+# (013) On package_data                     https://pythonhosted.org/setuptools/setuptools.html#including-data-files
+# (014) find_version code                   https://github.com/pypa/pip/blob/develop/setup.py
+# (015) Use pkg_resources to find version   https://stackoverflow.com/questions/2058802/how-can-i-get-the-version-defined-in-setup-py-setuptools-in-my-package
