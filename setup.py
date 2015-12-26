@@ -1,19 +1,54 @@
+# -----------------------------------------------------------------------------
 # Copyright (c) P. Robinson II.
 # Distributed under the terms of the Modified BSD License.
+import codecs
+import os
+import re
 
 try:
     from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
 
+
+# Utility Code ----------------------------------------------------------------
+'''Add to utils'''
+here = os.path.abspath(os.path.dirname(__file__))     # REF 024
+
+
+def read(*parts):
+    '''Read the files (REF 024)'''
+    # intentionally *not* adding an encoding option to open, See:
+    # https://github.com/pypa/virtualenv/issues/201#issuecomment-3145690
+    return codecs.open(os.path.join(here, *parts), 'r').read()
+
+
+def find_version(*file_paths):
+    '''Extract version string (REF 024)'''
+    version_file = read(*file_paths)
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                              version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
+
+# -----------------------------------------------------------------------------
+NAME = 'lamana'
+VERSION = find_version(NAME, '__init__.py')
+URL = 'https://github.com/par2/lamana'
+
 setup(
-    name='lamana',
-    version='0.4.8',                                  ### edit
+    name=NAME,
+    version=VERSION,
+    ##version='0.4.9-dev',                                  ### edit
     description='An extensible Python package for laminate analysis',
     author='P. Robinson II',
     author_email='par2.get@gmail.com',
-    url='https://github.com/par2/lamana',
-    download_url='https://github.com/par2/lamana/tarball/0.4.8',
+    url=URL,
+    ##url='https://github.com/par2/lamana',
+    download_url='/'.join([URL, 'tarball', VERSION]),
+    ##download_url=''.join(['https://github.com/par2/lamana/tarball/', VERSION]),
+    ##download_url='https://github.com/par2/lamana/tarball/0.4.9-dev',
     # Search all sub directories; specifics commented below
     packages=find_packages(),
     #packages=['lamana', 'lamana.models', 'lamana.utils', 'lamana.tests',
@@ -64,3 +99,5 @@ setup(
 # (011) Improved Package Management         http://nvie.com/posts/better-package-management/
 # (012) Modified BSD License                https://opensource.org/licenses/BSD-3-Clause
 # (023) On package_data                     https://pythonhosted.org/setuptools/setuptools.html#including-data-files
+# (024) find_version code                   https://github.com/pypa/pip/blob/develop/setup.py
+# (025) Use pkg_resources to find version   https://stackoverflow.com/questions/2058802/how-can-i-get-the-version-defined-in-setup-py-setuptools-in-my-package

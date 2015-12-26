@@ -1,27 +1,84 @@
+# This following script attempts build dependible conda environments on linux
+# numpy, pandas and matplotlib are required dependencies; care is needed
+# in improving build time and reproducibilty.
+
+sudo: false                                                 # works w/Docker
 language: python
 python:
   - "2.7"
+  - "2.7.10"
   - "3.3"
   - "3.4"
   - "3.5"
   - "3.5.1"
 #  - "3.5-dev" # 3.5 development branch
 
-# Command to pre-install pinned dependencies
-# Command to install source and build/install wheels
+notifications:
+  email: false
+
+# Necessary packages for building numpy; turned off for now sincr added by conda
+#cache: apt
+#addons:
+#  apt:
+#    packages:
+#    - libatlas-dev
+#    - libatlas-base-dev
+#    - liblapack-dev
+#    - gfortran
+
+# Setup conda
+before_install:
+  # Do this conditionally since it saves downloading time if the version is the same.
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
+    else
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    fi
+    ##- chmod +x miniconda.sh                                # release permissions
+  - bash miniconda.sh -b -p $HOME/miniconda                  # assign conda program to HOME dir
+  - export PATH="$HOME/miniconda/bin:$PATH"                  # enable `conda` command
+  - hash -r                                                  # reset links
+  - conda config --set always_yes yes --set changeps1 no     # say yes to prompts
+  - conda update -q conda                                    # update since mini lags behind conda; say "yes"
+    # Useful for debugging any issues with conda
+  - conda info -a
+  # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
+  ##- rm -rf /dev/shm
+  ##- ln -s /run/shm /dev/shm
+
 install:
-  - "pip install -r requirements.txt"
-  - "pip install ."
+  # Pre-building major dependencies with conda (much faster and easier)
+  # Ensure pip and nose will install within the conda env
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas
+  - source activate test-environment
+  ##- python setup.py install
+  # Note: `pip` used inplace of `conda`; reason uncertain (REF 003)
+  # Uses conda's pip on Travis' pip
+  - pip install -r requirements.txt                          # pre-install pinned dependencies
+  - pip install .                                            # install source and build/install wheels
   #- "pip install wheel"
   #- "python setup.py bdist_wheel"
   #- "pip install dist/*.whl"
-  - "pip list"
+  - pip list
 
 
 # Command to run tests
-script: nosetests
+script:
+  - nosetests
+
+# after_success:
+#  - coveralls
 
 #branches:
 #  only:
-#    - master
-#    - develop
+    #- master
+    #- develop
+
+
+# References
+# ----- ---------                           -------------
+# (001) Conda and coverage on Travis        http://dan-blanchard.roughdraft.io/7045057-quicker-travis-builds-that-rely-on-numpy-and-scipy-using-miniconda
+# (002) Travis and conda                    http://conda.pydata.org/docs/travis.html
+# (003) Conda on Travis w/details           http://lmjohns3.com/2015/06/using-travis-ci-with-miniconda-scipy-and-nose.html
+# (004) Example yaml                        https://github.com/lmjohns3/theanets/blob/master/.travis.yml
+# (005) Example 2 yaml                      http://samueljackson.me/2015/12/12/better-python-travis-config.html
