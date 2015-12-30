@@ -504,8 +504,11 @@ class Laminate(Stack):
         p = self.FeatureInput['Parameters']['p']
 
         # Replicate Multiple Rows by p
-        df = pd.concat([df_snap]*p)
-        df.sort(axis=0, inplace=True)
+        df = pd.concat([df_snap] * p)
+        # `sort` is deprecated; works in pandas 0.16.2; last worked in lamana 0.4.9
+        # replaced `sort` with `sort_index` for pandas 0.17.1; backwards compatible
+        df.sort_index(axis=0, inplace=True)
+        ##df.sort(axis=0, inplace=True)
         df.reset_index(drop=True, inplace=True)
         df = Laminate._set_stresses(df)
         #print(df)
@@ -863,11 +866,14 @@ class Laminate(Stack):
         joined = joined.join(intervals, on='layer')            # join long df with short intervals for internal_sums
         #print(joined)
 
+        '''Interval or internal sums?'''
         # Calc. Interval Sums
         trunc = joined[(joined['label'] != 'interface') & (
             joined['label'] != 'discont.')]                    # remove firsts and lasts from cumsum
-        internal_sums = np.cumsum(
-            trunc.groupby('layer')['intervals'])               # delta; apply sigma from algo
+        ##'''cumsum is not working with groupby in pandas 0.17.1'''
+        ##internal_sums = np.cumsum(
+        ##    trunc.groupby('layer')['intervals'])               # delta; apply sigma from algo
+        internal_sums = trunc.groupby('layer')['intervals'].cumsum() # 0.17.2 work around; backwards compat.
         #print(clipped)
         #print(internal_sums)
 

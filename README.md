@@ -6,7 +6,7 @@ An extensible Python package for laminate analysis
 
 **From PyPI**: Install [anaconda](https://www.continuum.io/downloads), then simply run:
 
-    $ pip install lamana -r requirements.txt
+    $ pip install lamana
 
 **Locally**: For developers, install [anaconda](https://www.continuum.io/downloads) and [git](https://git-scm.com/downloads). Then `git clone` one of the following branches into your development enviromnent: `develop` branch for lastest changes and the `master` branch for stable releases.
 
