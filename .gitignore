@@ -23,6 +23,9 @@ var/
 .installed.cfg
 *.egg
 
+#Gitflow Bug
+(cd .git*/
+
 # IPython Notebooks
 .ipynb_checkpoints/
 
