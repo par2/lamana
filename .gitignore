@@ -28,6 +28,8 @@ var/
 
 # IPython Notebooks
 .ipynb_checkpoints/
+_notebooks/
+*.ipynb
 
 # Installer logs
 pip-log.txt
