@@ -73,6 +73,7 @@ branches:
   only:
     - master
     - develop
+    - feature/tidy
 
 
 # References

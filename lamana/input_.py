@@ -402,7 +402,7 @@ class BaseDefaults(object):
             '10-ply': ['500-[50,50,50,50]-0'],
             '11-ply': ['400-[100,100,100,100]-800'],
             '13-ply': ['400-[100,100,100,100,100]-800'],
-        }
+            }
 
         # To add keys, first add logic to automate appending dict_ in groupify
         # This should add a key to geo_inputs.  Geo_objects will auto-mimic this logic.
@@ -553,7 +553,8 @@ class BaseDefaults(object):
             # Nested dict (Standard Form), directly assign
             elif isinstance(mat_props, dict):
                 # Standard (Nested) Dict
-                _trigger = mat_props['Modulus'].keys()        # needed; triggers KeyError if not Standard Form
+                mat_props['Modulus'].keys()                     # needed; triggers KeyError if not Standard Form
+                ##_trigger = mat_props['Modulus'].keys()        # needed; triggers KeyError if not Standard Form
                 dict_prop = mat_props
             else:
                 raise TypeError('Nested dict of material parameters required.  See Tutorial')

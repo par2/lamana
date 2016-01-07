@@ -191,24 +191,26 @@ def get_special_geometry(laminate):
     '''Return geometry string parsed from a special-plied (<5) laminate DataFrame.
     Used in controls.py.'''
     nplies = len(laminate['layer'].unique())
-    geo = [str(int(thickness)) for thickness               # gets unique values
-        in laminate.groupby('type', sort=False)['t(um)'].first()]
+    geo = [
+        str(int(thickness)) for thickness               # gets unique values
+        in laminate.groupby('type', sort=False)['t(um)'].first()
+    ]
     #print(geo)
 
     # Amend list by plies by inserting 0 for missing layer type thicknesses; list required for .join
     if nplies == 1:
-        ply = 'Monolith'
+        #ply = 'Monolith'
         geo.insert(0, '0')                                 # outer
         geo.insert(1, '0')                                 # inner
     elif nplies == 2:
-        ply = 'Bilayer'
+        #ply = 'Bilayer'
         geo.append('0')                                    # middle
         geo.append('0')
     elif nplies == 3:
-        ply = 'Trilayer'
+        #ply = 'Trilayer'
         geo.insert(1, '0')
     elif nplies == 4:
-        ply = '4ply'
+        #ply = '4ply'
         geo.append('0')
         '''There is some pythonic way to do this by Raymond Hettinger; but same thing.'''
         geo[1] = '[' + geo[1] + ']'                        # redo inner in General Convention notation
@@ -406,6 +408,7 @@ def read_csv_dir(path, *args, **kwargs):
     for dir_entry in os.listdir(path):
         dir_entry_path = os.path.join(path, dir_entry)
         if os.path.isfile(dir_entry_path):
+            # TODO: clean up and remove my_file; test affects
             with open(dir_entry_path, 'r') as my_file:
                 # Assumes first column are indices
                 file = pd.read_csv(dir_entry_path, *args, index_col=0, **kwargs)
