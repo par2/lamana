@@ -73,12 +73,12 @@ class Model(BaseModel):
             D_12T = sum(df.loc[df['label'] == 'interface', 'D_12'])
         #print(FeatureInput['Geometric']['p'])
 
-        D_11p = (1./((D_11T**2 - D_12T**2)) * D_11T)
-        D_12n = -(1./((D_11T**2 - D_12T**2)) * D_12T)
-        v_eq = D_12T / D_11T                               # equiv. Poisson's ratio
+        D_11p = (1. / ((D_11T**2 - D_12T**2)) * D_11T)
+        D_12n = -(1. / ((D_11T**2 - D_12T**2)) * D_12T)
+        v_eq = D_12T / D_11T                                           # equiv. Poisson's ratio
         M_r = self.calc_moment(df, FeatureInput['Parameters'], v_eq).m_r
         M_t = self.calc_moment(df, FeatureInput['Parameters'], v_eq).m_t
-        K_r = (D_11p*M_r) + (D_12n*M_t)                    # curvatures
+        K_r = (D_11p*M_r) + (D_12n*M_t)                                # curvatures
         K_t = (D_12n*M_r) + (D_11p*M_t)
 
         # Update FeatureInput
@@ -94,16 +94,20 @@ class Model(BaseModel):
                          }
 
         FeatureInput['Globals'] = global_params
-        self.FeatureInput = FeatureInput                   # update with Globals
+        self.FeatureInput = FeatureInput                               # update with Globals
         #print(FeatureInput)
 
         # Calculate Strains and Stresses and Update DataFrame
         df.loc[:, 'strain_r'] = K_r * df.loc[:, 'Z(m)']
         df.loc[:, 'strain_t'] = K_t * df.loc[:, 'Z(m)']
-        df.loc[:, 'stress_r (Pa/N)'] = (df.loc[:, 'strain_r'] * df.loc[:, 'Q_11']
-                            ) + (df.loc[:, 'strain_t'] * df.loc[:, 'Q_12'])
-        df.loc[:,'stress_t (Pa/N)'] = (df.loc[:, 'strain_t'] * df.loc[:, 'Q_11']
-                            ) + (df.loc[:, 'strain_r'] * df.loc[:, 'Q_12'])
+        df.loc[:, 'stress_r (Pa/N)'] = (
+            df.loc[:, 'strain_r'] * df.loc[:, 'Q_11']) + (
+            df.loc[:, 'strain_t'] * df.loc[:, 'Q_12']
+        )
+        df.loc[:,'stress_t (Pa/N)'] = (
+            df.loc[:, 'strain_t'] * df.loc[:, 'Q_11']) + (
+            df.loc[:, 'strain_r'] * df.loc[:, 'Q_12']
+        )
         df.loc[:, 'stress_f (MPa/N)'] = df.loc[:, 'stress_t (Pa/N)'] / 1e6
 
         del df['Modulus']
@@ -119,14 +123,14 @@ class Model(BaseModel):
         '''Return tuple of Series of (Q11, Q12) floats per lamina.'''
         # Iterate to Apply Modulus and Poisson's to correct Material
         '''TODO: Prefer cleaner ways to parse materials from mat_props'''
-        df_mat_props = pd.DataFrame(mat_props)             # df easier to munge
+        df_mat_props = pd.DataFrame(mat_props)                         # df easier to munge
         df_mat_props.index.name = 'materials'
-        for material in df_mat_props.index:
         ##for material in mat_props.index:
+        for material in df_mat_props.index:
             mat_idx = df['matl'] == material
             df.loc[mat_idx, 'Modulus'] = df_mat_props.loc[material, 'Modulus']
             df.loc[mat_idx, 'Poissons'] = df_mat_props.loc[material, 'Poissons']
-            E = df['Modulus']                              # series of moduli
+            E = df['Modulus']                                          # series of moduli
             v = df['Poissons']
         stiffness = ct.namedtuple('stiffness', ['q_11', 'q_12'])
         q_11 = E / (1 - (v**2))
@@ -154,8 +158,8 @@ class Model(BaseModel):
         a = load_params['a']
         r = load_params['r']
         moments = ct.namedtuple('moments', ['m_r', 'm_t'])
-        m_r = ((P_a/(4*math.pi)) * ((1+v_eq)*math.log10(a/r)))
-        m_t = ((P_a/(4*math.pi)) * (((1+v_eq)*math.log10(a/r))+(1-v_eq)))
+        m_r = ((P_a/(4*math.pi)) * ((1 + v_eq)*math.log10(a/r)))
+        m_t = ((P_a/(4*math.pi)) * (((1 + v_eq)*math.log10(a/r)) + (1 - v_eq)))
         return moments(m_r, m_t)
 
 
@@ -193,15 +197,18 @@ class Defaults(BaseDefaults):
         '''DEV: Add defaults first.  Then adjust attributes.'''
         # DEFAULTS ------------------------------------------------------------
         # Build dicts of geometric and material parameters
-        self.load_params = {'R': 12e-3,                    # specimen radius
-                            'a': 7.5e-3,                   # support ring radius
-                            'p': 5,                        # points/layer
-                            'P_a': 1,                      # applied load
-                            'r': 2e-4,                     # radial distance from center loading
-                            }
+        self.load_params = {
+            'R': 12e-3,                                                # specimen radius
+            'a': 7.5e-3,                                               # support ring radius
+            'p': 5,                                                    # points/layer
+            'P_a': 1,                                                  # applied load
+            'r': 2e-4,                                                 # radial distance from center loading
+        }
 
-        self.mat_props = {'Modulus': {'HA': 5.2e10, 'PSu': 2.7e9},
-                           'Poissons': {'HA': 0.25, 'PSu': 0.33}}
+        self.mat_props = {
+            'Modulus': {'HA': 5.2e10, 'PSu': 2.7e9},
+            'Poissons': {'HA': 0.25, 'PSu': 0.33}
+        }
 
         # ATTRIBUTES ----------------------------------------------------------
         # FeatureInput

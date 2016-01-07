@@ -9,10 +9,11 @@ import math
 
 ##import pandas as pd
 
-def _use_model_(Laminate, adjusted_z=False):
+
 #def _use_model_(df, FeatureInput, adjusted_z=False):
 #def use_model(df, FeatureInput, adjusted_z=False):
 ##def use_model(df, FeatureInput, *args, adjusted_z=False):        # python 3.x
+def _use_model_(Laminate, adjusted_z=False):
     '''Return updated DataFrame and FeatureInput.
 
     Variables
@@ -23,17 +24,17 @@ def _use_model_(Laminate, adjusted_z=False):
         Geometry, laminate parameters and more.  Updates Globals dict for
         parameters in the dashboard output.
     adjusted_z: bool; default=False
-        If True, uses z(m)* values instead; different assumption fo internal calc.
+        If True, uses z(m)* values instead; different assumption for internal calc.
 
     '''
     df = Laminate.LFrame.copy()
     FeatureInput = Laminate.FeatureInput
 
     # Calling functions to calculate Qs and Ds
-    df.loc[:,'Q_11'] = calc_stiffness(df, FeatureInput['Materials']).q_11
-    df.loc[:,'Q_12'] = calc_stiffness(df, FeatureInput['Materials']).q_12
-    df.loc[:,'D_11'] = calc_bending(df, adj_z=adjusted_z).d_11
-    df.loc[:,'D_12'] = calc_bending(df, adj_z=adjusted_z).d_12
+    df.loc[:, 'Q_11'] = calc_stiffness(df, FeatureInput['Materials']).q_11
+    df.loc[:, 'Q_12'] = calc_stiffness(df, FeatureInput['Materials']).q_12
+    df.loc[:, 'D_11'] = calc_bending(df, adj_z=adjusted_z).d_11
+    df.loc[:, 'D_12'] = calc_bending(df, adj_z=adjusted_z).d_12
     #print(df.head(3))
 
     # Global Variable Update
@@ -83,6 +84,7 @@ def _use_model_(Laminate, adjusted_z=False):
 
     return (df, FeatureInput)
 
+
 #------------------------------------------------------------------------------
 def calc_stiffness(df, mat_params):
     '''Return tuple of Series of (Q11, Q12) floats per lamina.'''
@@ -110,9 +112,10 @@ def calc_bending(df, adj_z=False):
     else:
         z = df['z(m)*']
     bending = ct.namedtuple('bending', ['d_11', 'd_12'])
-    d_11 = ((q_11*(h**3))/12.) + (q_11*h*(z**2))
-    d_12 = ((q_12*(h**3))/12.) + (q_12*h*(z**2))
+    d_11 = ((q_11*(h**3)) / 12.) + (q_11*h*(z**2))
+    d_12 = ((q_12*(h**3)) / 12.) + (q_12*h*(z**2))
     return bending(d_11, d_12)
+
 
 def calc_moment(df, geo_params, v_eq):
     '''Return tuple of moments (radial and tangential); floats.
