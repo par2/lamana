@@ -18,11 +18,11 @@ import matplotlib.pyplot as plt
 # colorblind from seaborn; grayscale is web-safe
 LAMANA_PALETTES = dict(
     #bold=['#FC0D00','#FC7700','#018C99','#00C318','#6A07A9','#009797','#CF0069'],
-    bold=['#EB0C00','#FC7700','#018C99','#00C318','#6A07A9','#009797','#CF0069'],
+    bold=['#EB0C00', '#FC7700', '#018C99', '#00C318', '#6A07A9', '#009797', '#CF0069'],
     colorblind=['#0072B2', '#009E73', '#D55E00', '#CC79A7', '#F0E442', '#56B4E9'],
     grayscale=['#FFFFFF', '#999999', '#666666', '#333333', '#000000'],
     HAPSu=['#E7940E', '#F5A9A9', '#FCEB00', '#0B4EA5'],
-)
+    )
 
 
 def _cycle_depth(iterable, n=None):
@@ -179,7 +179,7 @@ def _distribplot(
             df = LM.extrema                                        # plots p=2
         else:
             df = LM.LMFrame
-        nplies = LM.nplies
+        #nplies = LM.nplies                                         # unused
         materials = LM.materials
         lbl = LM.Geometry.string
         stack_order = LM.stack_order
@@ -205,8 +205,10 @@ def _distribplot(
         xs, ys = x_series.tolist(), y_series.tolist()
 
         # Update plot boundaries
-        if min(xs) < minX: minX = float(min(xs))
-        if max(xs) > maxX: maxX = float(max(xs))
+        if min(xs) < minX:
+            minX = float(min(xs))
+        if max(xs) > maxX:
+            maxX = float(max(xs))
         #print(minX, maxX)
 
         # Keyword Updates;
@@ -357,7 +359,8 @@ def _multiplot(
 
     suptitle_kw = {} if suptitle_kw is None else suptitle_kw
     suptitle_dft = dict(t='', fontsize=22, fontweight='bold')
-    if title: suptitle_dft.update(dict(t=title))
+    if title:
+        suptitle_dft.update(dict(t=title))
     suptitle_kw.update({k: v for k, v in suptitle_dft.items() if k not in suptitle_kw})
     #print('suptitle_kw: ', suptitle_kw)
 
@@ -368,9 +371,11 @@ def _multiplot(
     alphabet = map(chr, range(97, 123))                            # to label subplots; REF 037
     labels_dft = dict(suptitle=None, sublabels=list(alphabet),
                       axes_titles=None, legend_titles=None,)
-    if title: labels_dft.update(suptitle=title)                    # compliment convenience kw arg
+    if title:
+        labels_dft.update(suptitle=title)                    # compliment convenience kw arg
     labels_kw.update({k: v for k, v in labels_dft.items() if k not in labels_kw})
-    if labels_kw['suptitle']: suptitle_kw.update(t=labels_kw['suptitle'])
+    if labels_kw['suptitle']:
+        suptitle_kw.update(t=labels_kw['suptitle'])
 #    if labels_kw['subtitle']: subtitle=labels_kw['subtitle']
 #     if labels_kw['xlabel']: kwargs['xlabel'] = ''                # remove axlabels; use text()
 #     if labels_kw['ylabel']: kwargs['ylabel'] = ''                # remove axlabels; use text()

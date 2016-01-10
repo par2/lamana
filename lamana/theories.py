@@ -5,15 +5,15 @@
 
 import importlib
 
-'''Replace with interactive way to import models'''
+'''TODO: Replace * with interactive way to import models'''
 from lamana.models import *
 
 
 class BaseModel(object):
-    '''Provide attributes for subclassing custom models.
+    '''Provide attributes for sub-classing custom models.
 
     This class helps centralize common attributes associated with a selected
-    model.  Intermeadiate users are encourages to sub-class from here to unify
+    model.  Intermediate users are encourages to sub-class from here to unify
     the API idioms.  Model is selected in distributions.apply() and returned in
     Phase 3 of constructs.Laminate().
 
@@ -35,7 +35,7 @@ class BaseModel(object):
         return '<{} object>'.format(self.__class__.__name__)
 
 '''Need to find _use_model_ more dynamically than forcing to search Model._use_model.
-Try to add as a class attribute that comes by subclassing BaseModel.
+Try to add as a class attribute that comes by sub-classing BaseModel.
 '''
 
 
