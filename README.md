@@ -16,4 +16,4 @@ An extensible Python package for laminate analysis
     $ pip install -r requirements.txt
     $ pip install .                        # within lamana directory
 
-*NOTE: installing requirements.txt uses "pinned" dependencies, which may upgrade/downgrade existing packages in your local environment.  See documentation for more details and alternative installation methods (marked for future release).*
+*NOTE: installing requirements.txt uses "pinned" dependencies, which may upgrade/downgrade existing packages in your local environment.  See the [documentation](https://lamana.readthedocs.org) for more details and alternative installation methods (marked for future release).*
