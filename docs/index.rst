@@ -59,7 +59,7 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
 
    showcase
    installation
-   usinglamana
+   gettingstarted
    api
 
 
