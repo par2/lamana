@@ -35,8 +35,8 @@ run one of the following options:
 
     The first option is most succint and builds a LamAna installation from source. The second option builds more quickly from a binary that uses pre-compiled libraries.  Both options install the most current dependencies.
 
-If either of the latter commands work fine, you can skip the rest of
-this section. See the remaining instructions for more detailed
+If either of the latter commands work fine, **you can skip the rest of
+this section**. See the remaining instructions for more detailed
 information.
 
 Experienced Python users

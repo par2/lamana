@@ -9,7 +9,7 @@
 
 .. parsed-literal::
 
-    Last Run: 2016-01-09 23:01:50
+    Last Run: 2016-01-13 22:47:18
     
 
 Contributions
@@ -50,12 +50,17 @@ As a Developer
 to LPEPs
 ~~~~~~~~
 
-If you are not interested in wriing code, but would like to propose and
+If you are not interested in writing code, but would like to propose an
 idea for enchancing LamAna, you can submit an LPEP for review.
 
 1. Please draft your proposals in a similar format to existing LPEPs as
    jupyter notebooks
 2. You can submit a pull request on GitHub.
+
+The LPEP `submission <https://www.python.org/dev/peps/pep-0001/#id29>`__
+and content
+`guidelines <https://www.python.org/dev/peps/pep-0001/#id32>`__ closely
+follow PEP 0001.
 
 to Package Code
 ~~~~~~~~~~~~~~~
@@ -71,7 +76,7 @@ following:
 6. submit your test, code and documentation as a pull requests on
    GitHub.
 
-The latter steps apply to enhancements Feature modules or core modules.
-Thanks for your contributions. You are helping to improve the LamAna
-community!
+The latter steps pertain to adding or enchancing Feature modules and
+improving core modules. Thanks for your contributions. You are helping
+to improve the LamAna community!
 
