@@ -80,7 +80,7 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
    :caption: Developer Documentation
 
    overview
-   coremodules
+   core
    testing
    resources
    contributions
