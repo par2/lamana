@@ -54,7 +54,7 @@ install:
   ##- python setup.py install
   # Note: `pip` used inplace of `conda`; reason uncertain (REF 003)
   # Uses conda's pip on Travis' pip
-  - pip install -r requirements.txt                          # pre-install pinned dependencies
+  - pip install -r dev_requirements.txt                          # pre-install pinned dependencies
   - pip install .                                            # install source and build/install wheels
   #- "pip install wheel"
   #- "python setup.py bdist_wheel"
@@ -73,6 +73,7 @@ branches:
   only:
     - master
     - develop
+    - feature/docs
 
 
 # References
