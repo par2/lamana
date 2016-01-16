@@ -13,7 +13,7 @@ The LamAna project is an extensible Python library for interactive laminate anal
 .. sidebar:: What's New in LamAna
 
    - Official documentation hosted on readthedocs
-   - ...
+   - Docs support Jupyter notebooks (see `nbsphinx <https://nbsphinx.readthedocs.org/en/latest/>`_)
 
 Using the LamAna project, you can **calculate**/**export**/**analyze** data and
 **author** custom models based on laminate theory.  Featured components can be used to plot stress distributions, analyze thickessness effects and predict failure trends.
