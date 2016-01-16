@@ -13,7 +13,7 @@ An extensible Python package for laminate analysis
     $ git clone -b <branch name> https://github.com/par2/lamana
     $ conda create -n <testenv name> pip nose numpy matplotlib pandas
     $ source activate <testenv name>       # exclude source for Windows
-    $ pip install -r requirements.txt
+    $ pip install -r dev_requirements.txt
     $ pip install .                        # within lamana directory
 
 *NOTE: installing requirements.txt uses "pinned" dependencies, which may upgrade/downgrade existing packages in your local environment.  See the [documentation](https://lamana.readthedocs.org) for more details and alternative installation methods (marked for future release).*
