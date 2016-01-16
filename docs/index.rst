@@ -80,7 +80,7 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
    :caption: Developer Documentation
 
    overview
-   core
+   package
    testing
    resources
    contributions
@@ -93,6 +93,7 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
    :caption: Appendix
 
    changelog
+   docs
    lpep
    contact
 
