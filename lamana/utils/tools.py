@@ -31,8 +31,8 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
     verbose : bool; False
         If True, print a list of Geometries.
 
-    Example
-    =======
+    Examples
+    ========
     >>> from lamana.utils import tools as ut
     >>> g = ('400-200-400S')
     >>> case = ut.laminator(geos=g, ps=[2])
@@ -192,7 +192,7 @@ def get_special_geometry(laminate):
     Used in controls.py.'''
     nplies = len(laminate['layer'].unique())
     geo = [str(int(thickness)) for thickness               # gets unique values
-        in laminate.groupby('type', sort=False)['t(um)'].first()]
+           in laminate.groupby('type', sort=False)['t(um)'].first()]
     #print(geo)
 
     # Amend list by plies by inserting 0 for missing layer type thicknesses; list required for .join
@@ -230,10 +230,10 @@ def get_frames(cases, name=None, nplies=None, ps=None):
 
     Examples
     ========
-    >>>cases_selected = ut.get_frames(cases, name='Trilayer', ps=[])
-    >>>LMs_list = list(cases)                              # capture generator contents
-    >>>LMs_list = [LM for LM in cases_selected]            # capture and exhaust generator
-    >>>for LMs in cases_selected:                          # exhaust generator; see contents
+    >>> cases_selected = ut.get_frames(cases, name='Trilayer', ps=[])
+    >>> LMs_list = list(cases)                              # capture generator contents
+    >>> LMs_list = [LM for LM in cases_selected]            # capture and exhaust generator
+    >>> for LMs in cases_selected:                          # exhaust generator; see contents
     ...    print(LMs)
     '''
     '''Add a verbose mode'''
