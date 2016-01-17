@@ -1,5 +1,3 @@
-.. _api:
-
 .. currentmodule:: lamana
 
 API Reference
@@ -11,11 +9,11 @@ Core Modules
 ------------
 
 .. autosummary::
-
-   input_
-   constructs
-   theories
-   output_
+   
+   input_ module
+   constructs module
+   theories module
+   output_ module
    
 Feature Modules
 ---------------
@@ -29,8 +27,8 @@ Auxillary Modules
 
 .. autosummary::
 
-   tools
-   reference
+   utils.tools
+   utils.references
    
    
 Library Models
@@ -38,4 +36,4 @@ Library Models
 
 .. autosummary::
 
-   Wilson_LT
+   models.Wilson_LT

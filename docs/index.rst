@@ -97,3 +97,10 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
    demo
    lpep
    contact
+
+ Indices and tables
+==================
+ 
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
