@@ -97,5 +97,3 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
    demo
    lpep
    contact
-
-
