@@ -88,7 +88,7 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
 .. _appendix-docs:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Appendix
 
    changelog
@@ -97,9 +97,3 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
    lpep
    contact
 
- Indices and tables
-==================
- 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
