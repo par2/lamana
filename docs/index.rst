@@ -79,7 +79,6 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
    :maxdepth: 2
    :caption: Developer Documentation
 
-   overview
    package
    testing
    resources
