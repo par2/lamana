@@ -18,21 +18,47 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
     This is useful for tests requiring laminates with different thicknesses,
     ps and geometries.
 
-    Variables
-    =========
-    geos : list; Default: None
-        Contains tuples of geometry strings
-    load_params : dict; Default: None
+    .. Note:: DEPRECATE LamAna 0.4.10
+            `lamanator` will be removed in LamAna 0.5 and replaced by
+            `lamana.distributions.Cases` because the latter is more efficient.
+
+    Parameters
+    ----------
+    geos : list
+        Contains tuples of geometry strings. Default is `None`.
+    load_params : dict
         Passed-in geometric parameters if specified; else default is used.
-    mat_props : dict; Default: None
+        Default is `None`.
+    mat_props : dict
         Passed-in materials parameters if specified; else default is used.
-    ps : list; ints
+        Default is `None`.
+    ps : list of int, optional
         p values to be looped over; this sets the number of rows per DataFrame.
-    verbose : bool; False
-        If True, print a list of Geometries.
+        Default is 5.
+    verbose : bool
+        If True, print a list of Geometries. Default is `False`.
+
+    See Also
+    --------
+    test_...sanity#() test functions
+    utils.tools.get_frames()
+
+    Notes
+    -----
+    The preferred use for this function is the following:
+
+    >>> for case in cases:
+    ...    print(case.LMs)
+        [<lamana LaminateModel object (400-200-400S)>,
+         <lamana LaminateModel object (400-200-800)>],
+        [<lamana LaminateModel object (400-200-400S)>,
+         <lamana LaminateModel object (400-200-800)>]
+
+    >>> (LM for case in cases for LM in case.LMs)
+        <generator object>
 
     Examples
-    ========
+    --------
     >>> from lamana.utils import tools as ut
     >>> g = ('400-200-400S')
     >>> case = ut.laminator(geos=g, ps=[2])
@@ -51,23 +77,6 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
     ...         print(LM.Geometry)
 
     >>> (LM for i, LMs in cases.items() for LM in LMs)     # generator processing
-
-    Preferred
-    =========
-    >>> for case in cases:
-    ...    print(case.LMs)
-        [<lamana LaminateModel object (400-200-400S)>,
-         <lamana LaminateModel object (400-200-800)>],
-        [<lamana LaminateModel object (400-200-400S)>,
-         <lamana LaminateModel object (400-200-800)>]
-
-    >>> (LM for case in cases for LM in case.LMs)
-        <generator object>
-
-    See Also
-    ========
-    test_...sanity#() test functions
-    utils.tools.get_frames()
 
     '''
     # Default
