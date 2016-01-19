@@ -1,6 +1,5 @@
 #------------------------------------------------------------------------------
-# Class-style model
-
+'''A sample class-style, custom model using a modified laminate theory.'''
 # Users can define classes for custom laminate theory models.
 # Additionally, users can define custom defaults.
 
@@ -29,7 +28,7 @@ class Model(BaseModel):
         '''Return updated DataFrame and FeatureInput Return None if exceptions raised.
 
         Parameters
-        =========
+        ==========
         df : DataFrame
             LaminateModel with IDs and Dimensional Variables.
         FeatureInut : dict

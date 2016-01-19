@@ -1,11 +1,11 @@
 # -----------------------------------------------------------------------------
-# An interface between constructs and models modules
+'''A interface between constructs and models modules.'''
 # BaseModel() : A super class for user-customized models.
 # flake8 constructs.py --ignore=E265,E501,N802,H806
 
 import importlib
 
-'''Replace with interactive way to import models'''
+# TODO: Replace with interactive way to import models
 from lamana.models import *
 
 

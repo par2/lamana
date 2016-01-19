@@ -1,8 +1,8 @@
 # -----------------------------------------------------------------------------
-# Classes and functions for handling user inputs.
+'''Classes and functions for handling user inputs.'''
 # Geometry(): parse user input geometry strings to a tuple of floats (and lists/str)
 # BaseDefaults(): library of general geometry defaults; subclassed by the user.
-# flake8 input_.py --ignore=E265,E501,F841,N802,N803,N806
+# flake8 input_.py --ignore=E265, E501, N803, N806, N802, N813, E133
 
 import itertools as it
 import collections as ct

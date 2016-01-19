@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Objects for handling plotting and exported data
+'''Classes and functions for handling visualizations, plots and exporting data.'''
 # _distribplot() : independent plots of single and multiple  geometries
 # _multiplot(): aggregates severa; distribplots into a grid of subplots
 # flake8 output_.py --ignore E265,E501,E701,F841,N802,N803,N806

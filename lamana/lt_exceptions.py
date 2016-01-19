@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# General classes for a custom exceptions
+'''General classes for a custom exceptions.'''
 
 
 class Error(Exception):

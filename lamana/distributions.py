@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# A Feature Module comprising classes and functions involving stress distrubtions.
+'''A Feature Module of classes and functions related to stress distributions.'''
 # Case() : A collection of LaminateModel objects
 # flake8 distributions.py --ignore E265,E501,N802,N806
 

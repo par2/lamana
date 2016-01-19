@@ -1,8 +1,8 @@
 # -----------------------------------------------------------------------------
-# A module that builds core objects, i.e. stacks and laminates
+'''A module that builds core objects, such as stacks and laminates.'''
 # Stack() : an dict of the order laminate layers.
 # Laminate() : pandas objects including laminate dimensions and calculations
-# flake8 constructs.py --ignore=E265,E501,N802,H806
+
 
 import traceback
 import itertools as it
@@ -445,7 +445,7 @@ class Laminate(Stack):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             # Auto check attrs if assigned to DataFrames/Series, then add to list
-            blacklisted  = [attr for attr in self.__dict__ if
+            blacklisted = [attr for attr in self.__dict__ if
                 isinstance(getattr(self, attr), (pd.DataFrame, pd.Series))]
 
             # Check DataFrames and Series
@@ -873,7 +873,7 @@ class Laminate(Stack):
         ##'''cumsum is not working with groupby in pandas 0.17.1'''
         ##internal_sums = np.cumsum(
         ##    trunc.groupby('layer')['intervals'])               # delta; apply sigma from algo
-        internal_sums = trunc.groupby('layer')['intervals'].cumsum() # 0.17.2 work around; backwards compat.
+        internal_sums = trunc.groupby('layer')['intervals'].cumsum()  # 0.17.2 work around; backwards compat.
         #print(clipped)
         #print(internal_sums)
 

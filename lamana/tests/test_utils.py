@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Tests for constitency for utils
+'''Test for consistency of utils.'''
 
 import nose.tools as nt
 
@@ -9,8 +9,8 @@ import lamana as la
 from lamana.models import Wilson_LT as wlt
 from lamana.utils import tools as ut
 
-##bdft = BaseDefaults()                              # from base class    
-dft = wlt.Defaults()                               # from inherited class in models; user  
+##bdft = BaseDefaults()                              # from base class
+dft = wlt.Defaults()                               # from inherited class in models; user
 
 
 # PARAMETERS ------------------------------------------------------------------
@@ -18,12 +18,12 @@ dft = wlt.Defaults()                               # from inherited class in mod
 load_params = {'R' : 12e-3,                        # specimen radius
               'a' : 7.5e-3,                        # support ring radius
               'p' : 5,                             # points/layer
-              'P_a' : 1,                           # applied load 
+              'P_a' : 1,                           # applied load
               'r' : 2e-4,                          # radial distance from center loading
               }
 
 mat_props = {'HA' : [5.2e10, 0.25],
-             'PSu' : [2.7e9, 0.33],            
+             'PSu' : [2.7e9, 0.33],
              }
 
 # TESTS -----------------------------------------------------------------------
@@ -31,7 +31,7 @@ mat_props = {'HA' : [5.2e10, 0.25],
 # Defaults --------------------------------------------------------------------
 # Minor checks for sub-classes
 def test_Defaults_load_params1():
-    '''Confirm defaults geometric parameters for Wilson_LT are constant.''' 
+    '''Confirm defaults geometric parameters for Wilson_LT are constant.'''
     actual = dft.load_params
     expected = load_params
     nt.assert_equal(actual, expected)
@@ -41,7 +41,7 @@ def test_Defaultsmat_props1():
     actual = dft.mat_props
     expected = {'Modulus': {'HA': 5.2e10, 'PSu': 2.7e9},
                 'Poissons': {'HA': 0.25, 'PSu': 0.33}}
-    nt.assert_equal(actual, expected)    
+    nt.assert_equal(actual, expected)
 
 # Laminator -------------------------------------------------------------------
 def test_laminator_consistency1():
@@ -49,7 +49,7 @@ def test_laminator_consistency1():
     case = ut.laminator(geos=dft.geos_all, ps=[5])
     for case_ in case.values():
         case1 = case_
-    case2 = la.distributions.Case(load_params, mat_props) 
+    case2 = la.distributions.Case(load_params, mat_props)
     case2.apply(dft.geos_all)
     #print(case1)
     #print(case2)

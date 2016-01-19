@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Handy tools for global use
+'''Handy tools for global use.'''
 # flake8 utils/tools.py --ignore=E265,E501,F841,N802,N803
 
 import os
@@ -66,7 +66,8 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
 
     See Also
     ========
-    test_...sanity#() and utils.tools.get_frames()
+    test_...sanity#() test functions
+    utils.tools.get_frames()
 
     '''
     # Default
