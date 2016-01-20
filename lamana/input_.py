@@ -459,8 +459,7 @@ class BaseDefaults(object):
         '''Return an updated dict with keys of specified groups.
 
         This method is useful for automating groupings; new ply keys or
-        values can be added with relative ease to the dict. This method should
-        group them easily.
+        values can be added to the dict with relative ease.
 
         Requires
         ========
@@ -476,7 +475,7 @@ class BaseDefaults(object):
         d = ct.defaultdict(list)
         dict_ = dict_default.copy()
         # Sort dict naturally to help order the list values
-        #for k,v in sorted(dict_.items(), key=natural_sort):
+        ##for k,v in sorted(dict_.items(), key=natural_sort):
         for k, v in sorted(dict_.items(), key=ut.natural_sort):
             # Prepare k, v
             num = cls._extract_number(k)

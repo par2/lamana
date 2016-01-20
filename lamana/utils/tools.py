@@ -11,37 +11,33 @@ import pandas.util.testing as pdt
 import lamana as la
 
 
-## DEPRECATE
 def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False):
     '''Return a dict of Cases; quickly build and encase a suite of Case objects.
 
     This is useful for tests requiring laminates with different thicknesses,
     ps and geometries.
 
-    .. Note:: DEPRECATE LamAna 0.4.10
+    .. note:: DEPRECATE LamAna 0.4.10
             `lamanator` will be removed in LamAna 0.5 and replaced by
             `lamana.distributions.Cases` because the latter is more efficient.
 
     Parameters
     ----------
-    geos : list
-        Contains tuples of geometry strings. Default is `None`.
-    load_params : dict
+    geos : list; default `None`
+        Contains tuples of geometry strings.
+    load_params : dict; default `None`
         Passed-in geometric parameters if specified; else default is used.
-        Default is `None`.
-    mat_props : dict
+    mat_props : dict; default `None`
         Passed-in materials parameters if specified; else default is used.
-        Default is `None`.
-    ps : list of int, optional
+    ps : list of int, optional; default 5
         p values to be looped over; this sets the number of rows per DataFrame.
-        Default is 5.
-    verbose : bool
-        If True, print a list of Geometries. Default is `False`.
+    verbose : bool; default `False`
+        If True, print a list of Geometries.
 
     See Also
     --------
-    test_...sanity#() test functions
-    utils.tools.get_frames()
+    test_sanity#() : set of test functions that run sanity checks
+    utils.tools.get_frames() : utility function to parse DataFrames
 
     Notes
     -----
@@ -123,14 +119,12 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
 
 
 # Helpers
-###DEPRECATE
 def get_multi_geometry(laminate):
     '''Return geometry string parsed from a multi-plied laminate DataFrame.
 
     Uses pandas GroupBy to extract indices with unique values
     in middle and outer.  Splits the inner_i list by p.  Used in controls.py.
-
-    UPDATE: refactor for even multi-plies 0.4.3d4
+    Refactored for even multi-plies in 0.4.3d4.
     '''
     def chunks(lst, n):
         '''Split up a list into n-sized smaller lists; (REF 018)'''
@@ -142,7 +136,6 @@ def get_multi_geometry(laminate):
         return [str(int(i)) for i in lst]
 
     #print(laminate)
-
     group = laminate.groupby('type')
     nplies = len(laminate['layer'].unique())
     if nplies < 5:
@@ -166,8 +159,8 @@ def get_multi_geometry(laminate):
     out_idx = outer_group.index.tolist()
 
     # Make lists of inner_i indices for a single stress side_
-    '''Would like to make this inner_i splitting more robust'''
-    '''Better for it to auto differentiate subsets within inner_i'''
+    # TODO: Would like to make this inner_i splitting more robust
+    # TODO: better for it to auto differentiate subsets within inner_i
     in_lst = []
     for inner_i_idx in chunks(in_idx, p):
         #print(inner_i_idx)
@@ -196,10 +189,11 @@ def get_multi_geometry(laminate):
     return geometry
 
 
-###DEPRECATE
 def get_special_geometry(laminate):
     '''Return geometry string parsed from a special-plied (<5) laminate DataFrame.
-    Used in controls.py.'''
+    Used in controls.py.
+
+    '''
     nplies = len(laminate['layer'].unique())
     geo = [str(int(thickness)) for thickness               # gets unique values
            in laminate.groupby('type', sort=False)['t(um)'].first()]
@@ -220,7 +214,7 @@ def get_special_geometry(laminate):
     elif nplies == 4:
         ply = '4ply'
         geo.append('0')
-        '''There is some pythonic way to do this by Raymond Hettinger; but same thing.'''
+        # TODO: use join
         geo[1] = '[' + geo[1] + ']'                        # redo inner in General Convention notation
     else:
         raise Exception('Number of plies > 4.  Use get_multi_geometry() instead.')
@@ -230,23 +224,43 @@ def get_special_geometry(laminate):
     geometry = '-'.join(geo)
     return geometry
 
-'''Change to select_frames()...'''
 
-
-###DEPRECATE
+# TODO: Change to `select_frames`
 def get_frames(cases, name=None, nplies=None, ps=None):
     '''Yield and print a subset of case DataFrames given a keyword.
-    Else, prints all DataFrames for all cases.
+    Else, print all DataFrames for all cases.
+
+    Parameters
+    ----------
+    cases : list of DataFrames
+        Contains case objects.
+    name : str
+        Common name.
+    nplies : int
+        Number of plies.
+    ps : int
+        Number of points per layer.
 
     Examples
-    ========
+    --------
     >>> cases_selected = ut.get_frames(cases, name='Trilayer', ps=[])
     >>> LMs_list = list(cases)                              # capture generator contents
     >>> LMs_list = [LM for LM in cases_selected]            # capture and exhaust generator
     >>> for LMs in cases_selected:                          # exhaust generator; see contents
     ...    print(LMs)
+
+    See Also
+    --------
+    lamana.distributions.Cases.select() : canonical way to select df subsets.
+
+    Yields
+    ------
+    DataFrame
+        Extracted data from a sequence of case objects.
+
     '''
-    '''Add a verbose mode'''
+    # TODO: Add a verbose mode
+
     # Default
     if ps is None:
         ps = []
@@ -281,8 +295,27 @@ def get_frames(cases, name=None, nplies=None, ps=None):
 
 
 def write_csv(LM, path=None, verbose=True, overwrite=False):
-    '''Convert DataFrames to csv files and write them to a specified
-    directory.'''
+    '''Convert DataFrame to csv files and write them to a specified directory.
+
+    Parameters
+    ----------
+    LM : DataFrame
+        LaminateModel containing data calculations.
+    path : str, optional; default `./lamana/output` directory
+        Directory path to store resulting csv files.
+    verbose : bool; default True
+        Print additional information during the writing process.
+    overwrite : bool; default False
+        Save over files with the same name.  Prevents file incrementation
+        and excess files after cyclic calls.
+
+    Returns
+    -------
+    csv
+        Writes csv file of data contained in LM (a DataFrame) to a path.
+
+
+    '''
     # Parse Laminate Properties
     nplies = LM.nplies
     p = LM.p
@@ -292,6 +325,7 @@ def write_csv(LM, path=None, verbose=True, overwrite=False):
 
     # Default csv to output directory
     if path is None:
+        # TODO: write file paths pythonically; use abspath()
         path = os.getcwd()                                 # use for the test in the correct path
         ##path = path + r'\lamana\tests\controls_LT'         # for Main Script. Comment out in tests
         path = ''.join([path, r'\lamana\output'])
@@ -318,7 +352,20 @@ def write_csv(LM, path=None, verbose=True, overwrite=False):
 
 
 def compare_set(it, others, how='union', test=None):
-    '''Compile set operators from the standard library.'''
+    '''Return a specific set of unique values based on `how` it is evaluated.
+
+    Wraps set operators from the standard library.  Used to check values in demo.
+
+    Parameters
+    ----------
+    it, others : iterable
+        A container of unique or non-unique values.
+    how : {'union', 'intersection', 'difference', 'symmetric_difference'}; default 'union'
+        Determine which type of set to use.  Applies set theory.
+    test : {'issubset', 'issuperset', 'isdisjoint'}; default `None`
+        Test the type of subset.
+
+    '''
     # Defaults
     if isinstance(it, int):
         it = [it]
@@ -354,7 +401,14 @@ def compare_set(it, others, how='union', test=None):
 
 
 def ndframe_equal(ndf1, ndf2):
-    '''Returns True if DataFrames (or Series) are equal; else False.'''
+    '''Return True if DataFrames (or Series) are equal; else False.
+
+    Parameters
+    ----------
+    ndf1, ndf2 : Series or DataFrame
+        Two groups of data in pandas data structures.
+
+    '''
     try:
         if isinstance(ndf1, pd.DataFrame) and isinstance(ndf2, pd.DataFrame):
             pdt.assert_frame_equal(ndf1, ndf2)
@@ -368,7 +422,16 @@ def ndframe_equal(ndf1, ndf2):
 
 
 def is_matched(pattern, string):
-    '''Return True if container ends have equal count; matched.'''
+    '''Return True if container ends have equal count; matched.
+
+    Parameters
+    ----------
+    pattern : str
+        Regular expression pattern.
+    string : str
+        String to which the pattern in search.
+
+    '''
     search = re.findall(pattern, string)                   # quick, non-iterative extraction
     if '[' or ']' in search:
         bra = search.count('[')
@@ -382,8 +445,16 @@ def is_matched(pattern, string):
 
 # Cited Code ------------------------------------------------------------------
 def set_column_sequence(df, seq):
-    '''Takes a DataFrame and a subsequence of its columns, then returns
-    a DataFrame with columns sorted by seq. (REF 007).'''
+    '''Return a DataFrame with columns sorted by a given sequence (REF 007).
+
+    Parameters
+    ----------
+    df : DataFrame
+        One with unsorted columns.
+    seq : list-like
+        List of column names in desired order.
+
+    '''
     cols = seq[:]                                          # copy so we don't mutate seq
     for x in df.columns:
         if x not in cols:
@@ -391,8 +462,33 @@ def set_column_sequence(df, seq):
     return df[cols]
 
 
+def assertSeriesEqual(s1, s2, **kwds):
+    '''Return True if two Series are equal.
+
+    Parameters
+    ----------
+    s1, s2 : DataFrame
+        Compare two objects using pandas testing tools.
+    **kwds : dict-like
+        Keywords for `pandas.util.testing.assert_series_equal()`.
+
+    '''
+    from pandas.util.testing import assert_series_equal
+    return assert_series_equal(s1, s2, **kwds)
+
+
+# TODO: Determine what `check_less_precise` needs.  Post-theories tests use this.
 def assertFrameEqual(df1, df2, **kwds):
-    '''Assert two DataFrames are equal, ignoring column order; (REF 014).'''
+    '''Return True if two DataFrames are equal, ignoring order of columns (REF 014).
+
+    Parameters
+    ----------
+    df1, df2 : DataFrame
+        Compare two objects using pandas testing tools.
+    **kwds : dict-like
+        Keywords for `pandas.util.testing.assert_frame_equal()`.
+
+    '''
     from pandas.util.testing import assert_frame_equal
     # `sort` is deprecated; works in pandas 0.16.2; last worked in lamana 0.4.9
     # replaced `sort` with `sort_index` for pandas 0.17.1; backwards compatible
@@ -401,17 +497,10 @@ def assertFrameEqual(df1, df2, **kwds):
     ##return assert_frame_equal(df1.sort(axis=1), df2.sort(axis=1),
     ##                          check_names=True, **kwds)
 
-'''Determine what check_less_precise requires.  Some post_theories test use this.'''
 
-
-def assertSeriesEqual(s1, s2, **kwds):
-    '''Assert two Series are equal.'''
-    from pandas.util.testing import assert_series_equal
-    return assert_series_equal(s1, s2, **kwds)
-
-
+# TODO: Remove unused "my_file" and test
 def read_csv_dir(path, *args, **kwargs):
-    '''Return all csv files in a directory; (REF 013).'''
+    '''Yield all csv files in a directory (REF 013).'''
     # Read all files in path
     for dir_entry in os.listdir(path):
         dir_entry_path = os.path.join(path, dir_entry)
@@ -422,12 +511,49 @@ def read_csv_dir(path, *args, **kwargs):
                 yield file
 
 
+# TODO: Rename to int extractor.  sorting happen else where with an iterator and sorted().
 def natural_sort(data):
-    '''Sort numbers natural as humans would read them (REF 027); assumes sorting a dict.'''
+    '''Return list of naturally sorted, numeric strings, as humans read them (REF 027).
+
+    Parameters
+    ----------
+    data : string-like
+        String, tuple or dict key containing a string, e.g. '14-ply', 'foo-ply',
+        ('1-ply', None).  Numeric strings are used to sort.
+
+    Notes
+    -----
+    This function extracts string information from `data` w/reguar expressions
+    and parses numbers, if found.  These numeric strings are converted to
+    integers.  The result for each `string_` is a three part list of str and int,
+     e.g. ['', 1, '-ply'].  The sorted() function is smart enough to sort by
+     numerical order.  Use this function in an iterator.
+
+    Examples
+    --------
+    # Dicts are not normally sorted; we could therefore invoke `sorted`
+    # However, sorted() does not order numberic strings like humans.
+    >>> data = {'3-ply': None, '1-ply': None, '10-ply': None, '2-ply': None}
+    >>> data_sorted = sorted(data)
+    >>> data_sorted
+    ['1-ply', '10-ply', '2-ply', '3-ply']                  # not naturally sorted
+
+    # We thus use `natural_sort` as in combination with `sorted()`.
+    # Now we can make a naturally sorted list of dict keys.
+    >>> [k for k, v in sorted(data.items(), key=natural_sort)]
+    ['1-ply', '2-ply', '3-ply', '10-ply']
+    >>> [k for k in sorted(data, key=natural_sort)]        # iter dict.keys()
+    ['1-ply', '2-ply', '3-ply', '10-ply']
+
+    '''
     if isinstance(data, str):
         string_ = data
     # Extract string from tuple of a sorted dict
     elif isinstance(data, tuple):
         string_ = data[0]
     #print(string_)
+    # TODO:add if isinstance(data, dict): string_ = data.keys()
+    # to less preparsing of dict
+
+    #TODO: complete.  doesn't really do any sorting  just sets up the iterator.  Redo.
     return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
