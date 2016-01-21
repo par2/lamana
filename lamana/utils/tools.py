@@ -512,6 +512,7 @@ def read_csv_dir(path, *args, **kwargs):
 
 
 # TODO: Rename to int extractor.  sorting happen else where with an iterator and sorted().
+# TODO: Refine explanation, especially the return.  Why is it a 3-item list.
 def natural_sort(data):
     '''Return list of naturally sorted, numeric strings, as humans read them (REF 027).
 
@@ -525,21 +526,21 @@ def natural_sort(data):
     -----
     This function extracts string information from `data` w/reguar expressions
     and parses numbers, if found.  These numeric strings are converted to
-    integers.  The result for each `string_` is a three part list of str and int,
-     e.g. ['', 1, '-ply'].  The sorted() function is smart enough to sort by
-     numerical order.  Use this function in an iterator.
+    integers.  The result for each `string_` is a three part list of str and int
+    such as ['', 1, '-ply'].  The `sorted()` function is smart enough to sort by
+    numerical order.  Use this function in an iterator.
 
     Examples
     --------
-    # Dicts are not normally sorted; we could therefore invoke `sorted`
-    # However, sorted() does not order numberic strings like humans.
+    >>> # Dicts are not normally sorted; we could therefore invoke `sorted`
+    >>> # However, sorted() does not order numberic strings like humans.
     >>> data = {'3-ply': None, '1-ply': None, '10-ply': None, '2-ply': None}
     >>> data_sorted = sorted(data)
     >>> data_sorted
     ['1-ply', '10-ply', '2-ply', '3-ply']                  # not naturally sorted
 
-    # We thus use `natural_sort` as in combination with `sorted()`.
-    # Now we can make a naturally sorted list of dict keys.
+    >>> # We thus use `natural_sort` as in combination with `sorted()`.
+    >>> # Now we can make a naturally sorted list of dict keys.
     >>> [k for k, v in sorted(data.items(), key=natural_sort)]
     ['1-ply', '2-ply', '3-ply', '10-ply']
     >>> [k for k in sorted(data, key=natural_sort)]        # iter dict.keys()
