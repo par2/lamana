@@ -9,35 +9,34 @@ Core Modules
 ------------
 
 .. autosummary::
-   :toctree: generated/
-   
-   input_ module
-   constructs module
-   theories module
-   output_ module
-   
+    :toctree: generated/
+
+    input_
+    constructs
+    theories
+    output_
+
 Feature Modules
 ---------------
 
 .. autosummary::
-   :toctree: generated/
+    :toctree: generated/
 
-   distributions
-   
-Auxillary Modules
+    distributions
+
+Auxiliary Modules
 -----------------
 
 .. autosummary::
-   :toctree: generated/
+    :toctree: generated/
 
-   utils.tools
-   utils.references
-   
-   
-Library Models
---------------
+    utils.tools
+    utils.references
+      
+Models
+------
 
 .. autosummary::
-   :toctree: generated/
+    :toctree: generated/
 
-   models.Wilson_LT
+    models.Wilson_LT
