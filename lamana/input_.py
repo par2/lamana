@@ -356,8 +356,8 @@ class BaseDefaults(object):
 
     Defaults are maintained in two dicts:
 
-    - geo_inputs : A dict of standard geometry strings and special groups.
-    - Geo_objects : A dict of converted geo_inputs into Geometry objects.
+    - `geo_inputs` : A dict of standard geometry strings and special groups.
+    - `Geo_objects` : A dict of converted geo_inputs into Geometry objects.
 
     Methods
     -------
@@ -366,7 +366,7 @@ class BaseDefaults(object):
         Return a dict of the basic FeatureInput object; subclass in a model.
     get_materials(mat_props)
         Return a list of materials in order from a mat_props dict or DataFrame.
-    generate selection=None, geo_inputs=False)
+    generate(selection=None, geo_inputs=False)
         Yield a generator of selected geometries.
 
     Notes
@@ -485,7 +485,7 @@ class BaseDefaults(object):
 
         See Also
         --------
-        `utils.tools.natural_sort` : order dict.items() in loops; needed for tests
+        utils.tools.natural_sort : order dict.items() in loops; needed for tests
 
         Notes
         -----
@@ -680,8 +680,8 @@ class BaseDefaults(object):
 
         See Also
         --------
-        `la.distributions.Case.apply()` : main creator of FeatureInput objects
-        `la.models.Wilson_LT()` : used to build default instance FeatureInput
+        la.distributions.Case.apply() : main creator of FeatureInput objects
+        la.models.Wilson_LT() : used to build default instance FeatureInput
 
         '''
         mat_props_conv = self._convert_material_parameters(mat_props)
@@ -713,7 +713,7 @@ class BaseDefaults(object):
 
         See Also
         --------
-        `utils.tools.natural_sort` : order dict.items() in loops; needed for tests
+        utils.tools.natural_sort : order dict.items() in loops; needed for tests
 
         Examples
         --------

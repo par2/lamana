@@ -45,13 +45,13 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
 
     >>> for case in cases:
     ...    print(case.LMs)
-        [<lamana LaminateModel object (400-200-400S)>,
-         <lamana LaminateModel object (400-200-800)>],
-        [<lamana LaminateModel object (400-200-400S)>,
-         <lamana LaminateModel object (400-200-800)>]
+    [<lamana LaminateModel object (400-200-400S)>,
+     <lamana LaminateModel object (400-200-800)>],
+    [<lamana LaminateModel object (400-200-400S)>,
+     <lamana LaminateModel object (400-200-800)>]
 
     >>> (LM for case in cases for LM in case.LMs)
-        <generator object>
+    <generator object>
 
     Examples
     --------
@@ -60,13 +60,13 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
     >>> case = ut.laminator(geos=g, ps=[2])
     >>> LM = case[0]
     >>> LM
-        <lamana LaminateModel object (400-200-400S)>
+    <lamana LaminateModel object (400-200-400S)>
 
     >>> g = ['400-200-400S', '400-200-800']
     >>> cases = ut.laminator(geos=g, p=[2,3])
     >>> cases
-        {0: <lamana.distributions.Case p=2>,
-         1: <lamana.distributions.Case p=3>,}              # keys by p
+    {0: <lamana.distributions.Case p=2>,
+     1: <lamana.distributions.Case p=3>,}                  # keys by p
 
     >>> for i, case in cases.items():                      # process cases
     ...     for LM in case.LMs:
