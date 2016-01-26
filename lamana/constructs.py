@@ -376,6 +376,12 @@ class Laminate(Stack):
     has_neutaxis : bool
         Return True if a row is found labeled 'neut. axis'.
 
+    Raises
+    ------
+    AttributeError
+        If custom attributes could not be set to the `LaminateModel`.
+
+
     Example
     =======
     >>> from lamana.models import Wilson_LT as wlt
@@ -842,6 +848,12 @@ class Laminate(Stack):
             populated.
         column: str
             Column to assign internals.
+
+        Raises
+        ------
+        ZeroDivisionError
+            If p = 1, internals cannot be made.
+
         '''
         df = df_mod.copy()
 

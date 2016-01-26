@@ -24,11 +24,12 @@ class Model(BaseModel):
         self.FeatureInput = None
         self.LaminateModel = None
 
+    # TODO: eventually abstract into BaseModel and deprecate direct coding
     def _use_model_(self, Laminate, adjusted_z=False):
         '''Return updated DataFrame and FeatureInput Return None if exceptions raised.
 
         Parameters
-        ==========
+        ----------
         df : DataFrame
             LaminateModel with IDs and Dimensional Variables.
         FeatureInut : dict
@@ -37,16 +38,30 @@ class Model(BaseModel):
         adjusted_z: bool; default=False
             If True, uses z(m)* values instead; different assumption for internal calc.
 
+        Raises
+        ------
+        ZeroDivisionError
+            If zero `r` or `a` in the log term are zero.
+        ValueError
+            If negative numbers are in the log term or the support radius exceeds
+            the sample radius.
+
+        Returns
+        -------
+        tuple
+            The updated calculations and parameters stored in a tuple
+            `(LaminateModel, FeatureInput)``.
+
         '''
         self.Laminate = Laminate
         df = Laminate.LFrame.copy()
         FeatureInput = Laminate.FeatureInput
 
-        # Dev-defined Exception Handling
+        # Author-defined Exception Handling
         if (FeatureInput['Parameters']['r'] == 0):
-            raise ZeroDivisionError('r=0 is invalid for log in the moment eqn.')
+            raise ZeroDivisionError('r=0 is invalid for the log term in the moment eqn.')
         elif (FeatureInput['Parameters']['a'] == 0):
-            raise ZeroDivisionError('a=0 is invalid for log in the moment eqn.')
+            raise ZeroDivisionError('a=0 is invalid for the log term in the moment eqn.')
         elif (FeatureInput['Parameters']['r'] < 0) | (FeatureInput['Parameters']['a'] < 0):
             raise ValueError('Negative numbers are invalid for the log term '
                              'in moment eqn.')
@@ -166,11 +181,12 @@ class Defaults(BaseDefaults):
     Dimensional defaults are inherited from utils.BaseDefaults().
     Material-specific parameters are defined here by he user.
 
-    - Default geometric and materials parameters
-    - Default FeatureInputs
+    - Default geometric parameters
+    - Default material properties
+    - Default FeatureInput
 
     Examples
-    ========
+    --------
     >>> dft = Defaults()
     >>> dft.load_params
     {'R' : 12e-3, 'a' : 7.5e-3, 'p' : 1, 'P_a' : 1, 'r' : 2e-4,}
@@ -184,8 +200,12 @@ class Defaults(BaseDefaults):
       'Geometric' : {'R' : 12e-3, 'a' : 7.5e-3, 'p' : 1, 'P_a' : 1, 'r' : 2e-4,},
       'Materials' : {'HA' : [5.2e10, 0.25], 'PSu' : [2.7e9, 0.33],},
       'Custom' : None,
-      'Model' : Wilson_LT,
-     }
+      'Model' : Wilson_LT}
+
+    Returns
+    -------
+    class
+        Updated attributes inherited from  the `BaseDefaults` class.
 
     '''
     def __init__(self):

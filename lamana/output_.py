@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
 '''Classes and functions for handling visualizations, plots and exporting data. BETA'''
-# _distribplot() : independent plots of single and multiple  geometries
+# _distribplot(): independent plots of single and multiple  geometries
 # _multiplot(): aggregates severa; distribplots into a grid of subplots
 # flake8 output_.py --ignore E265,E501,E701,F841,N802,N803,N806
 
@@ -10,9 +10,9 @@ import itertools as it
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-# NOTE: Why docstrings not showing?
-# PLOT ------------------------------------------------------------------------
-# colorblind from seaborn; grayscale is web-safe
+
+
+# colorblind palette from seaborn; grayscale is web-safe
 LAMANA_PALETTES = dict(
     #bold=['#FC0D00','#FC7700','#018C99','#00C318','#6A07A9','#009797','#CF0069'],
     bold=['#EB0C00','#FC7700','#018C99','#00C318','#6A07A9','#009797','#CF0069'],
@@ -22,14 +22,13 @@ LAMANA_PALETTES = dict(
 )
 
 
-def _cycle_depth(iterable, n=None):
-    '''Return a cycler that iterates n items into an iterable.'''
-    if n is None:
-        n = len(iterable)
-    return it.cycle(it.islice(iterable, n))
+# =============================================================================
+# PLOTS -----------------------------------------------------------------------
+# =============================================================================
+# Process plotting figures of single and multiple subplots
+# TODO: Abstract to Distribplot and PanelPlot classes
 
 
-# TODO: Abstract to classes Distribplot and PanelPlot.
 def _distribplot(
     LMs, x=None, y=None, normalized=True, halfplot=None, extrema=True,
     legend_on=True, colorblind=False, grayscale=False, annotate=False, ax=None,
@@ -86,6 +85,16 @@ def _distribplot(
         - legend: |loc=1|fontsize='large'|
         - sublabel: default is lower case alphabet
                    |x=0.12|y=0.94|s=''|fontsize=20|weight='bold'|ha='center'|va='center'|
+
+    Returns
+    -------
+    matplotlib axes
+        A plot of k or d (height) versus stress.
+
+    Raises
+    ------
+        Exception
+            If no stress column is found.
 
     '''
 
@@ -197,6 +206,7 @@ def _distribplot(
             #print ('stress_cols ', stress_cols)
             #print(x)
         except KeyError:
+            # TODO: make a custom exception
             raise Exception("Stress column '{}' not found. "
                             'Specify y column in plot() method.'.format(x))
 
@@ -330,6 +340,11 @@ def _multiplot(
     labels_kw : dict
         One stop for custom labels and annotated text passed in from user.
         axestitle, sublabels, legendtitles are lists of labels for each caselet.
+
+    Returns
+    -------
+    matplotlib figure
+        A figure of subplots.
 
     '''
     # DEFAULTS ----------------------------------------------------------------

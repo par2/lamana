@@ -19,46 +19,54 @@ from lamana.utils import tools as ut
 
 
 class Geometry(object):
-    '''Parse input geometry string into floats; return a namedtuple (GeometryTuple).
+    '''Parse input geometry string into floats.
 
-    When a single (or a list of) string(s) is passed to
-    distributions.Case.apply() method, this class parses those strings into
-    (outer, [inner], middle, 'S?') format. Formatted in General Convention,
-    a converted namedtuple object is returned.
+    Extended Summary
+    ----------------
+    When a single (or a list of) geometry string(s) is passed to the
+    `lamana.distributions.Case.apply()` method, this class parses those strings
+    into (outer, [inner], middle, 'S?') format.
 
-    Objects
-    =======
-    (400.0, [200.0], 800.0)                                # multi-ply
-    (400.0, [200.0], 800.0, 'S')                           # multi-ply, symmetric
-    (400.0, [100.0, 100.0], 800.0)                         # multi-ply, [inner_i]
+    Here are examples of conventions used to write geometry strings:
 
-    Uses
-    ====
-    General: outer-[inner_i]-middle
-    Short-hand: outer-inner-middle
+    - General: outer-[inner_i]-middle
+    - Short-hand: outer-inner-middle
 
-    Variables
-    =========
+    Formatted in General Convention, a converted namedtuple object is returned.
+    Examples of GeometryTuples:
+
+    - (400.0, [200.0], 800.0)                              # multi-ply
+    - (400.0, [200.0], 800.0, 'S')                         # multi-ply, symmetric
+    - (400.0, [100.0, 100.0], 800.0)                       # multi-ply, [inner_i]
+
+    Parameters
+    ----------
     geo_input : list or tupled list
         Geometry thicknesses of a laminate.
 
-    Properties
-    ==========
-    total : float
-        Calculate total thickness for laminates using any convention.
-    total_middle : list; float
-        Calculate total thickness for middle lamina using any convention.
-    total_inner : list; float
-        Calculate total thickness for inner lamina using any convention.
-    total_inner_i : list; float
-        Calculate total thickness for each inner_i lamina.
-    total_outer : list; float
-        Calculate total thickness for outer lamina using any convention.
-    is_symmetric : bool
-        Return True if 'S' convention is used.
+    Attributes
+    ----------
+    total
+    total_middle
+    total_inner
+    total_inner_i
+    total_outer
+    is_symmetric
+    namedtuple : namedtuple
+        A GeometryTuple in General Convention, e.g. (400.0, [200.0], 800.0, 'S').
+    geometry : list
+        The converted and parsed geometry string.
+    middle : float
+        Middle layer thickness.
+    inner : list of floats
+        Inner layer thicknesses in micrometers.
+    outer : float
+        Outer layer thickness.
+    string : str
+        The input geometry string converted to General Convention format.
 
     Examples
-    ========
+    --------
     >>> g1 = ('0-0-2000')                                  # Monolith
     >>> g2 = ('1000-0-0')                                  # Bilayer
     >>> g3 = ('600-0-800')                                 # Trilayer
@@ -70,20 +78,13 @@ class Geometry(object):
     >>> la.input_.Geometry(g5)
     Geometry object (400.0-[200.0]-800.0)
 
-
-    Preferred
-    =========
-    >>> G1 = la.input_.Geometry('400-200-800')
-    >>> G1
-    GeometryTuple(outer=400.0, inner=[200.0], middle=800.0)
-    >>> G1.inner
-    [200.0]
     '''
 
     def __init__(self, geo_input):
         '''Ideally a want to call Geometry and get namedtuple auto; return self?'''
 
-        '''Consolidate into namedtuple or self.'''
+        # TODO: Consolidate into namedtuple or self
+        # TODO: rename geometrytuple
         self.namedtuple = self._parse_geometry(geo_input)  # a namedtuple; see collections lib
         self.geometry = self._parse_geometry(geo_input)    # a namedtuple; see collections lib
         self.middle = self.geometry.middle                 # attributes from namedtuple; symmetric sensitive
@@ -131,34 +132,30 @@ class Geometry(object):
     def _parse_geometry(self, geo_input, hash_=False):
         '''Return a namedtuple of outer-inner-middle geometry values.
 
+        Extended Summary
+        ----------------
         Per General Convention, a GeometryTuple has floats and an inner list.
         Checks for symmetry, handles inner list, then makes the GeometryTuple.
 
         Also can create a hashable version of GeometryTuple; tuple instead of
         list for inner_i.
 
-        Formats
-        =======
-        ('outer-[inner,...]-middle')
-        ('outer-[inner,...]-middleS')
-        'outer-[inner,...]-middle'
-
-        Variables
-        =========
+        Parameters
+        ---------
         geo_input : tupled str or str
             outer-inner-middle values or outer-[inner]-middle values.
 
         Returns
-        =======
-        geo_namedtuple : namedtuple; mixed
-            Numeric values converted to floats; (outer, [inner], middle,'S?')
+        -------
+        namedtuple of mixed types
+            GeometryTuple: numeric values converted to floats; (outer, [inner], middle,'S?')
         '''
 
         def check_symmetry(last):
             '''Yield float or str if 'S' is in the last token of the geometry string.
 
-            Example
-            =======
+            Examples
+            --------
             >>> [i for i in check_symmetry('400S')]
             [400.0, 'S']
             >>> [i for i in check_symmetry('400')]
@@ -182,14 +179,22 @@ class Geometry(object):
             Also parses inner_i (if multiple inners are found) str to floats.
             This is later converted to a list of inner_i, as required by LPEP 001.01.
 
-            Example
-            =======
+            Examples
+            --------
             >>> list(parse_inner('[100,100]'))
             [100.0, 100.0]
             >>> list(parse_inner('[200]'))
             [200.0]
             >>> list(parse_inner('200'))
             [200.0]
+
+            Raises
+            ------
+            TypeError
+                If a non-string is passed in for the geo_input arg.
+            Exception
+                If the parsed geo string is less than 3 tokens.
+
             '''
             if inside.startswith('['):
                 if ',' in inside:
@@ -234,7 +239,7 @@ class Geometry(object):
         if not isinstance(geo_input, str):
             raise TypeError("Cannot parse input type.  Supported types: str")
         elif len(tokens) < 3:
-                '''Replace with custom exception'''
+                # TODO: Replace with custom exception
                 raise Exception("Input token is too short. Supported geometry string format: 'outer-[inner_i]-middle'")
         else:
             '''Find another name for hash_ which is a bool'''
@@ -317,7 +322,7 @@ class Geometry(object):
         '''Return True if 'S' convention is used.
 
         Examples
-        ========
+        --------
         >>> g5 = ('400-200-800')                           # Short-hand use; <= 5-ply
         >>> g6 = ('400-200-400S')                          # Symmetric
         >>> for geo in [g5, g6]
@@ -333,33 +338,44 @@ class Geometry(object):
 # Supplies basic dicts and methods by supplying custom case-building information.
 
 class BaseDefaults(object):
-    '''Subclass general defaults for laminate geometries and objects.
+    '''Common geometry strings, objects and methods for building defaults.
 
-    Allows quick access to default parameters.  Useful in consistent testing.
+    Extended Summary
+    ----------------
+    Allows quick access to default parameters.  It is useful in consistent testing.
+
+    Users can subclass geometric defaults and add specific parameters
+    (loading, material, geometric, etc.) to improve start-up and reduce
+    redundant code. Here are some objects base and subclasses can access or
+    inherit:
 
     - Base : Default geometry strings
     - Base : Default Geometry objects
     - Sub-class : Default material and geometric/loading parameters
     - Sub-class : Default FeatureInputs
 
-    Users can subclass these geometric defaults and add specific parameters
-    (loading, material, geometric, etc.) to improve start-up and reduce
-    redundant code.
+    Defaults are maintained in two dicts:
 
-    New geometry strings can be added to the geo_inputs dict (extension).
-    NOTE: removing dict entries (trimming) will break tests (not recommended).
+    - geo_inputs : A dict of standard geometry strings and special groups.
+    - Geo_objects : A dict of converted geo_inputs into Geometry objects.
 
     Methods
-    =======
-    get_FeatureInput --> dict
-        Get the basic FeatureInput object; subclass in models.
-    get_materials --> list
-        Get a list of materials in order from a mat_props dict or DataFrame.
-    generate --> generator
-        Build a generator of selected geo
+    -------
+    get_FeatureInput(Geometry, load_params=None, mat_props=None,
+                     materials=None, model=None, global_vars=None)
+        Return a dict of the basic FeatureInput object; subclass in a model.
+    get_materials(mat_props)
+        Return a list of materials in order from a mat_props dict or DataFrame.
+    generate selection=None, geo_inputs=False)
+        Yield a generator of selected geometries.
+
+    Notes
+    -----
+    DEVs can add entres to the Default dicts.  Removing existing dict entries or
+    "trimming" the Default dicts will break tests (not recommended).
 
     Examples
-    ========
+    --------
     >>> bdft = BaseDefaults()
     >>> bdft.geos_most                                     # list of geometry Input strings
     [('0-0-2000'), ('1000-0-0'), ('600-0-800'),
@@ -373,8 +389,10 @@ class BaseDefaults(object):
 
     >>> from lamana.models import Wilson_LT as wlt         # user-implemmented Defaults
     >>> dft = wlt.Defaults()                               # sub-classed from BaseDefaults
-    >>> dft.load_params = {'R' : 12e-3, 'a' : 7.5e-3, 'p' : 1,
-                         'P_a' : 1, 'r' : 2e-4,}
+    >>> dft.load_params = {
+    ...     'R' : 12e-3, 'a' : 7.5e-3, 'p' : 1,
+    ...     'P_a' : 1, 'r' : 2e-4,
+    ... }
 
     >>> dft.mat_props = {'HA' : [5.2e10, 0.25], 'PSu' : [2.7e9, 0.33],}
     >>> dft.FeatureInput
@@ -382,14 +400,13 @@ class BaseDefaults(object):
      'Geometric' : {'R' : 12e-3, 'a' : 7.5e-3, 'p' : 1, 'P_a' : 1, 'r' : 2e-4,},
      'Materials' : {'HA' : [5.2e10, 0.25], 'PSu' : [2.7e9, 0.33],},
      'Custom' : None,
-     'Model' : Wilson_LT,
-    }
+     'Model' : Wilson_LT,}
 
     '''
 
     def __init__(self):
         # Geometry Input Strings
-        '''DEV: Add geometry strings here.  Do not remove.'''
+        # DEV: Add geometry strings here.  Do not remove.
         self.geo_inputs = {
             '1-ply': ['0-0-2000', '0-0-1000'],
             '2-ply': ['1000-0-0'],
@@ -456,20 +473,27 @@ class BaseDefaults(object):
 
     @classmethod
     def _groupify_dict(cls, dict_default, Geo_obj=False):
-        '''Return an updated dict with keys of specified groups.
+        '''Return a dict of logical groups.
 
         This method is useful for automating groupings; new ply keys or
         values can be added to the dict with relative ease.
 
-        Requires
-        ========
+        Returns
+        -------
+        dict
+            Keys of specified groups.
+
+        See Also
+        --------
+        `utils.tools.natural_sort` : order dict.items() in loops; needed for tests
+
+        Notes
+        -----
+        This methods requires:
+
         - name keys by number of plies; e.g. '14-ply' (human sorts)
         - add values as a list of strings
         - add to the geo_inputs dict (Geo_objects mimics and updates automatically)
-
-        See Also
-        ========
-        utils.tools.natural_sort: order dict.items() in loops; needed for tests
 
         '''
         d = ct.defaultdict(list)
@@ -541,11 +565,23 @@ class BaseDefaults(object):
         return dict_
 
     # HELPERS -------------------------------------------------------------
-    '''Consider separating'''
     # Material Manipulations
     @classmethod
     def _convert_material_parameters(cls, mat_props):
-        '''Handle exceptions for converting input material dict in Standard Form.'''
+        '''Handle exceptions for converting input material dict in Standard Form.
+
+        Returns
+        -------
+        dict
+            Material properties converted to Standard Form.
+
+        Raises
+        ------
+        TypeError
+            If mat_props is neither in Quick or Standard Form, but requires to
+            be written as a nested dict.
+
+        '''
         try:
             if mat_props is None:
                 dict_prop = {}
@@ -555,7 +591,7 @@ class BaseDefaults(object):
                 _trigger = mat_props['Modulus'].keys()        # needed; triggers KeyError if not Standard Form
                 dict_prop = mat_props
             else:
-                raise TypeError('Nested dict of material parameters required.  See Tutorial')
+                raise TypeError('Nested dict of material parameters required.  See Tutorial.')
         except(KeyError):
             # Un-nested dict (Quick Form), convert, then assign
             # Assumes Quick Form; attempts to convert
@@ -581,8 +617,8 @@ class BaseDefaults(object):
                  'Poissons': {'HA': 0.25, 'PSu': 0.33}}
 
         Returns
-        =======
-        dict_prop : dict (defaultdict)
+        -------
+        defaultdict
             A dict of materials properties; names as keys, materials:
             properties as key-value pairs.
 
@@ -596,26 +632,72 @@ class BaseDefaults(object):
 
     @classmethod
     def get_materials(cls, mat_props):
-        '''Return a list of ordered materials. Order can be overridden by a list.'''
+        '''Return a list of ordered materials. Order can be overridden by a list.
+
+        Parameters
+        ----------
+        mat_props : dict
+            Material properties in Standard or Quick Form.
+
+        Returns
+        -------
+        list
+            An ordered list of materials; uses a pandas DataFrame to order it.
+
+        '''
         mat_props_conv = cls._convert_material_parameters(mat_props)
         return pd.DataFrame(mat_props_conv).index.values.tolist()
 
     def get_FeatureInput(self, Geometry, load_params=None, mat_props=None,
                          materials=None, model=None, global_vars=None):
-        '''Return a FeatureInput for a given Geometry object.'''
+        '''Return a FeatureInput for a given Geometry object.
+
+        Handles conversions to different formats.  Idiomaic approach to building
+        FeatureInput objects, especially in custom models.  All parameters
+        require user/author input.
+
+        Parameters
+        ----------
+        Geometry : Geometry object
+            A native data type comprising geometry information.
+        load_params : dict; default None
+            Loading parameters.
+        mat_props : dict; default None
+            Material parameters.
+        materials : list; default None
+            Unique materials in stacking order; > 1 assumes alternating layers.
+            Will be converted to Standard Form.
+        model : str; default None
+            Custom model name located in `models` directory.
+        global_vars dict, optional; default None
+            Additional variables that may be locally calculated while
+            globally pertinent.
+
+        Returns
+        -------
+        FeatureInput
+            Essential dict of user-provided values.
+
+        See Also
+        --------
+        `la.distributions.Case.apply()` : main creator of FeatureInput objects
+        `la.models.Wilson_LT()` : used to build default instance FeatureInput
+
+        '''
         mat_props_conv = self._convert_material_parameters(mat_props)
 
         if materials is None:
             materials = self.get_materials(mat_props_conv)
 
-        '''Add Exception handling of materials order list and mat_props here.'''
-        FeatureInput = {'Geometry': Geometry,
-                        'Parameters': load_params,
-                        'Properties': mat_props_conv,
-                        'Materials': materials,
-                        'Model': model,
-                        'Globals': global_vars,
-                        }
+        # TODO: Add Exception handling of materials order list and mat_props here.
+        FeatureInput = {
+            'Geometry': Geometry,
+            'Parameters': load_params,
+            'Properties': mat_props_conv,
+            'Materials': materials,
+            'Model': model,
+            'Globals': global_vars,
+        }
         return FeatureInput
 
     # Make generators of custom geometry strings or objects
@@ -623,14 +705,18 @@ class BaseDefaults(object):
         '''Yield a generator of selected geometry strings or objects given a key.
 
         Parameters
-        ==========
-        selection : list; None
-            Of strings of keys within the geo_inputs dict.
-        geo_inputs : bool; False
+        ----------
+        selection : list of strings; default None
+            The strings are key names within the geo_inputs dict.
+        geo_inputs : bool; default False
             If true, uses geo_inputs from BaseDefaults class; else defaults to Geo_objects
 
+        See Also
+        --------
+        `utils.tools.natural_sort` : order dict.items() in loops; needed for tests
+
         Examples
-        ========
+        --------
         >>> from lamana.input_ import BaseDefaults
         >>> bdft = BaseDefaults()
         >>> bdft.generate()
@@ -642,10 +728,6 @@ class BaseDefaults(object):
 
         >>> list(bdft.generate(selection=['standard'], geo_inputs=False))
         [Geometry object (400.0-[200.0]-800.0)]               # Geometry object; default
-
-        See Also
-        ========
-        utils.tools.natural_sort: order dict.items() in loops; needed for tests
 
         '''
         # Default to all strings/objects (not groups) if None selected

@@ -68,6 +68,12 @@ class Case(object):
     LMs : LaminateModel object
         Returns the native Laminate object.
 
+    Raises
+    ------
+    TypeError
+        If load_params or mat_props is None; needs a dict and nested dict
+        respectively.
+
     '''
     # Automated Parameters
     '''Rename args to load_params and mat_props.'''
@@ -191,6 +197,12 @@ class Case(object):
         input_.Geometry : convert user input geometries to usable code.
         constructs.Laminate : build DataFrames containing laminate calculations.
         constructs.Laminate.build_laminate() : uses FeatureInputs
+
+        Raises
+        ------
+        ValueError
+            If no value geometry strings are found.
+
         '''
         '''Consider moving, to all only once.'''
         G = la.input_.Geometry
@@ -467,7 +479,14 @@ class Case(object):
 
     @property
     def materials(self):
-        '''Override the _materials attribute.'''
+        '''Override the _materials attribute.
+
+        Raises
+        ------
+        NameError
+            If a trying to set a name not already in the materials list.
+
+        '''
         print('Getting materials...')
         return self._materials
 
@@ -590,6 +609,14 @@ class Cases(ct.MutableMapping):
         keyword to Case(separate=True).
     #defaults_path : str
         Custom path from which to import Defaults().
+
+
+    Raises
+    ------
+    ImportError
+        If default load parameters or materials properites cannot be set.
+    TypeError
+        If invalid caselet type detected or p is a non-integer.
 
     Examples
     ========
