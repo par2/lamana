@@ -24,8 +24,6 @@ from lamana.lt_exceptions import IndeterminateError
 class Stack(object):
     '''Build a StackTuple object containing stack-related methods.
 
-    Extended Summary
-    ----------------
     We need to go from a 3 item Geometry object to n-sized stack of labeled
     layers.  Two operations are performed:
 
@@ -78,8 +76,6 @@ class Stack(object):
     def decode_geometry(self, Geometry):
         '''Return a generator that decodes the Geometry object.
 
-        Extended Summary
-        ----------------
         Interprets the stacking order and yields a tuple of the lamina type
         (ltype) and thickness.
 
@@ -102,8 +98,8 @@ class Stack(object):
         >>> %timeit [layer_ for layer_ in decode_geometry(G)] (generators to lists): 57.1 us
         >>> %timeit [layer_ for layer_ in decode_geometry(G)] (generators to lists; 2nd refactor): 107 us
 
-        Example
-        -------
+        Examples
+        --------
         >>> G = la.input_.Geometry('400-[200]-800')
         >>> G
         Geometry object('400-[200]-800')
@@ -112,7 +108,7 @@ class Stack(object):
         >>> decoded
         <generator object>
 
-        >>>[tupled for tupled in decode_geometry(G)]
+        >>> [tupled for tupled in decode_geometry(G)]
         [('outer', 400.0),
          ('inner', 200.0),
          ('middle', 800.0),
@@ -173,14 +169,14 @@ class Stack(object):
         Parameters
         ----------
         decoded : generator of tuples
-            Decoded Geometry object, containing tuples of thickness and layer_ type.
-            Stacking order is preserved; result of Stack.decode_geometry().
+            Decoded Geometry object, containing tuples of thickness & `layer_` type.
+            Stacking order is preserved; result of `Stack.decode_geometry()`.
 
         Returns
         -------
         namedtuple
             A StackTuple (dict, int, str, str):
-            - order: (dict) of the layer_ number as keys and decoded geometry values
+            - order: (dict) of the `layer_` number as keys and decoded geometry values
             - nplies: (int) number of plies
             - name: (str) name of laminate
             - alias: (str) common name
@@ -192,8 +188,8 @@ class Stack(object):
         >>> geo_input = '400-200-800
         >>> G = la.input_.Geometry(geo_input)
         >>> decoded = decode_geometry(G)
-        %timeit identify_geometry(decoded)                (with lists): 950 us
-        %timeit identify_geometry(decoded)                (with generators): 935 us  ?
+        >>> %timeit identify_geometry(decoded)                (with lists): 950 us
+        >>> %timeit identify_geometry(decoded)                (with generators): 935 us  ?
 
         Examples
         --------
@@ -317,12 +313,8 @@ class Stack(object):
 class Laminate(Stack):
     '''Generate a `LaminateModel` object.  Stores several representations.
 
-    Extended Summary
-    ----------------
     Laminate inherits from Stack.  A `FeatureInput` is passed in from a certain
     "Feature" module and exchanged between constructs and theories modules.
-
-    Changes from legacy definitions marked with "*".
 
     Native objects:
 
@@ -330,23 +322,31 @@ class Laminate(Stack):
     - `LFrame` : snapshot with multiple rows including Dimensional Data.
     - `LMFrame` : `LFrame` w/Dimensional and Data variables via theories.Model data.
 
-    ID Variables
-    ------------
+    This class builds `LamainateModels`, which are defined by the user as a
+    `models` module; related to laminate theory, i.e. `Q11`, `Q12`, `D11`,
+    `D12`, ..., `stress`, `strain`, etc.
+
+    The listed Parameters are "ID Variables".  The Other Parameters are "Dimensional
+    Variables".  There are special variables related to columns in DataFrames,
+    suffixed with underscores.
+
+    Parameters
+    ----------
     layer_ : int
         Enumerates layers from bottom, tensile side up.
     side_ : str
         Side of the stress state; tensile (bottom) or compressive (top).
     type_ : str
         Type of layer; outer, inner or middle.
-    *matl_ : str
+    matl_ : str
         Type of material.
     t_ : float
         Total thickness per layer.
 
-    Dimensional Variables
-    ---------------------
+    Other Parameters
+    ----------------
     label_ : str
-        Type of point; *interfacial, internal or discontinuity.
+        Type of point; interfacial, internal or discontinuity.
     h_ : float
         Lamina thickness for all lamina except middle layers (half thickness).
     d_ : float
@@ -354,18 +354,12 @@ class Laminate(Stack):
         `theories.Model` and used in testing. Units (m).
     intf_ : int
         Enumerates an interfaces from tensile side up.
-    *k_ : float
+    k_ : float
         Lamina height level used in `Wilson_LT` - 1.
     Z_ : float
         Distance from the neutral axis to an interface (or sub-interface p).
     z_ : float
         Distance from the neutral axis to the lamina midplane (or sub-midplane_p).
-
-    Model
-    -----
-    ... : ...
-        Defined by the user in a models module; related to laminate theory,
-        i.e. `Q11`, `Q12`, `D11`, `D12`, ..., `stress`, `strain`, etc.
 
     Attributes
     ----------
@@ -811,8 +805,8 @@ class Laminate(Stack):
         -----
         Since 0.4.3c4d, `_type_cache` type list is replaced with ndarray.
 
-        Example
-        -------
+        Examples
+        --------
         >>> case = la.distributions.Case(load_params, mat_props)
         >>> laminate = case.apply(('400-200-800'))
         >>> laminate._check_layer_order()
@@ -975,8 +969,8 @@ class Laminate(Stack):
     def summary(self):
         '''Print a summary of Laminate properties.
 
-        Variables
-        =========
+        Parameters
+        ----------
         nplies : int
             number of plies
         p : int

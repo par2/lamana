@@ -24,7 +24,7 @@ mpl.use('Agg')
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('.'))                      # autosummary?
+#sys.path.insert(0, os.path.abspath('.'))                      # autosummary?
 sys.path.insert(0, os.path.abspath('../lamana'))              # autodoc
 
 # -- General configuration ------------------------------------------------
@@ -40,8 +40,9 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
     'sphinx.ext.autosummary',
+	'sphinx.ext.napoleon',
     'nbsphinx',
-    'numpydoc',
+    #'numpydoc',
 ]
 
 # Generate the API documentation when building (from seaborn)

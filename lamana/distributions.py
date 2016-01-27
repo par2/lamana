@@ -85,6 +85,7 @@ class Case(object):
     diagram.
 
     '''
+
     # Automated Parameters
     '''Rename args to load_params and mat_props.'''
     # TODO: remove materials kwarg (?)
@@ -130,7 +131,9 @@ class Case(object):
         DEV: `__eq__` handles all DataFrame/Series items of `__dict__` separately.
         Attribute names with DataFrame/Series assignments are blacklisted
         and checked separately from other `__dict__` items.
+
         '''
+
         if isinstance(other, self.__class__):
             # Auto check attrs if assigned to DataFrames/Series, then add to list
             blacklisted = [attr for attr in self.__dict__ if
@@ -177,8 +180,6 @@ class Case(object):
     def apply(self, geo_strings=None, model='Wilson_LT', unique=False):
         '''Apply geometries and laminate theory model to a `LaminateModel`.
 
-        Extended Summary
-        ----------------
         Convert user inputs general convention, then to Geometry objects
         and iterate to assign a laminate theory model, make a `FeatureInput`
         object and build DataFrames.
@@ -218,7 +219,7 @@ class Case(object):
         --------
         lamana.input_.Geometry : convert user input geometries to usable code.
         lamana.constructs.Laminate : build DataFrames containing laminate calculations.
-        lamana.constructs.Laminate.build_laminate() : uses FeatureInputs.
+        lamana.constructs.Laminate.build_laminate : uses FeatureInput`.
 
         Notes
         -----
@@ -306,10 +307,9 @@ class Case(object):
              ax=None, subplots_kw=None, suptitle_kw=None, **kwargs):
         '''Plot single and multiple LaminateModels.
 
-        Extended Summary
-        ----------------
         Plots objects found within a list of LMs.  Assumes Laminate objects are
-        in the namespace.  Calls `_distribplot()`` for single/multiple geometries.
+        in the namespace.  Calls `lamana.output_._distribplot()` for
+        single/multiple geometries.
 
         Parameters
         ----------
@@ -320,9 +320,9 @@ class Case(object):
         x, y : str; default None
             DataFrame column names.  Users can manually pass in other columns names.
         normalized : bool; default None
-            If true, plots y = k_; else plots y = d_ unless specified otherwise.
+            If true, plots y = `k_`; else plots y = `d_` unless specified otherwise.
         halfplot : str; default None
-            Trim the DataFrame to read either |'tensile'|'compressive'|None|.
+            Trim the DataFrame to read either 'tensile', 'compressive' or `None`.
         extrema : bool; default True
             Plot minima and maxima only; equivalent to p=2.
         separate : bool; default False
@@ -339,110 +339,26 @@ class Case(object):
             Unnormalized plot of single geometry in upper right corner.
         ax : matplotlib axes; default None
             An axes containing the plots.
-        {subplots, suptitle}_kw : dict; default None
+        subplots_kw : dict; default None
             Default keywords are initialed to set up the distribution plots.
-            - subplots: |ncols=1|figsize=(12,8)|dpi=300|
-            - suptitle: |fontsize=15|fontweight='bold'|
+            (`ncols`=1, `figsize`=(12, 8), `dpi`=300)
+        suptitle_kw : dict; default None
+            Default keywords are initialed to set up the distribution plots.
+            (`fontsize`=15, `fontweight`='bold')
 
         Notes
         -----
-        See `distroplot()`` for more kwargs. Here are some preferred idioms:
+        Here are some preferred idioms:
 
         >>> case.LM.plot()                                # geometries in case
         Case Plotted. Data Written. Image Saved.
         >>> case.LM[4:-1].plot()                          # handle slicing
         Case Plotted. Data Written. Image Saved.
 
-        Examples
-        --------
-
-        Plot Single Geometry
-        --------------------
-
-        Unnormalized stress distribution for single geometry (default):
-
-        .. plot::
-            :context: close-figs
-
-            >>> import lamana as la
-            >>> from LamAma.models import Wilson_LT as wlt
-            >>> dft = wlt.Defaults()
-            >>> case = la.distributions.Case(dft.load_params, dft.mat_props)
-            >>> case.apply('400-[200]-800')
-            >>> case.plot()
-
-        Normalized stress distribution for single geometry:
-
-        .. plot::
-            :context: close-figs
-
-            >>> case.plot(normalized=True)
-
-        Normalized stress distribution (base) with an unnormalized inset:
-
-       .. plot::
-           :context: close-figs
-
-           >>> case.plot(inset=True)
-
-        Stress distribution plot with layer annotations:
-
-        .. plot::
-            :context: close-figs
-
-            >>> plot(annotate=True)
-
-        Custom markerstyles and kwarg passing.
-
-        .. plot::
-            :context: close-figs
-
-            >>> plot(markerstyles=['D'])
-
-        Colorblind-safe color palette.
-
-        .. plot::
-            :context: close-figs
-
-            >>> plot(colorblind=True)
-
-        Grayscale color palette.
-
-        .. plot::
-            :context: close-figs
-
-            >>> plot(grayscale=True)
-
-
-        Plot Multiple Geometries
-        ------------------------
-
-        Normalized stress distributions for multiple geometries (default):
-
-        .. plot::
-            :context: close-figs
-
-            >>> case.apply('400-200-800', '350-400-500', '200-100-1400')
-            >>> case.plot()
-
-        Tensile stress distribution:
-        .. plot::
-            :context: close-figs
-
-            >>> case.plot(halfplot='tensile')
-
-        Insets are not implemented for multiple geometries:
-
-        .. plot::
-            :context: close-figs
-
-            >>> case.plot(inset=True)
-            NotImplementedError 'Unable to superimpose multiple, unnormalized plots.
-
         See Also
         --------
         lamana.constructs.Laminate : builds the `LaminateModel` object.
-        lamana.output_.distribplot : generic handler for stress distribution plots.
+        lamana.output_._distribplot : generic handler for stress distribution plots.
         lamana.output_._multiplot : plots multiple cases as subplots (caselets).
         lamana.distributions.Cases.plot : makes call to `_multiplot()`.
 
@@ -617,8 +533,6 @@ class Case(object):
 class Cases(ct.MutableMapping):
     '''Return a dict of Case objects.
 
-    Extended Summary
-    ----------------
     This is useful for situations requiring laminates with different geometries,
     thicknesses and ps.
 
@@ -772,7 +686,7 @@ class Cases(ct.MutableMapping):
                 else:
                     case_.apply(caselets)
                 self.caselets = [case_]
-                '''Brittle; need more robust try-except'''
+                # TODO: Brittle; need more robust try-except
             except(AttributeError):
                 try:
                     # if a list of lists

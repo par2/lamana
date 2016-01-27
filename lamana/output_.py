@@ -4,6 +4,150 @@
 # _multiplot(): aggregates severa; distribplots into a grid of subplots
 # flake8 output_.py --ignore E265,E501,E701,F841,N802,N803,N806
 
+'''Plot single and multiple LaminateModels.
+
+Plots objects found within a list of LMs.  Assumes Laminate objects are
+in the namespace.  Calls `_distribplot()` for single/multiple geometries.
+
+Parameters
+----------
+title : str; default None
+    Suptitle; convenience keyword
+subtitle : str; default None
+    Subtitle; convenience keyword.  Used ax.text().
+x, y : str; default None
+    DataFrame column names.  Users can manually pass in other columns names.
+normalized : bool; default None
+    If true, plots y = k_; else plots y = d_ unless specified otherwise.
+halfplot : str; default None
+    Trim the DataFrame to read either |'tensile'|'compressive'|None|.
+extrema : bool; default True
+    Plot minima and maxima only; equivalent to p=2.
+separate : bool; default False
+    Plot each geometry in separate subplots.
+legend_on : bool; default True
+    Turn on/off plot
+colorblind : bool; default False
+    Set line and marker colors as colorblind-safe.
+grayscale : bool; default False
+    Set everything to grayscale; overrides colorblind.
+annotate : bool; default False
+    Annotate names of layer types.
+inset: bool; default None
+    Unnormalized plot of single geometry in upper right corner.
+ax : matplotlib axes; default None
+    An axes containing the plots.
+{subplots, suptitle}_kw : dict; default None
+    Default keywords are initialed to set up the distribution plots.
+    - subplots: |ncols=1|figsize=(12,8)|dpi=300|
+    - suptitle: |fontsize=15|fontweight='bold'|
+
+Notes
+-----
+See `_distroplot()` for more kwargs. Here are some preferred idioms:
+
+>>> case.LM.plot()                                # geometries in case
+Case Plotted. Data Written. Image Saved.
+>>> case.LM[4:-1].plot()                          # handle slicing
+Case Plotted. Data Written. Image Saved.
+
+Examples
+--------
+
+Plot Single Geometry
+--------------------
+
+Unnormalized stress distribution for single geometry (default):
+
+.. plot::
+    :context: close-figs
+
+    >>> import lamana as la
+    >>> from LamAma.models import Wilson_LT as wlt
+    >>> dft = wlt.Defaults()
+    >>> case = la.distributions.Case(dft.load_params, dft.mat_props)
+    >>> case.apply('400-[200]-800')
+    >>> case.plot()
+
+Normalized stress distribution for single geometry:
+
+.. plot::
+    :context: close-figs
+
+    >>> case.plot(normalized=True)
+
+Normalized stress distribution (base) with an unnormalized inset:
+
+.. plot::
+   :context: close-figs
+
+   >>> case.plot(inset=True)
+
+Stress distribution plot with layer annotations:
+
+.. plot::
+    :context: close-figs
+
+    >>> plot(annotate=True)
+
+Custom markerstyles and kwarg passing.
+
+.. plot::
+    :context: close-figs
+
+    >>> plot(markerstyles=['D'])
+
+Colorblind-safe color palette.
+
+.. plot::
+    :context: close-figs
+
+    >>> plot(colorblind=True)
+
+Grayscale color palette.
+
+.. plot::
+    :context: close-figs
+
+    >>> plot(grayscale=True)
+
+
+Plot Multiple Geometries
+------------------------
+
+Normalized stress distributions for multiple geometries (default):
+
+.. plot::
+    :context: close-figs
+
+    >>> case.apply('400-200-800', '350-400-500', '200-100-1400')
+    >>> case.plot()
+
+Tensile stress distribution:
+.. plot::
+    :context: close-figs
+
+    >>> case.plot(halfplot='tensile')
+
+Insets are not implemented for multiple geometries:
+
+.. plot::
+    :context: close-figs
+
+    >>> case.plot(inset=True)
+    NotImplementedError 'Unable to superimpose multiple, unnormalized plots.
+
+See Also
+--------
+lamana.constructs.Laminate : builds the `LaminateModel` object.
+lamana.output_._distribplot : generic handler for stress distribution plots.
+lamana.output_._multiplot : plots multiple cases as subplots (caselets).
+lamana.distributions.Case.plot : makes call to `_distribplot()`.
+lamana.distributions.Cases.plot : makes call to `_multiplot()`.
+
+'''
+
+
 import math
 import itertools as it
 
@@ -38,8 +182,6 @@ def _distribplot(
 ):
     '''Return an axes plot of stress distributions.
 
-    Extended Summary
-    ----------------
     Some characteristics
         - multiplot: plot multiple geometries
         - halfplot: plots only compressive or tensile side
@@ -328,8 +470,8 @@ def _multiplot(
 ):
     '''Return figure of axes containing several plots.
 
-    Extended Summary
-    ----------------
+    Characteristics:
+
     - multiple plots
     - kwarg/arg passing
     - global labels and titles

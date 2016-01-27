@@ -44,20 +44,23 @@ class BaseModel(object):
 def handshake(Laminate, adjusted_z=False):
     '''Return updated LaminateModel and FeatureInput objects.
 
-    Parameters
-    ----------
-    Laminate : the psudeo LaminateModels object (not yet updated)
-        The entire Laminate object is passed in for access to all methods.
-        Laminate.LFrame only has ID and Dimensional columns, so no Laminate
-        Theory calculations or columns are present yet.
-
-    Extended Summary
-    ----------------
     This key method interfaces between Laminate class and a custom model module.
     Models are named by the type of laminate theory, e.g. Classical_LT, Wilson_LT.
     This name is applied by the user upon calling `Case.apply()` and is found in
     the FeatureInput dict.
 
+    Parameters
+    ----------
+    Laminate : Laminate object
+        The entire Laminate object is passed in, giving access to all methods.
+        Laminate.LFrame only has ID and Dimensional columns, so no laminate
+        theory calculations or columns are populated yet.
+    adjusted_z : bool, optional; default False
+        This option allows with the used of the z(m)* column.  A different
+        algorithm was used it calculate the internal values for this variable.
+
+    Notes
+    -----
     This method searches for a special hook method named `_use_model_` in the
     specified model module.  This hook may be written as method within a class
     or written as an independent function offering a choice for users to write
@@ -70,8 +73,6 @@ def handshake(Laminate, adjusted_z=False):
     if none is found, the exception is caught and a hook named `Model._use_model_`
     is sought next (as of 0.4.5b1).
 
-    Notes
-    -----
     Here is the workflow of a model selected by the user and its call in `Laminate`.
     This assumes the model is developed and located in the standard models directory.
 
@@ -81,6 +82,7 @@ def handshake(Laminate, adjusted_z=False):
     3. Call `theories.handshake(L)` and searches for the model name in models dir.
     4. Call hook method `models._use_model_` (if a function) or
        models.<model_name>._use_model_ (if a class)
+
     '''
     # Find and Import the Model
     model_name = Laminate.FeatureInput['Model']

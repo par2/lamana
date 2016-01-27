@@ -21,8 +21,6 @@ from lamana.utils import tools as ut
 class Geometry(object):
     '''Parse input geometry string into floats.
 
-    Extended Summary
-    ----------------
     When a single (or a list of) geometry string(s) is passed to the
     `lamana.distributions.Case.apply()` method, this class parses those strings
     into (outer, [inner], middle, 'S?') format.
@@ -132,8 +130,6 @@ class Geometry(object):
     def _parse_geometry(self, geo_input, hash_=False):
         '''Return a namedtuple of outer-inner-middle geometry values.
 
-        Extended Summary
-        ----------------
         Per General Convention, a GeometryTuple has floats and an inner list.
         Checks for symmetry, handles inner list, then makes the GeometryTuple.
 
@@ -340,8 +336,6 @@ class Geometry(object):
 class BaseDefaults(object):
     '''Common geometry strings, objects and methods for building defaults.
 
-    Extended Summary
-    ----------------
     Allows quick access to default parameters.  It is useful in consistent testing.
 
     Users can subclass geometric defaults and add specific parameters
@@ -371,7 +365,7 @@ class BaseDefaults(object):
 
     Notes
     -----
-    DEVs can add entres to the Default dicts.  Removing existing dict entries or
+    DEVs can add entries to the Default dicts.  Removing existing dict entries or
     "trimming" the Default dicts will break tests (not recommended).
 
     Examples
@@ -379,7 +373,7 @@ class BaseDefaults(object):
     >>> bdft = BaseDefaults()
     >>> bdft.geos_most                                     # list of geometry Input strings
     [('0-0-2000'), ('1000-0-0'), ('600-0-800'),
-    ('500-500-0'), ('400-200-800')]
+     ('500-500-0'), ('400-200-800')]
 
     >>> bdft.Geos_simple                                   # list of Geometry objects
     [<Geometry object ('0-0-2000')>,
