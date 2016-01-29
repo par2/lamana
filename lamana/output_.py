@@ -170,9 +170,16 @@ LAMANA_PALETTES = dict(
 # PLOTS -----------------------------------------------------------------------
 # =============================================================================
 # Process plotting figures of single and multiple subplots
+
+
+def _cycle_depth(iterable, n=None):
+    '''Return a cycler that iterates n items into an iterable.'''
+    if n is None:
+        n = len(iterable)
+    return it.cycle(it.islice(iterable, n))
+
+
 # TODO: Abstract to Distribplot and PanelPlot classes
-
-
 def _distribplot(
     LMs, x=None, y=None, normalized=True, halfplot=None, extrema=True,
     legend_on=True, colorblind=False, grayscale=False, annotate=False, ax=None,
@@ -190,8 +197,8 @@ def _distribplot(
 
     Parameters
     ----------
-    LMs : list
-        List of LaminateModels.
+    LMs : list of LaminateModel objects
+        Container for LaminateModels.
     x, y : str
         DataFrame column names.  Users can pass in other columns names.
     normalized : bool
@@ -237,6 +244,17 @@ def _distribplot(
     ------
         Exception
             If no stress column is found.
+
+    Examples
+    --------
+    >>> # Plot a single geometry
+    >>> import lamana as la
+    >>> from lamana.models import Wilson_LT as wlt
+    >>> dft = wlt.Defaults()
+    >>> case = la.distributions.Case(dft.load_params, dft.mat_props)
+    >>> case.apply(['400-200-800'])
+    >>> la.output_._distribplot(case.LMs)
+    <matplotlib.axes._subplots.AxesSubplot>
 
     '''
 
@@ -488,6 +506,19 @@ def _multiplot(
     matplotlib figure
         A figure of subplots.
 
+    Examples
+    --------
+    >>> # Plot a set of caselets (subplots)
+    >>> import lamana as la
+    >>> from lamana.models import Wilson_LT as wlt
+    >>> dft = wlt.Defaults()
+    >>> const_total = ['350-400-500', '400-200-800']
+    >>> cases = la.distributions.Cases(
+    ...     const_total, load_params=dft.load_params, mat_props=dft.mat_props,
+    ...     model='Wilson_LT', ps=[2, 3]
+    ... )
+    >>> la.output_._multiplot(cases)
+
     '''
     # DEFAULTS ----------------------------------------------------------------
     title = '' if title is None else title
@@ -540,7 +571,8 @@ def _multiplot(
     # Reset figure dimensions
     ncaselets = len(caselets)
     ncols_dft = subplots_kw['ncols']
-    nrows = math.ceil(ncaselets / ncols_dft)
+    nrows = int(math.ceil(ncaselets / ncols_dft))          # Fix "can't mult. seq. by non-int..." error; nrows should always be int
+    ##nrows = math.ceil(ncaselets / ncols_dft)
     subplots_kw['figsize'] = (24, 8 * nrows)
     if ncaselets < ncols_dft:
         ncols_dft = ncaselets
@@ -564,6 +596,7 @@ def _multiplot(
         '''Iterate axes of the subplots; apply a small plot ("caselet").
 
         Caselets could contain cases (iterable) or LaminateModels (not iterable).
+
         '''
         try:
             caselet, axtitle, ltitle, sublabel = (

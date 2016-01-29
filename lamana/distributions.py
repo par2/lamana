@@ -301,6 +301,7 @@ class Case(object):
         print('User input geometries have been converted and set to Case.')
 
     # TODO: get ipython directives working to plot figures from docstrings.
+    # TODO: emulate pandas, return an mpl axes instead of None; change test
     def plot(self, title=None, subtitle=None, x=None, y=None, normalized=None,
              halfplot=None, extrema=True, separate=False, legend_on=True,
              colorblind=False, grayscale=False, annotate=False, inset=False,
