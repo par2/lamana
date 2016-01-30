@@ -5,6 +5,8 @@ import codecs
 import os
 import re
 
+#TODO: Apparently setuptools "ruins the universe"; be cautious with continued use  
+
 try:
     from setuptools import setup, find_packages
 except ImportError:
