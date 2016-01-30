@@ -46,11 +46,10 @@ coverage.xml
 .hypothesis/
 
 # Sphinx documentation
-# TODO: Try to ignore all folders
 docs/_build/
 docs/_static/
 docs/_templates/
-docs/generated
+#docs/generated/
 
 
 # GitHub Desktop Defaults
