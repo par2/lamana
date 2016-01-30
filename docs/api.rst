@@ -32,7 +32,7 @@ Auxiliary Modules
 
     utils.tools
     utils.references
-      
+
 Models
 ------
 
@@ -40,3 +40,25 @@ Models
     :toctree: generated/
 
     models.Wilson_LT
+
+Classes
+-------
+
+.. autosummary::
+    :toctree: generated/
+
+    input_.Geometry
+    input_.BaseDefaults
+    distributions.Case
+    distributions.Cases
+    constructs.Stack
+    constructs.Laminate
+    theories.BaseModel
+
+Functions
+---------
+
+.. autosummary::
+    :toctree: generated/
+
+    theories.handshake
