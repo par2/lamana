@@ -25,7 +25,8 @@ mpl.use('Agg')
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))                      # autosummary?
-sys.path.insert(0, os.path.abspath('../lamana/'))             # autodoc
+#sys.path.insert(0, os.path.abspath('../lamana/'))             # autodoc
+sys.path.insert(0, os.path.abspath('..'))                     # autodoc
 
 # -- General configuration ------------------------------------------------
 
@@ -37,6 +38,7 @@ sys.path.insert(0, os.path.abspath('../lamana/'))             # autodoc
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+	'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
     'sphinx.ext.autosummary',
@@ -185,7 +187,7 @@ html_static_path = ['_static']
 #html_domain_indices = True
 
 # If false, no index is generated.
-#html_use_index = True
+html_use_index = True
 
 # If true, the index is split into individual pages for each letter.
 #html_split_index = False
@@ -307,7 +309,12 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    'python': ('http://docs.python.org/3', None),
+    'pandas': ('http://pandas.pydata.org/', None),
+    'matplotlib': ('http://matplotlib.org/', None),
+    'numpy': ('http://docs.scipy.org/doc/numpy', None),
+}
 
 # Activate the theme.
 #html_theme = 'bootstrap'
