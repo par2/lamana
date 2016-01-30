@@ -41,8 +41,11 @@ Models
 
     models.Wilson_LT
 
+LamAna Objects
+--------------
+
 Classes
--------
+~~~~~~~
 
 .. autosummary::
     :toctree: generated/
@@ -56,7 +59,7 @@ Classes
     theories.BaseModel
 
 Functions
----------
+~~~~~~~~~
 
 .. autosummary::
     :toctree: generated/

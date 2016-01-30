@@ -51,6 +51,14 @@ The documentation for LamAna is organized into several sections by increasing co
 
 Detailed information on ancillary topics can be found in the :ref:`Appendix<appendix-docs>`.
 
+.. _gallery-docs:
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Gallery
+   :name: gallerydoc
+   
+   showcase
 
 .. _user-docs:
 
@@ -58,11 +66,11 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
    :maxdepth: 2
    :caption: User Documentation
    :name: usertoc
-
-   showcase
+   
    installation
    gettingstarted
    api
+   support
 
 
 .. _author-docs:
@@ -81,21 +89,10 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
    :maxdepth: 2
    :caption: Developer Documentation
    :name: devtoc
-
+   
    package
-   testing
-   resources
    contributions
-
-
-.. _appendix-docs:
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Appendix
-   :name: appendixtoc
-
+   testing
    docs
    demo
    lpep
-
