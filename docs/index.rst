@@ -59,7 +59,6 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
    :name: gallerydoc
    
    showcase
-   showcase2
 
 .. _user-docs:
 
