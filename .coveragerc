@@ -10,3 +10,9 @@ omit =
     /home/travis/virtualenv/python3.5.0/lib/python3.5/site-packages/*
     /home/travis/virtualenv/python3.5.1/lib/python3.5/site-packages/*
     lamana/tests/*
+    lamana/models/tests/*
+    lamana/lt_exceptions.py
+    lamana/models/example_Wilson_LT_class.py
+    lamana/models/example_Wilson_LT_func.py
+    lamana/utils/references.py
+    lamana/examples/*
