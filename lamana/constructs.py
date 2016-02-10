@@ -28,7 +28,7 @@ class Stack(object):
     layers.  Two operations are performed:
 
     1. Decode the Geometry object into a list of lamina thicknesses and
-        types "unfolded" (or mirrored) across the physical neutral axis.
+       types "unfolded" (or mirrored) across the physical neutral axis.
     2. Identify the unfolded geometry to build a StackTuple - a namedtuple
        containing a dict of the stacking order, the number or plies, the
        official stack name and alias.
@@ -36,7 +36,7 @@ class Stack(object):
     Parameters
     ----------
     FeatureInput : dict or Geometry object
-        Use `Geometry` key to extract the GeometryTuple (converted geometry string)
+        Use `Geometry` key to extract the `GeometryTuple` (converted geometry string)
         Can directly accept a Geometry object.
 
     Methods
@@ -79,7 +79,7 @@ class Stack(object):
         Interprets the stacking order and yields a tuple of the lamina type
         (ltype) and thickness.
 
-        A Geometry object has a .geometry attribute returning a namedtuple of
+        A `Geometry` object has a .geometry attribute returning a namedtuple of
         laminae thicknesses labeled:
 
         - ['outer', 'inner', 'middle', 'symmetric']        # symmetry convention
@@ -311,24 +311,26 @@ class Stack(object):
 
 
 class Laminate(Stack):
-    '''Generate a `LaminateModel` object.  Stores several representations.
+    '''Create a `LaminateModel` object.  Stores several representations.
 
-    Laminate inherits from Stack.  A `FeatureInput` is passed in from a certain
-    "Feature" module and exchanged between constructs and theories modules.
+    Laminate first inherits from the `Stack` class.  A `FeatureInput` is passed in
+    from a certain "Feature" module and exchanged between constructs and theories
+    modules.
 
     Native objects:
 
     - `Snapshot` : stack of unique layers (1, 2, ..., n), single rows and ID columns.
     - `LFrame` : snapshot with multiple rows including Dimensional Data.
-    - `LMFrame` : `LFrame` w/Dimensional and Data variables via theories.Model data.
+    - `LMFrame` : `LFrame` w/Dimensional and Data variables via `theories.Model` data.
 
-    This class builds `LamainateModels`, which are defined by the user as a
-    `models` module; related to laminate theory, i.e. `Q11`, `Q12`, `D11`,
-    `D12`, ..., `stress`, `strain`, etc.
+    Finally this class build a `LamainateModel` object, which merges the LaminateModel
+    date with the Model data defined by an author in a separate `models` module;
+    models are related to classical laminate theory variables, i.e. `Q11`, `Q12`,
+    `D11`, `D12`, ..., `stress`, `strain`, etc.
 
     The listed Parameters are "ID Variables".  The Other Parameters are "Dimensional
     Variables".  There are special variables related to columns in DataFrames,
-    suffixed with underscores.
+    suffixed with trailing underscores.
 
     Parameters
     ----------
@@ -355,7 +357,7 @@ class Laminate(Stack):
     intf_ : int
         Enumerates an interfaces from tensile side up.
     k_ : float
-        Lamina height level used in `Wilson_LT` - 1.
+        Relative height; includes fractional height of kth layer.
     Z_ : float
         Distance from the neutral axis to an interface (or sub-interface p).
     z_ : float
