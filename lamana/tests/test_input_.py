@@ -992,3 +992,5 @@ def test_BaseModels_helper_getmaterials2():
     actual = bdft.get_materials(mat_props, lst_materials={'PSu': 0.3, 'HA': 0.2})
     expected = ['dummy']
     nt.assert_equal(actual, expected)
+
+# TODO: add test for subclassing basedefaults; test ability to overwrite defaults; see class Example

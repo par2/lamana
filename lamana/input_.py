@@ -23,15 +23,15 @@ class Geometry(object):
 
     When a single (or a list of) geometry string(s) is passed to the
     `lamana.distributions.Case.apply()` method, this class parses those strings
-    into (outer, [inner], middle, 'S?') format.
+    into (outer, [inner], middle, 'S') format'; 'S' is optional.
 
     Here are examples of conventions used to write geometry strings:
 
     - General: outer-[inner_i]-middle
     - Short-hand: outer-inner-middle
 
-    Formatted in General Convention, a converted namedtuple object is returned.
-    Examples of GeometryTuples:
+    Formatted in General Convention, a converted namedtuple of the geometry
+    is returned.  Examples of GeometryTuples:
 
     - (400.0, [200.0], 800.0)                              # multi-ply
     - (400.0, [200.0], 800.0, 'S')                         # multi-ply, symmetric
@@ -91,7 +91,7 @@ class Geometry(object):
 
         self.string = self.__class__._to_gen_convention(geo_input)
 
-        # Private attribute used for hashing and set comparisons
+        # Private attribute used for set comparisons and hashing
         self._geometry_hash = self._parse_geometry(geo_input, hash_=True)
 
     def __str__(self):
@@ -119,10 +119,13 @@ class Geometry(object):
     def __hash__(self):
         '''Allow set comparisons.
 
-        The only required property is that objects which compare equal
-        have the same hash value (REF 035).  self.__dict__ is unhashable
-        due to the inner list.  So a copy is made called _geometry_hash
-        of GeometryTuple with tupled inner instead.'''
+        The only required property for a hash is that objects which equally
+        compare have the same hash value (REF 035).  `self.__dict__` is unhashable
+        due to the inner list (lists are mutable, thus unhashable).  So a copy is
+        made called `_geometry_hash` of GeometryTuple where the inner value is
+        tupled instead.
+
+        '''
         return hash(self._geometry_hash)
         #return hash(tuple(sorted(self.__dict__.items())))
         #return hash(self._geo_string)
@@ -304,7 +307,7 @@ class Geometry(object):
 
     @property
     def total_inner_i(self):
-        '''Calculate total thickness for each inner_i lamina.'''
+        '''Calculate total thickness for the ith inner lamina.'''
         result = [inner_i * 2 for inner_i in self.inner]
         return result
 
@@ -336,17 +339,17 @@ class Geometry(object):
 class BaseDefaults(object):
     '''Common geometry strings, objects and methods for building defaults.
 
-    Allows quick access to default parameters.  It is useful in consistent testing.
+    Allows quick access to default parameters.  It is useful for consistent testing.
 
     Users can subclass geometric defaults and add specific parameters
     (loading, material, geometric, etc.) to improve start-up and reduce
-    redundant code. Here are some objects base and subclasses can access or
-    inherit:
+    redundant code. Here are some objects that can be found in and subclassed
+    from this base class:
 
     - Base : Default geometry strings
     - Base : Default Geometry objects
-    - Sub-class : Default material and geometric/loading parameters
-    - Sub-class : Default FeatureInputs
+    - Subclass : Default material and geometric/loading parameters
+    - Subclass : Default FeatureInputs
 
     Defaults are maintained in two dicts:
 
@@ -355,8 +358,7 @@ class BaseDefaults(object):
 
     Methods
     -------
-    get_FeatureInput(Geometry, load_params=None, mat_props=None,
-                     materials=None, model=None, global_vars=None)
+    get_FeatureInput(Geometry, load_params=None, mat_props=None, **kwargs)
         Return a dict of the basic FeatureInput object; subclass in a model.
     get_materials(mat_props)
         Return a list of materials in order from a mat_props dict or DataFrame.
@@ -365,40 +367,63 @@ class BaseDefaults(object):
 
     Notes
     -----
-    DEVs can add entries to the Default dicts.  Removing existing dict entries or
+    DEV: add entries to the Default dicts.  Removing existing dict entries or
     "trimming" the Default dicts will break tests (not recommended).
+
+    Material properties, geometric/loading parameters and FeatureInput cannot be
+    generalized and are thus left to the author to define in their custom defaults
+    subclass.  The best place to customize this is in a custom models module.
 
     Examples
     --------
-    >>> bdft = BaseDefaults()
+    >>> # Base: Idiomatic instantiation of Base Defaults
+    >>> bdft = BaseDefaults()                              # instantiation
+
+    >>> # Access a set of built-in geometry strings
     >>> bdft.geos_most                                     # list of geometry Input strings
     [('0-0-2000'), ('1000-0-0'), ('600-0-800'),
      ('500-500-0'), ('400-200-800')]
 
+    >>> # Access a set of built-in Geometry objects (converted geometry strings)
     >>> bdft.Geos_simple                                   # list of Geometry objects
     [<Geometry object ('0-0-2000')>,
      <Geometry object ('1000-0-0')>,
      <Geometry object '600-0-800')>,
      <Geometry object ('500-500-0')>,]
 
+    >>> # Subclass: Idiomatic import and instantiation of custom Defaults (see Wilson_LT ex.)
     >>> from lamana.models import Wilson_LT as wlt         # user-implemmented Defaults
-    >>> dft = wlt.Defaults()                               # sub-classed from BaseDefaults
-    >>> dft.load_params = {
-    ...     'R' : 12e-3, 'a' : 7.5e-3, 'p' : 1,
-    ...     'P_a' : 1, 'r' : 2e-4,
-    ... }
+    >>> dft = wlt.Defaults()                               # subclassed from BaseDefaults
 
-    >>> dft.mat_props = {'HA' : [5.2e10, 0.25], 'PSu' : [2.7e9, 0.33],}
+    >>> # Access Defaults loading parameters, material properties and FeatureInput
+    >>> dft.load_params
+    {'R': 12e-3, 'a': 7.5e-3, 'p': 1, 'P_a': 1, 'r': 2e-4}
+    >>> dft.mat_props
+    {'HA': [5.2e10, 0.25], 'PSu': [2.7e9, 0.33],}
     >>> dft.FeatureInput
-    {'Geometry' : '400-[200]-800',
-     'Geometric' : {'R' : 12e-3, 'a' : 7.5e-3, 'p' : 1, 'P_a' : 1, 'r' : 2e-4,},
-     'Materials' : {'HA' : [5.2e10, 0.25], 'PSu' : [2.7e9, 0.33],},
-     'Custom' : None,
-     'Model' : Wilson_LT,}
+    {'Geometry': '400-[200]-800',
+     'Geometric': {'R' : 12e-3, 'a' : 7.5e-3, 'p' : 1, 'P_a' : 1, 'r' : 2e-4,},
+     'Materials': {'HA' : [5.2e10, 0.25], 'PSu' : [2.7e9, 0.33],},
+     'Custom': None,
+     'Model': Wilson_LT,
+     'Globals': None,}
+
+    >>> # Reassign Defaults instances (e.g. R, p)
+    >>> dft.load_params = {
+    ...     'R': 50e-3, 'a': 7.5e-3, 'p' : 5,
+    ...     'P_a': 1, 'r': 2e-4,
+    ... }
+    >>> dft.load_params
+    {'R': 50e-3, 'a': 7.5e-3, 'p' : 5, 'P_a': 1, 'r': 2e-4,}
 
     '''
 
     def __init__(self):
+
+        # TODO: Add BaseDefaults attributes to claim the namespace
+        # i.e, load_params = None, mat_props = None, FeatureInput = None
+        # Consider this architexture rather than leave the author with oneous to def vars
+
         # Geometry Input Strings
         # DEV: Add geometry strings here.  Do not remove.
         self.geo_inputs = {
@@ -642,11 +667,12 @@ class BaseDefaults(object):
         mat_props_conv = cls._convert_material_parameters(mat_props)
         return pd.DataFrame(mat_props_conv).index.values.tolist()
 
+    # TODO: Look into why global_vars is used instead of globals
     def get_FeatureInput(self, Geometry, load_params=None, mat_props=None,
                          materials=None, model=None, global_vars=None):
         '''Return a FeatureInput for a given Geometry object.
 
-        Handles conversions to different formats.  Idiomaic approach to building
+        Handles conversions to different formats.  Idiomatic approach to building
         FeatureInput objects, especially in custom models.  All parameters
         require user/author input.
 
@@ -659,12 +685,12 @@ class BaseDefaults(object):
         mat_props : dict; default None
             Material parameters.
         materials : list; default None
-            Unique materials in stacking order; > 1 assumes alternating layers.
-            Will be converted to Standard Form.
+            Unique materials in stacking order; > 1 materials assumes alternating
+            layers.  Will be converted to Standard Form.
         model : str; default None
             Custom model name located in `models` directory.
-        global_vars dict, optional; default None
-            Additional variables that may be locally calculated while
+        global_vars : dict, optional; default None
+            Additional variables that may be locally calculated though
             globally pertinent.
 
         Returns
@@ -707,7 +733,7 @@ class BaseDefaults(object):
 
         See Also
         --------
-        utils.tools.natural_sort : order dict.items() in loops; needed for tests
+        utils.tools.natural_sort : orders `dict.items()` in loops; needed for tests
 
         Examples
         --------
