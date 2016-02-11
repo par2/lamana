@@ -55,3 +55,7 @@ pandas==0.17.1
 nbsphinx==0.2.2
 ipykernel==4.2.2
 numpydoc==0.5
+
+# Test requirements
+coverage==3.7.1
+nose-cov==1.6
