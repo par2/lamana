@@ -376,26 +376,31 @@ class BaseDefaults(object):
 
     Examples
     --------
-    >>> # Base: Idiomatic instantiation of Base Defaults
+    Base: Idiomatic instantiation of Base Defaults
+
     >>> bdft = BaseDefaults()                              # instantiation
 
-    >>> # Access a set of built-in geometry strings
+    Access a set of built-in geometry strings
+
     >>> bdft.geos_most                                     # list of geometry Input strings
     [('0-0-2000'), ('1000-0-0'), ('600-0-800'),
      ('500-500-0'), ('400-200-800')]
 
-    >>> # Access a set of built-in Geometry objects (converted geometry strings)
+    Access a set of built-in Geometry objects (converted geometry strings)
+
     >>> bdft.Geos_simple                                   # list of Geometry objects
     [<Geometry object ('0-0-2000')>,
      <Geometry object ('1000-0-0')>,
      <Geometry object '600-0-800')>,
      <Geometry object ('500-500-0')>,]
 
-    >>> # Subclass: Idiomatic import and instantiation of custom Defaults (see Wilson_LT ex.)
+    Subclass: Idiomatic import and instantiation of custom Defaults (see Wilson_LT ex.)
+
     >>> from lamana.models import Wilson_LT as wlt         # user-implemmented Defaults
     >>> dft = wlt.Defaults()                               # subclassed from BaseDefaults
 
-    >>> # Access Defaults loading parameters, material properties and FeatureInput
+    Access Defaults loading parameters, material properties and FeatureInput
+
     >>> dft.load_params
     {'R': 12e-3, 'a': 7.5e-3, 'p': 1, 'P_a': 1, 'r': 2e-4}
     >>> dft.mat_props
@@ -408,7 +413,8 @@ class BaseDefaults(object):
      'Model': Wilson_LT,
      'Globals': None,}
 
-    >>> # Reassign Defaults instances (e.g. R, p)
+    Reassign Defaults instances (e.g. R, p)
+
     >>> dft.load_params = {
     ...     'R': 50e-3, 'a': 7.5e-3, 'p' : 5,
     ...     'P_a': 1, 'r': 2e-4,

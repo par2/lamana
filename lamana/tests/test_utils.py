@@ -15,21 +15,23 @@ dft = wlt.Defaults()                               # from inherited class in mod
 
 # PARAMETERS ------------------------------------------------------------------
 # Build dicts of geometric and material parameters
-load_params = {'R' : 12e-3,                        # specimen radius
-              'a' : 7.5e-3,                        # support ring radius
-              'p' : 5,                             # points/layer
-              'P_a' : 1,                           # applied load
-              'r' : 2e-4,                          # radial distance from center loading
-              }
+load_params = {
+    'R': 12e-3,                                   # specimen radius
+    'a': 7.5e-3,                                  # support ring radius
+    'p': 5,                                       # points/layer
+    'P_a': 1,                                     # applied load
+    'r': 2e-4,                                    # radial distance from center loading
+}
 
-mat_props = {'HA' : [5.2e10, 0.25],
-             'PSu' : [2.7e9, 0.33],
-             }
+mat_props = {
+    'HA': [5.2e10, 0.25],
+    'PSu': [2.7e9, 0.33],
+}
 
 # TESTS -----------------------------------------------------------------------
 
 # Defaults --------------------------------------------------------------------
-# Minor checks for sub-classes
+# Minor checks for subclasses
 def test_Defaults_load_params1():
     '''Confirm defaults geometric parameters for Wilson_LT are constant.'''
     actual = dft.load_params

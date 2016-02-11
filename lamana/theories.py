@@ -10,14 +10,14 @@ from lamana.models import *
 
 
 class BaseModel(object):
-    '''Provide attributes for sub-classing custom models.
+    '''Provide attributes for subclassing custom models.
 
     Notes
     -----
-    This class helps centralize common attributes associated with a selected
-    model.  Model is selected in `distributions.apply()` and returned in
-    Phase 3 of `constructs.Laminate()`.  It is idiomatic to sub-class from here
-    to make custom models.
+    This class helps centralize common attributes associated with a custom
+    model.  A model is selected in `distributions.apply()` and returned in
+    Phase 3 of `constructs.Laminate()`.  It is idiomatic to subclass `BaseModel`
+    when making custom models.
 
     See Also
     --------
@@ -45,18 +45,18 @@ def handshake(Laminate, adjusted_z=False):
     '''Return updated LaminateModel and FeatureInput objects.
 
     This key method interfaces between Laminate class and a custom model module.
-    Models are named by the type of laminate theory, e.g. Classical_LT, Wilson_LT.
-    This name is applied by the user upon calling `Case.apply()` and is found in
-    the FeatureInput dict.
+    Model names are related to the laminate theory, e.g. Classical_LT, Wilson_LT.
+    This name is applied by the user upon calling `Case.apply(model='model_name')`
+    and is found in the FeatureInput dict.
 
     Parameters
     ----------
     Laminate : Laminate object
-        The entire Laminate object is passed in, giving access to all methods.
-        Laminate.LFrame only has ID and Dimensional columns, so no laminate
+        The entire `Laminate` object is passed in, giving access to its methods.
+        `Laminate.LFrame` only has ID and Dimensional columns, so no laminate
         theory calculations or columns are populated yet.
     adjusted_z : bool, optional; default False
-        This option allows with the used of the z(m)* column.  A different
+        This option forces the use of the z(m)* column values.  A different
         algorithm was used it calculate the internal values for this variable.
 
     Notes
@@ -78,10 +78,11 @@ def handshake(Laminate, adjusted_z=False):
 
     1. User selects a model in `lamana.distributions.Case.apply(model='model_name')`;
        Model name is stored in the FeatureInput object, passed into `Laminate`.
-    2. Call `lamana.constructs.Laminate._update_columns._update_calculations(FI)`.
-    3. Call `theories.handshake(L)` and searches for the model name in models dir.
-    4. Call hook method `models._use_model_` (if a function) or
-       models.<model_name>._use_model_ (if a class)
+    2. Inside `lamana.constructs.Laminate`,  _update_columns._update_calculations(FI)`
+       is called, which initiates LT calculations for the given model.
+    3. `theories.handshake(L)` is called and searches for the model name in models dir.
+    4. Inside the selected model, the hook method `models._use_model_` is called
+       (if function-style) or `models.<model_name>._use_model_` (if class-style)
 
     '''
     # Find and Import the Model

@@ -27,13 +27,6 @@ bdft = BaseDefaults()
 class Case(object):
     '''Build a Case object that handles User Input parameters.
 
-    Parameters
-    ----------
-    geometric : dict
-        Loading paramters (load_params) including p.
-    materials : dict
-        Either dict or nested dict of material properties (mat_props).
-
     Attributes
     ----------
     materials
@@ -65,12 +58,9 @@ class Case(object):
     Methods
     -------
     apply(geo_strings=None, model='Wilson_LT', unique=False)
-        Return `LaminateModel` and `FeatureInput` objects by iteration.
-        Accept user geometries and selected model.
-    plot(self, title=None, subtitle=None, x=None, y=None, normalized=None,
-         halfplot=None, extrema=True, separate=False, legend_on=True,
-         colorblind=False, grayscale=False, annotate=False, inset=False,
-         ax=None, subplots_kw=None, suptitle_kw=None, **kwargs)
+        Return `LaminateModel` and `FeatureInput` objects by iterating geometry
+        strings.  Accept user geometries and selected model.
+    plot(**kwargs)
         Return matplotlib plots given laminate DataFrames.
 
     Raises
@@ -180,7 +170,7 @@ class Case(object):
     def apply(self, geo_strings=None, model='Wilson_LT', unique=False):
         '''Apply geometries and laminate theory model to a `LaminateModel`.
 
-        Convert user inputs general convention, then to Geometry objects
+        Convert user inputs general convention, then to `Geometry` objects
         and iterate to assign a laminate theory model, make a `FeatureInput`
         object and build DataFrames.
 
@@ -219,7 +209,7 @@ class Case(object):
         --------
         lamana.input_.Geometry : convert user input geometries to usable code.
         lamana.constructs.Laminate : build DataFrames containing laminate calculations.
-        lamana.constructs.Laminate.build_laminate : uses FeatureInput`.
+        lamana.constructs.Laminate.build_laminate : uses `FeatureInput`.
 
         Notes
         -----
@@ -318,7 +308,7 @@ class Case(object):
             Suptitle; convenience keyword
         subtitle : str; default None
             Subtitle; convenience keyword.  Used ax.text().
-        x, y : str; default None
+        {x, y} : str; default None
             DataFrame column names.  Users can manually pass in other columns names.
         normalized : bool; default None
             If true, plots y = `k_`; else plots y = `d_` unless specified otherwise.
@@ -349,7 +339,7 @@ class Case(object):
 
         Notes
         -----
-        Here are some preferred idioms:
+        Here are some preferred idioms (not yet implemented):
 
         >>> case.LM.plot()                                # geometries in case
         Case Plotted. Data Written. Image Saved.
@@ -530,6 +520,10 @@ class Case(object):
         '''Return number of a Laminates.'''
         return len(self.LaminateModels)
 
+# =============================================================================
+# UTILITY ---------------------------------------------------------------------
+# =============================================================================
+# Builds and handles multiple cases simultaneously
 
 class Cases(ct.MutableMapping):
     '''Return a dict of Case objects.
@@ -537,16 +531,9 @@ class Cases(ct.MutableMapping):
     This is useful for situations requiring laminates with different geometries,
     thicknesses and ps.
 
-    - LM : `LaminateModel` object.
-    - LaminateModel : DataFrames of laminate info; `Snapshot`, `LFrame`, `LMFrame`.
-    - case : group of LMs with the same geometric, loading and material parameters.
-    - cases : group of cases, particularly with a similar pattern of interest or
-      different rows (`p`).
-    - caselet : a subset of cases or LMs; geometry string, list or case (See LPEP 003)
-
     Characteristics:
 
-    - if user-defined, tries to import Defaults() to simplify instantiations
+    - if user-defined, tries to import `Defaults()` to simplify instantiations
     - dict-like storage and access of cases
     - iterable by values
     - sliceable; returns a selection of cases
@@ -626,7 +613,14 @@ class Cases(ct.MutableMapping):
     >>> (LM for case in cases for LM in case.LMs)
     <generator object>
 
-    >>> # Cases accepts repeated geometry strings and returns unique sets
+    Notes
+    -----
+    - LM: `LaminateModel` object.
+    - LaminateModel: DataFrames of laminate info; `Snapshot`, `LFrame`, `LMFrame`.
+    - case: group of LMs with the same geometric, loading and material parameters.
+    - cases: group of cases, particularly with a similar pattern of interest or
+      different rows (`p`).
+    - caselet: a subset of cases or LMs; geometry string, list or case (See LPEP 003)
 
     '''
     def __init__(
