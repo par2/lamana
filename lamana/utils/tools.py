@@ -422,7 +422,7 @@ def ndframe_equal(ndf1, ndf2):
 
 
 def is_matched(pattern, string):
-    '''Return True if container ends have equal count; matched.
+    '''Return True if container brackets or parentheses have equal count; matched.
 
     Parameters
     ----------
@@ -431,7 +431,20 @@ def is_matched(pattern, string):
     string : str
         String to which the pattern in search.
 
+    Examples
+    --------
+    >>> s = 'Here the [brackets] are matched.'
+    >>> p = '.'                                            # regular expression pattern for all
+    >>> is_matched(p, s)
+    True
+
+    >>> s = 'Here the [brackets][ are NOT matched.'
+    >>> p = '.'                                           # regular expression pattern
+    >>> is_matched(p, s)
+    False
+
     '''
+    # TODO: all default pattern for 'all' (.) if none supplied; make pattern optional
     search = re.findall(pattern, string)                   # quick, non-iterative extraction
     if '[' or ']' in search:
         bra = search.count('[')
@@ -442,8 +455,12 @@ def is_matched(pattern, string):
     #print(bra, ket, par, ren)
     return bra == ket and par == ren
 
+# =============================================================================
+# CITED CODE ------------------------------------------------------------------
+# =============================================================================
+# Code is modified from existing examples and cited in reference.py
 
-# Cited Code ------------------------------------------------------------------
+
 def set_column_sequence(df, seq):
     '''Return a DataFrame with columns sorted by a given sequence (REF 007).
 
@@ -467,7 +484,7 @@ def assertSeriesEqual(s1, s2, **kwds):
 
     Parameters
     ----------
-    s1, s2 : DataFrame
+    {s1, s2} : DataFrame
         Compare two objects using pandas testing tools.
     **kwds : dict-like
         Keywords for `pandas.util.testing.assert_series_equal()`.
@@ -483,7 +500,7 @@ def assertFrameEqual(df1, df2, **kwds):
 
     Parameters
     ----------
-    df1, df2 : DataFrame
+    {df1, df2} : DataFrame
         Compare two objects using pandas testing tools.
     **kwds : dict-like
         Keywords for `pandas.util.testing.assert_frame_equal()`.
