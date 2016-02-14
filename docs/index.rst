@@ -15,7 +15,7 @@ The LamAna project is an extensible Python library for interactive laminate anal
    - Official documentation hosted on readthedocs
    - Docs support Jupyter notebooks (see `nbsphinx <https://nbsphinx.readthedocs.org/en/latest/>`_)
    - Docs support Sphinx extensions: autodocs, autosummary, numpydoc/napolean, viewcode
-   
+
 Using the LamAna project, you can **calculate**/**export**/**analyze** data and
 **author** custom models based on laminate theory.  Featured components can be used to plot stress distributions, analyze thickessness effects and predict failure trends.
 
@@ -57,7 +57,7 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
    :maxdepth: 1
    :caption: Gallery
    :name: gallerydoc
-   
+
    showcase
 
 .. _user-docs:
@@ -66,7 +66,7 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
    :maxdepth: 2
    :caption: User Documentation
    :name: usertoc
-   
+
    installation
    gettingstarted
    api
@@ -89,11 +89,11 @@ Detailed information on ancillary topics can be found in the :ref:`Appendix<appe
    :maxdepth: 2
    :caption: Developer Documentation
    :name: devtoc
-   
+
    package
+   components
    contributions
    testing
    docs
    demo
    lpep
-
