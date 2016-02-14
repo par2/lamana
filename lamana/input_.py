@@ -471,6 +471,7 @@ class BaseDefaults(object):
         self.geos_dissimilar = self.geo_inputs['dissimilar']
         self.geos_sample = self.geo_inputs['sample']
 
+        # TODO: must be way to automate these assignments; reduce redundancy.
         # Geometry Object Attributes
         self.Geos_even = self.Geo_objects['even']
         self.Geos_odd = self.Geo_objects['odd']
