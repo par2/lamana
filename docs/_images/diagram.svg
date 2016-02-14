@@ -25,11 +25,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="435.25619"
-     inkscape:cy="362.26079"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="87.214496"
+     inkscape:cy="294.84692"
      inkscape:document-units="px"
-     inkscape:current-layer="g6677"
+     inkscape:current-layer="layer2"
      showgrid="false"
      inkscape:window-width="1366"
      inkscape:window-height="716"
@@ -959,10 +959,10 @@
     <g
        id="g8219"
        style="fill:#ffffff;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:8, 8;stroke-dashoffset:0"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
-       transform="translate(0,2)">
+       transform="matrix(1.0128046,0,0,0.9999697,-2.486372,2.0203472)">
       <g
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
@@ -2025,7 +2025,7 @@
        width="110.14842"
        id="rect2985-1-4-5-3-5-1-4"
        style="fill:#ffffff;stroke:#000000;stroke-width:3;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter7831)"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
@@ -2037,7 +2037,7 @@
        width="110.14842"
        id="rect2985-4-8-1-4-1-1-6-5"
        style="fill:#ffffff;stroke:#000000;stroke-width:3;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter7827)"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -2082,7 +2082,7 @@
     <path
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        transform="matrix(0.45146607,0,0,0.45146607,-76.555974,652.76096)"
        d="m 407.85713,280.21933 a 23.571428,24.285715 0 1 1 -47.14285,0 23.571428,24.285715 0 1 1 47.14285,0 z"
        sodipodi:ry="24.285715"
@@ -2095,7 +2095,7 @@
     <path
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        transform="matrix(0.45146607,0,0,0.45146607,-58.556577,636.39251)"
        d="m 407.85713,280.21933 a 23.571428,24.285715 0 1 1 -47.14285,0 23.571428,24.285715 0 1 1 47.14285,0 z"
        sodipodi:ry="24.285715"
@@ -2108,7 +2108,7 @@
     <path
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        transform="matrix(0.45146607,0,0,0.45146607,-30.562215,679.84134)"
        d="m 407.85713,280.21933 a 23.571428,24.285715 0 1 1 -47.14285,0 23.571428,24.285715 0 1 1 47.14285,0 z"
        sodipodi:ry="24.285715"
@@ -2121,7 +2121,7 @@
     <path
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        transform="matrix(0.45146607,0,0,0.45146607,12.881186,723.31708)"
        d="m 407.85713,280.21933 a 23.571428,24.285715 0 1 1 -47.14285,0 23.571428,24.285715 0 1 1 47.14285,0 z"
        sodipodi:ry="24.285715"
@@ -3216,7 +3216,7 @@
        y="340.56717"
        ry="1.4449209"
        transform="matrix(0.70712395,0.70708961,-0.70708961,0.70712395,0,0)"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
@@ -3228,7 +3228,7 @@
        y="488.90201"
        ry="1.4449209"
        transform="matrix(0.70712395,0.70708961,-0.70708961,0.70712395,0,0)"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -3280,7 +3280,7 @@
        sodipodi:ry="24.285715"
        d="m 407.85713,280.21933 a 23.571428,24.285715 0 1 1 -47.14285,0 23.571428,24.285715 0 1 1 47.14285,0 z"
        transform="matrix(0.45146607,0,0,0.45146607,-76.555974,652.76096)"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -3293,7 +3293,7 @@
        sodipodi:ry="24.285715"
        d="m 407.85713,280.21933 a 23.571428,24.285715 0 1 1 -47.14285,0 23.571428,24.285715 0 1 1 47.14285,0 z"
        transform="matrix(0.45146607,0,0,0.45146607,-58.556577,636.39251)"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -3306,7 +3306,7 @@
        sodipodi:ry="24.285715"
        d="m 407.85713,280.21933 a 23.571428,24.285715 0 1 1 -47.14285,0 23.571428,24.285715 0 1 1 47.14285,0 z"
        transform="matrix(0.45146607,0,0,0.45146607,-30.562215,679.84134)"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -3319,13 +3319,13 @@
        sodipodi:ry="24.285715"
        d="m 407.85713,280.21933 a 23.571428,24.285715 0 1 1 -47.14285,0 23.571428,24.285715 0 1 1 47.14285,0 z"
        transform="matrix(0.45146607,0,0,0.45146607,12.881186,723.31708)"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        transform="matrix(1.0991982,1.0991448,-1.0991448,1.0991982,-508.76779,423.5843)"
        ry="0.40012044"
        y="-294.80051"
@@ -3339,13 +3339,13 @@
        style="fill:#ffffff;stroke:#000000;stroke-width:0.77723157;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        d="m 343.65118,628.16163 c -0.15899,0 -0.31537,0.0724 -0.4372,0.19431 l -12.82432,12.82432 c 0.0611,0 0.0972,0.0361 0.0972,0.0972 l 0,8.20951 c 0,0.0611 -0.0361,0.0971 -0.0972,0.0971 l -8.20951,0 c -0.0611,0 -0.0971,-0.0361 -0.0971,-0.0971 l -11.51274,11.51274 c -0.24365,0.24366 -0.24366,0.63074 0,0.87439 l 12.33855,12.33855 c 0.0199,-0.0286 0.0595,-0.0485 0.0971,-0.0485 l 8.16093,0 c 0.0611,0 0.0972,0.0361 0.0972,0.0971 l 0,8.20951 c 0,0.0306 -0.0286,0.0286 -0.0485,0.0485 l 11.99843,11.99851 c 0.24367,0.24365 0.63074,0.24366 0.87439,0 l 11.56132,-11.56132 8.11235,0 c 0.0611,0 0.0972,-0.0361 0.0972,-0.0971 l 0,-8.11236 12.8729,-12.87289 c 0.24364,-0.24367 0.24366,-0.63074 0,-0.87439 l -12.04709,-11.99851 0,-8.16093 c 0,-0.0611 -0.0846,-0.14566 -0.14566,-0.14566 l -8.11235,0 -12.33855,-12.33855 c -0.12187,-0.12187 -0.2782,-0.19431 -0.4372,-0.19431 z"
        id="rect6875-8-2-0"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <text
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        sodipodi:linespacing="125%"
        id="text3213-7-5-7-2"
        y="667.36023"
@@ -3360,7 +3360,7 @@
     <rect
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        transform="matrix(1.0991982,1.0991448,-1.0991448,1.0991982,-542.52805,457.34457)"
        ry="0.40012044"
        y="-294.80051"
@@ -3374,13 +3374,13 @@
        style="fill:#ffffff;stroke:#000000;stroke-width:0.77723157;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        d="m 309.89092,661.9219 c -0.15899,0 -0.31537,0.0724 -0.4372,0.19431 l -12.82432,12.82432 c 0.0611,0 0.0972,0.0361 0.0972,0.0972 l 0,8.20951 c 0,0.0611 -0.0361,0.0971 -0.0972,0.0971 l -8.20951,0 c -0.0611,0 -0.0971,-0.0361 -0.0971,-0.0971 L 276.81,694.75994 c -0.24365,0.24366 -0.24366,0.63074 0,0.87439 l 12.33855,12.33855 c 0.0199,-0.0286 0.0595,-0.0485 0.0971,-0.0485 l 8.16093,0 c 0.0611,0 0.0972,0.0361 0.0972,0.0971 l 0,8.20951 c 0,0.0306 -0.0286,0.0286 -0.0485,0.0485 l 11.99843,11.99851 c 0.24367,0.24365 0.63074,0.24366 0.87439,0 l 11.56132,-11.56132 8.11235,0 c 0.0611,0 0.0972,-0.0361 0.0972,-0.0971 l 0,-8.11236 12.8729,-12.87289 c 0.24364,-0.24367 0.24366,-0.63074 0,-0.87439 l -12.04709,-11.99851 0,-8.16093 c 0,-0.0611 -0.0846,-0.14566 -0.14566,-0.14566 l -8.11235,0 -12.33855,-12.33855 c -0.12187,-0.12187 -0.2782,-0.19431 -0.4372,-0.19431 z"
        id="rect6875-8-2-8"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <text
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        sodipodi:linespacing="125%"
        id="text3213-7-5-7-6"
        y="701.12048"
@@ -3395,7 +3395,7 @@
     <rect
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        transform="matrix(1.0991982,1.0991448,-1.0991448,1.0991982,-576.28832,423.58431)"
        ry="0.40012044"
        y="-294.80051"
@@ -3409,13 +3409,13 @@
        style="fill:#ffffff;stroke:#000000;stroke-width:0.77723157;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        d="m 276.13065,628.16164 c -0.15899,0 -0.31537,0.0724 -0.4372,0.19431 l -12.82432,12.82432 c 0.0611,0 0.0972,0.0361 0.0972,0.0972 l 0,8.20951 c 0,0.0611 -0.0361,0.0971 -0.0972,0.0971 l -8.20951,0 c -0.0611,0 -0.0971,-0.0361 -0.0971,-0.0971 l -11.51274,11.51274 c -0.24365,0.24366 -0.24366,0.63074 0,0.87439 l 12.33855,12.33855 c 0.0199,-0.0286 0.0595,-0.0485 0.0971,-0.0485 l 8.16093,0 c 0.0611,0 0.0972,0.0361 0.0972,0.0971 l 0,8.20951 c 0,0.0306 -0.0286,0.0286 -0.0485,0.0485 l 11.99843,11.99851 c 0.24367,0.24365 0.63074,0.24366 0.87439,0 l 11.56132,-11.56132 8.11235,0 c 0.0611,0 0.0972,-0.0361 0.0972,-0.0971 l 0,-8.11236 12.8729,-12.87289 c 0.24364,-0.24367 0.24366,-0.63074 0,-0.87439 l -12.04709,-11.99851 0,-8.16093 c 0,-0.0611 -0.0846,-0.14566 -0.14566,-0.14566 l -8.11235,0 -12.33855,-12.33855 c -0.12187,-0.12187 -0.2782,-0.19431 -0.4372,-0.19431 z"
        id="rect6875-8-2"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <text
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        sodipodi:linespacing="125%"
        id="text3213-7-5-7"
        y="667.36023"
@@ -3752,7 +3752,7 @@
     <text
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        sodipodi:linespacing="125%"
        id="text4930-7-1"
        y="596.14636"
@@ -3767,7 +3767,7 @@
     <text
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        sodipodi:linespacing="125%"
        id="text4930-4-5-3-2"
        y="875.63312"
@@ -3782,7 +3782,7 @@
     <text
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        sodipodi:linespacing="125%"
        id="text4930-4-7-1-6"
        y="770.49908"
@@ -3797,7 +3797,7 @@
     <text
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        sodipodi:linespacing="125%"
        id="text4930-1-5-5-4-3-7"
        y="784.03149"
@@ -3812,7 +3812,7 @@
     <text
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        sodipodi:linespacing="125%"
        id="text4930-1-5-1-5-9-5"
        y="767.66302"
@@ -3827,7 +3827,7 @@
     <text
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        sodipodi:linespacing="125%"
        id="text4930-1-5-1-5-2-4-1"
        y="811.33502"
@@ -3842,37 +3842,37 @@
     <text
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        sodipodi:linespacing="125%"
        id="text4930-4-7-1-6-3"
-       y="747.7157"
+       y="785.7157"
        x="158.05678"
        style="font-size:70px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        xml:space="preserve"><tspan
          style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace"
-         y="747.7157"
+         y="785.7157"
          x="158.05678"
          id="tspan4932-0-11-1-1-3"
          sodipodi:role="line">Foo.handshake(x)</tspan></text>
     <text
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        sodipodi:linespacing="125%"
        id="text4930-4-7-1-6-3-4"
-       y="854.78119"
+       y="890.78119"
        x="56.381207"
        style="font-size:70px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        xml:space="preserve"><tspan
          style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace"
-         y="854.78119"
+         y="890.78119"
          x="56.381207"
          id="tspan4932-0-11-1-1-3-1"
          sodipodi:role="line">Laminate.foo(x)</tspan></text>
     <text
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        sodipodi:linespacing="125%"
        id="text4930-1-5-1-5-2-4-1-8"
        y="854.81079"
@@ -3887,33 +3887,18 @@
     <text
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
-       sodipodi:linespacing="125%"
-       id="text4930-4-7-1-6-3-6"
-       y="787.60608"
-       x="170.22963"
-       style="font-size:70px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><tspan
-         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace"
-         y="787.60608"
-         x="170.22963"
-         id="tspan4932-0-11-1-1-3-5"
-         sodipodi:role="line">handshake(x)</tspan></text>
-    <text
-       inkscape:export-ydpi="90"
-       inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        sodipodi:linespacing="125%"
        id="text4930-4-7-1-6-3-48"
        y="610.50568"
-       x="235.22391"
+       x="231.22391"
        style="font-size:70px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        xml:space="preserve"><tspan
          style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace"
          y="610.50568"
-         x="235.22391"
+         x="231.22391"
          id="tspan4932-0-11-1-1-3-6"
-         sodipodi:role="line">x.foo('LT 1')</tspan></text>
+         sodipodi:role="line">Case.apply(*args, model='LT 1')</tspan></text>
     <text
        transform="translate(-6.4075476,-111.76537)"
        sodipodi:linespacing="125%"
@@ -4253,7 +4238,7 @@
     <path
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:transform-center-y="56.496927"
        inkscape:transform-center-x="-22.721328"
        inkscape:connector-curvature="0"
@@ -4263,7 +4248,7 @@
     <path
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:transform-center-y="-57.394303"
        inkscape:transform-center-x="23.297378"
        inkscape:connector-curvature="0"
@@ -4273,7 +4258,7 @@
     <path
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:transform-center-y="-57.394303"
        inkscape:transform-center-x="23.297378"
        inkscape:connector-curvature="0"
@@ -4286,7 +4271,7 @@
        id="path6831"
        d="m 242.14285,723.79075 c 12.85715,-17.85714 -25.281,-51.81109 -25.281,-51.81109 0,0 -25.95067,-26.93365 -13.64321,-56.04605 7.22951,-12.36693 19.77427,-23.60972 25.35278,-3.57143 5.4974,19.74697 11.16934,25.33121 11.90117,26.18501"
        style="fill:none;stroke:#999999;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3, 1;stroke-dashoffset:0;marker-end:url(#Arrow2MendU)"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -4295,7 +4280,7 @@
        id="path6831-8"
        d="m 242.86888,723.96628 c 17.85714,-12.85715 31.60805,19.22008 44.74003,32.35207 18.10983,18.6149 42.55633,21.07281 71.19833,7.58229 12.95948,-6.10398 50.83179,-31.25049 43.97753,-51.11167 -6.77786,-19.63981 -22.76956,-33.13025 -23.65963,-33.87198"
        style="fill:none;stroke:#999999;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3, 1;stroke-dashoffset:0;marker-end:url(#Arrow2Mendy)"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -4304,7 +4289,7 @@
        id="path6831-8-2"
        d="m 242.86888,722.95613 c 17.85714,-12.85715 51.81109,25.281 51.81109,25.281 0,0 24.43365,23.45067 53.54605,11.14321 12.36693,-7.22951 10.63546,-16.16805 3.57143,-19.99564 -18.24193,-9.88426 -11.1913,-6.07217 -20.33177,-11.92885"
        style="fill:none;stroke:#999999;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3, 1;stroke-dashoffset:0;marker-end:url(#Arrow2MendO)"
-       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\repos\LamAna\images\diagram_theories 2.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\diagram_theories.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>

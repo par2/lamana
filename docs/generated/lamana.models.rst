@@ -12,22 +12,6 @@ lamana.models.Wilson_LT module
     :undoc-members:
     :show-inheritance:
 
-lamana.models.example_Wilson_LT_class module
---------------------------------------------
-
-.. automodule:: lamana.models.example_Wilson_LT_class
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-lamana.models.example_Wilson_LT_func module
--------------------------------------------
-
-.. automodule:: lamana.models.example_Wilson_LT_func
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------
