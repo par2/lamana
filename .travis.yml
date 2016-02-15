@@ -6,7 +6,7 @@ sudo: false                                                 # works w/Docker
 language: python
 python:
   - "2.7"
-  - "2.7.10"
+  - "2.7.11"
   - "3.3"
   - "3.4"
   - "3.5"
@@ -76,7 +76,6 @@ branches:
   only:
     - master
     - develop
-    - feature/docs
 
 
 # References
@@ -86,4 +85,4 @@ branches:
 # (003) Conda on Travis w/details           http://lmjohns3.com/2015/06/using-travis-ci-with-miniconda-scipy-and-nose.html
 # (004) Example yaml                        https://github.com/lmjohns3/theanets/blob/master/.travis.yml
 # (005) Example 2 yaml                      http://samueljackson.me/2015/12/12/better-python-travis-config.html
-# (006) Sample codecov w/miniconda          https://github.com/JIC-CSB/jicbioimage.illustrate/blob/master/.travis.yml#L31 
+# (006) Sample codecov w/miniconda          https://github.com/JIC-CSB/jicbioimage.illustrate/blob/master/.travis.yml#L31
