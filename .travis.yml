@@ -67,6 +67,7 @@ script:
   - nosetests --with-cov --cov lamana
   - ls -al
   - coverage xml
+  - which coverage
 
 # Code Coverage
 after_success:
