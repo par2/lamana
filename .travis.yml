@@ -66,6 +66,7 @@ install:
 script:
   - nosetests --with-cov --cov lamana
   - ls -al
+  - cat .coverage.*
   - coverage xml
   - which coverage
 
