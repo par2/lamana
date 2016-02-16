@@ -65,6 +65,8 @@ install:
 # Command to run tests
 script:
   - nosetests --with-cov --cov lamana
+  - ls -al
+  - coverage xml
 
 # Code Coverage
 after_success:
