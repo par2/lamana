@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
-# Confirms output of general Laminate structure
-'''NOTE: Refactoring in 0.4.3c5b led to patching container orders. '''
+'''Confirm output of general Laminate structure.'''
+# NOTE: Refactoring in 0.4.3c5b led to patching container orders.
 
 import nose.tools as nt
 import pandas as pd
@@ -985,7 +985,7 @@ def test_Laminate_sanity7():
                 #print(LM.Geometry)
                 df = LM.LMFrame
                 # Select middle most indices, should be zero
-                halfidx = len(df.index) // 2
+                halfidx = len(df.index)//2
                 #print(halfidx)
                 actual = df.loc[halfidx - 1: halfidx, cols].values
                 expected = np.zeros((2, 1))

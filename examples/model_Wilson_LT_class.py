@@ -7,10 +7,10 @@ import math
 ##import pandas as pd
 
 #from .theories import Model
-from LamAna.theories import Model
+from lamana.theories import BaseModel
 
 
-class Wilson_LT(Model):
+class Wilson_LT(BaseModel):
     '''A modified laminate theory for circular biaxial flexure disks,
     loaded with a flat piston punch on 3-ball support having two distinct
     materials (polymer and ceramic).'''
@@ -21,10 +21,10 @@ class Wilson_LT(Model):
         self.FeatureInput = None
         self.LaminateModel = None
 
+    #def _use_model_(self, df, FeatureInput, adjusted_z=False):
+    #def update_LaminateModel(self, df, FeatureInput, adjusted_z=False):
+    ##def update_LaminateModel(df, FeatureInput, *args, adjusted_z=False):        # python 3.x
     def _use_model_(self, Laminate, adjusted_z=False):
-    ##def _use_model_(self, df, FeatureInput, adjusted_z=False):
-    ##def update_LaminateModel(self, df, FeatureInput, adjusted_z=False):
-    ##def update_LaminateModel(df, FeatureInput, *args, adjusted_z=False):     # python 3.x
         '''Return updated DataFrame and FeatureInput.
 
         Variables
@@ -101,9 +101,9 @@ class Wilson_LT(Model):
 
         return (df, FeatureInput)
 
-    #------------------------------------------------------------------------------
-    def calc_stiffness(self, df, mat_params):
+    #---------------------------------------------------------------------------
     ##def calc_stiffness(df, mat_params):
+    def calc_stiffness(self, df, mat_params):
         '''Return tuple of Series of (Q11, Q12) floats per lamina.'''
         # Iterate to Apply Modulus and Poisson's to correct Material
         for material in mat_params.index:
@@ -119,7 +119,6 @@ class Wilson_LT(Model):
         return stiffness(q_11, q_12)
 
     def calc_bending(self, df, adj_z=False):
-    ##def calc_bending(df, adj_z=False):
         '''Return tuple of Series of (D11, D12) floats.'''
         q_11 = df['Q_11']
         q_12 = df['Q_12']
@@ -134,7 +133,6 @@ class Wilson_LT(Model):
         return bending(d_11, d_12)
 
     def calc_moment(self, df, geo_params, v_eq):
-    ##def calc_moment(df, geo_params, v_eq):
         '''Return tuple of moments (radial and tangential); floats.
         See Timishenko-Woinowsky: Eq. 91; default'''
         P_a = geo_params['P_a']

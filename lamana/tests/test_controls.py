@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Tests for DataFrame various cases.  Uses external csv control files
+'''Test for various DataFrame output.  Uses external csv control files.'''
 
 import os
 

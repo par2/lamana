@@ -1,4 +1,6 @@
 #------------------------------------------------------------------------------
+'''A class for storing weblinks and references for package development.'''
+
 
 
 class Reference(object):
@@ -50,6 +52,7 @@ class Reference(object):
     # (043) Interactive, regex visualization    https://regex101.com/r/lL0cW7/4
     # (044) regex to find comma inside (),[]    https://stackoverflow.com/questions/33793037/python-regex-to-find-special-characters-between-delimiters/33793322#33793322
     # (045) Good integreation practices         https://pytest.org/latest/goodpractises.html
+    # (046) sorted with a key                   http://www.thegeekstuff.com/2014/06/python-sorted/
 
     pass
 #------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Confirms accurate execution of building cases
+'''Confirm accurate execution of building cases.'''
 
 import copy
 import itertools as it
@@ -433,7 +433,8 @@ def test_Case_apply_Snapshots1():
         'layer': [1, 2, 3, 4, 5, 6, 7],
         'matl': ['HA', 'PSu', 'HA', 'PSu', 'HA', 'PSu', 'HA'],
         'type': ['outer', 'inner', 'inner', 'middle', 'inner', 'inner', 'outer'],
-        't(um)': [400.0, 100.0, 100.0, 800.0, 100.0, 100.0, 400.0]}
+        't(um)': [400.0, 100.0, 100.0, 800.0, 100.0, 100.0, 400.0]
+    }
 
     actual = case1.snapshots[8]
     expected = pd.DataFrame(d)

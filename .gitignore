@@ -29,7 +29,6 @@ var/
 # IPython Notebooks
 .ipynb_checkpoints/
 _notebooks/
-*.ipynb
 
 # Installer logs
 pip-log.txt
@@ -48,8 +47,9 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
-
-
+docs/_static/
+docs/_templates/
+#docs/generated/
 
 
 # GitHub Desktop Defaults

@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Confirms output of general application of models
+'''Confirm output of general models.'''
 
 import nose.tools as nt
 
@@ -54,7 +54,7 @@ def test_theories_FeatureInput_globals1():
 
 def test_theories_FeatureInput_globels2():
     '''Globals stay None if p=1, post LMFrame processing.'''
-    '''Opportunity to use a select method for p spefically.'''
+    # TODO: Opportunity to use a select method for p spefically.
     case = ut.laminator(geos=dft.geos_standard, ps=[1])
     for case_ in case.values():
         for LM in case_.LMs:

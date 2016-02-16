@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Tests for constitency for utils
+'''Test for consistency of utils.'''
 
 import nose.tools as nt
 
@@ -16,11 +16,11 @@ dft = wlt.Defaults()                                       # from inherited clas
 # PARAMETERS ------------------------------------------------------------------
 # Build dicts of geometric and material parameters
 load_params = {
-    'R': 12e-3,                                    # specimen radius
-    'a': 7.5e-3,                                   # support ring radius
-    'p': 5,                                        # points/layer
-    'P_a': 1,                                      # applied load
-    'r': 2e-4,                                     # radial distance from center loading
+    'R': 12e-3,                                            # specimen radius
+    'a': 7.5e-3,                                           # support ring radius
+    'p': 5,                                                # points/layer
+    'P_a': 1,                                              # applied load
+    'r': 2e-4,                                             # radial distance from center loading
 }
 
 mat_props = {
@@ -32,7 +32,7 @@ mat_props = {
 
 
 # Defaults --------------------------------------------------------------------
-# Minor checks for sub-classes
+# Minor checks for subclasses
 def test_Defaults_load_params1():
     '''Confirm defaults geometric parameters for Wilson_LT are constant.'''
     actual = dft.load_params
