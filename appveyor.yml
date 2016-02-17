@@ -83,7 +83,7 @@ artifacts:
   # bdist_wheel puts your built wheel in the dist directory
   - path: dist\*
 
-# Tweas for gitflow; multiple configs to prevent breaking master
+# Tweaks for gitflow; multiple configs to prevent breaking master
 # configuration for "master" branch
 # build in Release mode and deploy locally
 -
@@ -94,6 +94,7 @@ artifacts:
   configuration: Release
   deploy:
     provider: Local
+    ...
 
 # configuration for all branches starting from "/feature"
 # build in Debug mode and deploy locally for testing
@@ -105,6 +106,7 @@ artifacts:
   configuration: Debug
   deploy:
     provider: Local
+    ...
 
 #on_success:
 #  You can use this step to upload your artifacts to a public website.
