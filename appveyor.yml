@@ -83,6 +83,29 @@ artifacts:
   # bdist_wheel puts your built wheel in the dist directory
   - path: dist\*
 
+# Tweas for gitflow; multiple configs to prevent breaking master
+# configuration for "master" branch
+# build in Release mode and deploy locally
+-
+  branches:
+    only:
+      - master
+
+  configuration: Release
+  deploy:
+    provider: Local
+
+# configuration for all branches starting from "/feature"
+# build in Debug mode and deploy locally for testing
+-
+  branches:
+    only:
+      - /feature/*
+
+  configuration: Debug
+  deploy:
+    provider: Local
+
 #on_success:
 #  You can use this step to upload your artifacts to a public website.
 #  See Appveyor's documentation for more details. Or you can simply
@@ -91,3 +114,4 @@ artifacts:
 # References
 # ----- ---------                           -------------
 # (001) Appveyor with Miniconda             http://tjelvarolsson.com/blog/how-to-continuously-test-your-python-code-on-windows-using-appveyor/
+# (002) Branches with gitflow               http://www.appveyor.com/docs/branches
