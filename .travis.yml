@@ -69,13 +69,12 @@ script:
 # Code Coverage
 after_success:
   - codecov
-# after_success:
-#  - coveralls
 
 branches:
   only:
     - master
     - develop
+    - feature/appveyor
 
 
 # References
