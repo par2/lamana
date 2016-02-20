@@ -76,10 +76,11 @@ after_success:
 # after_success:
 #  - coveralls
 
-branches:
-  only:
-    - master
-    - develop
+# Whitelist
+#branches:
+#  only:
+#    - master
+#    - develop
 
 
 # References
