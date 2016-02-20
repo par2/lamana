@@ -1,6 +1,7 @@
 # -----------------------------------------------------------------------------
-# A Feature Module comprising classes and functions involving stress distrubtions.
+'''A Feature Module of classes and functions related to stress distributions.'''
 # Case() : A collection of LaminateModel objects
+# Cases() : A collection of Cases
 # flake8 distributions.py --ignore E265,E501,N802,N806
 
 import os
@@ -26,51 +27,58 @@ bdft = BaseDefaults()
 class Case(object):
     '''Build a Case object that handles User Input parameters.
 
-    Variables
-    =========
-    geometric : dict
-        Loading paramters (load_params) including p.
-    materials : dict
-        Either dict or nested dict of material properties (mat_props).
+    Attributes
+    ----------
+    materials
+    {middle, inner, outer, total}
+    total_{middle, inner, inner_i, outer}
+    snapshots
+    frames
+    LMs
+    size
+    load_params : dict; default None
+        A dict of common loading parameters, sample and support radii, etc.
+    mat_props : dict; default None
+        A dict of materials and properties, i.e. elastic modulus and Poisson's ratio.
+    parameters : Series
+        Converted load_params to pandas object; used for quick display.
+    properties : DataFrame
+        Converted mat_props to pandas object; used for quick display.
+    Geometries : list of Geometry objects
+        A container for multiple Geometry objects.
+    model : str
+        Specified custom, laminate theory model.
+    LaminateModels : list of DataFrames
+        Each DataFrame represents a laminate stack containing calculations
+        from the applied laminate theory model.
+    p : int
+        Datapoints per lamina.  Although available in FeatureInput, this
+        attribute is mainly is used for quick access in string representations.
 
     Methods
-    =======
-    apply --> None
-        Accepts user geometries and selected model.  Builds LaminateModel and
-        FeatureInput objects by iteration.
-    plot --> matplotlib axes
-        Plots laminate DataFrame.
+    -------
+    apply(geo_strings=None, model='Wilson_LT', unique=False)
+        Return `LaminateModel` and `FeatureInput` objects by iterating geometry
+        strings.  Accept user geometries and selected model.
+    plot(**kwargs)
+        Return matplotlib plots given laminate DataFrames.
 
-    Properties
-    ==========
-    middle : list; float
-        All middle thicknesses.
-    inner : list; list
-        All inner thicknesses.
-    outer : list; float
-        All outer thicknesses.
+    Raises
+    ------
+    TypeError
+        If load_params or mat_props is None; needs a dict and nested dict
+        respectively.
 
-    total : list; float
-        Totaled laminate thickness.
-    total_middle : list; float
-        Totaled total middle layer thicknesses.
-    total_inner : list; list
-        Totaled "inner" layer thicknesses; for all inner layers in the laminate.
-    total_inner_i : list; float
-        Totaled, specific layer thicknesses.
-    total_outer : list; float
-        Totaled outer layer thicknesses.
-
-    snapshots : list; DataFrame
-        Returns a quick view of the stack.
-    frames : list; DataFrame
-        Returns a list of DataFrames representing each laminate.
-    LMs : LaminateModel object
-        Returns the native Laminate object.
+    Notes
+    -----
+    See the "Getting Started" documentation for a sample loading configuration
+    diagram.
 
     '''
+
     # Automated Parameters
     '''Rename args to load_params and mat_props.'''
+    # TODO: remove materials kwarg (?)
     def __init__(self, load_params=None, mat_props=None, materials=None):
         # Default Parameters
         if load_params is not None:
@@ -95,12 +103,12 @@ class Case(object):
         self.p = []                                   # added 0.4.3d
 
     def __str__(self):                                # for object calls
-        '''Returns Geometry object string.'''
+        '''Return a string repr of a Geometry object.'''
         ##return'<{}>'.format(self.__class__)
         return'<{} p={}>'.format(self.__class__, self.p)
 
     def __repr__(self):                               # for object calls
-        '''Returns Geometry object string.'''
+        '''Return a string repr of a Geometry object.'''
         ##return'<{}>'.format(self.__class__)
         return'<{} p={}, size={}>'.format(self.__class__, self.p,
                                           len(self.LaminateModels))
@@ -108,10 +116,14 @@ class Case(object):
     def __eq__(self, other):
         '''Compare Case objects, designed to handle pandas objects.
 
-        DEV: __eq__ handles all DataFrame/Series items of __dict__ separately.
+        Notes
+        -----
+        DEV: `__eq__` handles all DataFrame/Series items of `__dict__` separately.
         Attribute names with DataFrame/Series assignments are blacklisted
-        and checked separately from other __dict__ items.
+        and checked separately from other `__dict__` items.
+
         '''
+
         if isinstance(other, self.__class__):
             # Auto check attrs if assigned to DataFrames/Series, then add to list
             blacklisted = [attr for attr in self.__dict__ if
@@ -156,41 +168,55 @@ class Case(object):
         return df_properties
 
     def apply(self, geo_strings=None, model='Wilson_LT', unique=False):
-        '''Apply geometries and Laminate Theory model to a LaminateModel.
+        '''Apply geometries and laminate theory model to a `LaminateModel`.
 
-        Convert user inputs general convention, then to Geometry objects
-        and iterate to assign a laminate theory model, make a FeatureInput
+        Convert user inputs general convention, then to `Geometry` objects
+        and iterate to assign a laminate theory model, make a `FeatureInput`
         object and build DataFrames.
 
-        DEV: be careful what you assign to self.  Remember self.__dict__
-        is used for comparisons via __eq__.  If used, consider adding to
-        blacklisted list in __eq__.
+        Three essential objects that are created here are:
 
-        Variables
-        =========
-        geo_strings : list; str; Default: None
-            User input geometry strings.  Note: lower case  geo --> unconverted.
-        model : module, classes
-            Indicated model is pulled from theories module(s).
-        unique : bool
-            Apply a set of unique geometry strings.
-
-        Objects
-        =======
-        Geometry : list; mixed
-            Converted user input geometries; uses input_.Geometry().
-            Note: upper case Geo --> converted
-        FeatureInput : dict
+        - Geometry : list of mixed types
+            Converted user input geometries; uses `input_.Geometry().` Note the
+            upper case "G" implies a converted geometry string to Geometry object.
+        - FeatureInput : dict
             Container for parameters used in building laminates;
-        LaminateModels : list; DataFrames
+        - LaminateModels : list of DataFrames
             DataFrames representing a laminate stack containing calculations
             using the applied laminate theory model.
 
+        Parameters
+        ----------
+        geo_strings : list of str; default None
+            User input geometry strings.  Note lower case  'geo' implies a
+            simple geometry string.
+        model : str; default 'Wilson_LT
+            Selected model is a custom model found in `models` directory.
+        unique : bool; default False
+            Apply a set of unique geometry strings.
+
+        Returns
+        -------
+        None
+            Updates certain attributes.
+
+        Raises
+        ------
+        ValueError
+            If no value geometry strings are found.
+
         See Also
-        ========
-        input_.Geometry : convert user input geometries to usable code.
-        constructs.Laminate : build DataFrames containing laminate calculations.
-        constructs.Laminate.build_laminate() : uses FeatureInputs
+        --------
+        lamana.input_.Geometry : convert user input geometries to usable code.
+        lamana.constructs.Laminate : build DataFrames containing laminate calculations.
+        lamana.constructs.Laminate.build_laminate : uses `FeatureInput`.
+
+        Notes
+        -----
+        DEV: be careful what you assign to self.  Remember `self.__dict__`
+        is used for comparisons via `__eq__`.  If used, consider adding to
+        blacklisted list in `__eq__`.
+
         '''
         '''Consider moving, to all only once.'''
         G = la.input_.Geometry
@@ -201,7 +227,7 @@ class Case(object):
 
         # Defaults
         if geo_strings is None:
-            '''Add is_valid(geometry) here? Almost like type checking'''
+            # TODO: Add is_valid(geometry) here? Almost like type checking
             raise ValueError("No geometries found.  Please input valid geometry, "
                              "e.g. '400-[200]-800.'")
             ##raise Exception("No geometries found.  Please input valid geometry, e.g. '400-[200-800.'")
@@ -211,17 +237,31 @@ class Case(object):
 #             self._geo_strings = geo_strings
 
         def get_LaminateModels(geometries):
-            '''Yield LaminateModels and FeatureInputs.
+            '''Yield a LaminateModel; build a FeatureInput.
 
-            Set Geometry objects given an iterable of geometry strings.
-            Also set p for info (i.e. string representation).'''
+            Set Geometry objects to instance given an iterable of geometry strings.
+            Also set p for info (i.e. string representation).
+
+            Notes
+            -----
+            First checks a cache of unique converted geo_strings before LM; strings are
+            more efficient to check than Geometry objects.
+
+            Builds and sets a `LaminateModel`, `FeatureInput` and sets the `p`
+            attribute simultaneously.
+
+            Yields
+            ------
+            LaminateModel
+                DataFrame of laminate theory calculations.
+
+            '''
             _geo_cache = set()
 
             for geometry in geometries:
                 conv_geometry = la.input_.Geometry._to_gen_convention(geometry)
 
-                # Check a cache of unique converted geo_strings before LM
-                # Strings are more efficient to check than Geometry objects
+                # Check a cache
                 if unique and (conv_geometry in _geo_cache):
                     pass
                 else:
@@ -250,149 +290,69 @@ class Case(object):
         self.LaminateModels = list(get_LaminateModels(geo_strings))
         print('User input geometries have been converted and set to Case.')
 
+    # TODO: get ipython directives working to plot figures from docstrings.
+    # TODO: emulate pandas, return an mpl axes instead of None; change test
     def plot(self, title=None, subtitle=None, x=None, y=None, normalized=None,
              halfplot=None, extrema=True, separate=False, legend_on=True,
              colorblind=False, grayscale=False, annotate=False, inset=False,
              ax=None, subplots_kw=None, suptitle_kw=None, **kwargs):
         '''Plot single and multiple LaminateModels.
 
-        Plots objects found within a list of LMs. Assumes Laminate objects are in the namespace.
-        Calls _distribplot() for single/multiple geometries.
+        Plots objects found within a list of LMs.  Assumes Laminate objects are
+        in the namespace.  Calls `lamana.output_._distribplot()` for
+        single/multiple geometries.
 
         Parameters
-        ==========
-        title : str
+        ----------
+        title : str; default None
             Suptitle; convenience keyword
-        subtitle:
+        subtitle : str; default None
             Subtitle; convenience keyword.  Used ax.text().
-        x, y : str
+        {x, y} : str; default None
             DataFrame column names.  Users can manually pass in other columns names.
-        normalized : bool
-            If true, plots y = k_; else plots y = d_ unless specified otherwise.
-        halfplot : str
-            Trim the DataFrame to read either |'tensile'|'compressive'|None|.
-        extrema : bool
-            Plot minima and maxima only; equivalent to p=2. Default: True.
-        separate : bool
+        normalized : bool; default None
+            If true, plots y = `k_`; else plots y = `d_` unless specified otherwise.
+        halfplot : str; default None
+            Trim the DataFrame to read either 'tensile', 'compressive' or `None`.
+        extrema : bool; default True
+            Plot minima and maxima only; equivalent to p=2.
+        separate : bool; default False
             Plot each geometry in separate subplots.
-        legend_on : bool
-            Turn on/off plot. Default: True.
-        colorblind : bool
-            Set line and marker colors as colorblind-safe. Default: False.
-        grayscale : bool
+        legend_on : bool; default True
+            Turn on/off plot
+        colorblind : bool; default False
+            Set line and marker colors as colorblind-safe.
+        grayscale : bool; default False
             Set everything to grayscale; overrides colorblind.
-        annotate : bool
+        annotate : bool; default False
             Annotate names of layer types.
-        inset: bool
+        inset: bool; default None
             Unnormalized plot of single geometry in upper right corner.
-        ax : matplotlib axes
+        ax : matplotlib axes; default None
             An axes containing the plots.
-
-        See distroplot() for more kwargs.
-        {subplots, suptitle}_kw : dict
+        subplots_kw : dict; default None
             Default keywords are initialed to set up the distribution plots.
-            - subplots: |ncols=1|figsize=(12,8)|dpi=300|
-            - suptitle: |fontsize=15|fontweight='bold'|
+            (`ncols`=1, `figsize`=(12, 8), `dpi`=300)
+        suptitle_kw : dict; default None
+            Default keywords are initialed to set up the distribution plots.
+            (`fontsize`=15, `fontweight`='bold')
 
-        Preferred
-        =========
+        Notes
+        -----
+        Here are some preferred idioms (not yet implemented):
+
         >>> case.LM.plot()                                # geometries in case
         Case Plotted. Data Written. Image Saved.
         >>> case.LM[4:-1].plot()                          # handle slicing
         Case Plotted. Data Written. Image Saved.
 
-        Examples
-        ========
-
-        Plot Single Geometry
-        --------------------
-
-        Unnormalized stress distribution for single geometry (default):
-
-        .. plot::
-            :context: close-figs
-
-            >>> import lamana as la
-            >>> from LamAma.models import Wilson_LT as wlt
-            >>> dft = wlt.Defaults()
-            >>> case = la.distributions.Case(dft.load_params, dft.mat_props)
-            >>> case.apply('400-[200]-800')
-            >>> case.plot()
-
-        Normalized stress distribution for single geometry:
-
-        .. plot::
-            :context: close-figs
-
-            >>> case.plot(normalized=True)
-
-        Normalized stress distribution (base) with an unnormalized inset:
-
-       .. plot::
-           :context: close-figs
-
-           >>> case.plot(inset=True)
-
-        Stress distribution plot with layer annotations:
-
-        .. plot::
-            :context: close-figs
-
-            >>> plot(annotate=True)
-
-        Custom markerstyles and kwarg passing.
-
-        .. plot::
-            :context: close-figs
-
-            >>> plot(markerstyles=['D'])
-
-        Colorblind-safe color palette.
-
-        .. plot::
-            :context: close-figs
-
-            >>> plot(colorblind=True)
-
-        Grayscale color palette.
-
-        .. plot::
-            :context: close-figs
-
-            >>> plot(grayscale=True)
-
-
-        Plot Multiple Geometries
-        ------------------------
-
-        Normalized stress distributions for multiple geometries (default):
-
-        .. plot::
-            :context: close-figs
-
-            >>> case.apply('400-200-800', '350-400-500', '200-100-1400')
-            >>> case.plot()
-
-        Tensile stress distribution:
-        .. plot::
-            :context: close-figs
-
-            >>> case.plot(halfplot='tensile')
-
-        Insets are not implemented for multiple geometries:
-
-        .. plot::
-            :context: close-figs
-
-            >>> case.plot(inset=True)
-            NotImplementedError 'Unable to superimpose multiple, unnormalized plots.
-
         See Also
-        ========
-        constructs.Laminate : builds the LaminateModel object
-        output_.distribplot : generic handler for stress distribution plots
-        output_._multiplot : plots multiple cases as subplots (caselets)
-        distributions.Cases.plot : makes call to _multiplot()
+        --------
+        lamana.constructs.Laminate : builds the `LaminateModel` object.
+        lamana.output_._distribplot : generic handler for stress distribution plots.
+        lamana.output_._multiplot : plots multiple cases as subplots (caselets).
+        lamana.distributions.Cases.plot : makes call to `_multiplot()`.
+
         '''
         #print('Accessing plot() method.')
         # FIGURE ------------------------------------------------------------------
@@ -467,7 +427,14 @@ class Case(object):
 
     @property
     def materials(self):
-        '''Override the _materials attribute.'''
+        '''Override the _materials attribute.
+
+        Raises
+        ------
+        NameError
+            If a trying to set a name not already in the materials list.
+
+        '''
         print('Getting materials...')
         return self._materials
 
@@ -483,35 +450,43 @@ class Case(object):
 
     @property
     def middle(self):
+        '''Return thicknesses of the middle layers.'''
         return [Geo.middle for Geo in self.Geometries]
 
     @property
     def inner(self):
+        '''Return thicknesses of the inner layers.'''
         return [Geo.inner for Geo in self.Geometries]
 
     @property
     def outer(self):
+        '''Return thicknesses of the outer layers.'''
         return [Geo.outer for Geo in self.Geometries]
 
     # Totals
     @property
     def total(self):
+        '''Return total laminate thickness.'''
         return [Geo.total for Geo in self.Geometries]
 
     @property
     def total_middle(self):
+        '''Return total thicknesses of the middle layer.'''
         return [Geo.total_middle for Geo in self.Geometries]
 
     @property
     def total_inner(self):
+        '''Return thicknesses of all inner layers.'''
         return [Geo.total_inner for Geo in self.Geometries]
 
     @property
     def total_inner_i(self):
+        '''Return thicknesses of the separate inner layers.'''
         return [Geo.total_inner_i for Geo in self.Geometries]
 
     @property
     def total_outer(self):
+        '''Return thicknesses of all outer layers.'''
         return [Geo.total_outer for Geo in self.Geometries]
 
     @property
@@ -528,8 +503,8 @@ class Case(object):
         Laminate class.
 
         Examples
-        ========
-        >>>case1.frames
+        --------
+        >>> case1.frames
         [<LaminateModel object>]
         '''
         print('Accessing frames method.')
@@ -545,6 +520,10 @@ class Case(object):
         '''Return number of a Laminates.'''
         return len(self.LaminateModels)
 
+# =============================================================================
+# UTILITY ---------------------------------------------------------------------
+# =============================================================================
+# Builds and handles multiple cases simultaneously
 
 class Cases(ct.MutableMapping):
     '''Return a dict of Case objects.
@@ -552,67 +531,68 @@ class Cases(ct.MutableMapping):
     This is useful for situations requiring laminates with different geometries,
     thicknesses and ps.
 
-    - LM : LaminateModel object.
-    - LaminateModel : DataFrames of laminate info; Snapshot, LFrame, LMFrame.
-    - case : group of LMs with the same geometric, loading and material parameters.
-    - cases : group of cases, particularly with a similar pattern of interest or
-      different rows (p).
-    - caselet : a subset of cases or LMs; geometry string, list or case (See LPEP 003)
-
     Characteristics:
-    - if user-defined, tries to import Defaults() to simplify instantiations
+
+    - if user-defined, tries to import `Defaults()` to simplify instantiations
     - dict-like storage and access of cases
     - iterable by values
     - sliceable; returns a selection of cases
     - subset selection methods of LaminateModels
     - set operations for subset selections
 
-    Variables
-    =========
+    Parameters
+    ----------
     caselets : list
         Containing geometry strings, lists of geometry strings or cases
         (as of 0.4.4b3).
-    load_params : dict; Default: None
+    load_params : dict; default None
         Passed-in geometric parameters if specified; else default is used.
-    mat_props : dict
+    mat_props : dict; default None
         Passed-in materials parameters if specidfied; else default is used.
-    ps : list; ints
-        p values to be looped over; p sets the number of rows per DataFrame.
-    model : str
-        Module name from which to auto-import Defaults().
-    verbose : bool
+    ps : list of ints
+        `p` values to be looped over; `p` sets the number of rows per DataFrame.
+    model : str; default None
+        Module name from which to auto-import `Defaults()``.
+    verbose : bool; default False
         If True, print a list of Geometries.
-    unique : bool
-        If True and given a series of intersecting caselets (specifically
-        geometry strings), return unique geometries per caselet.
-    combine : bool
-        Combines caselets into a single case. Convenience, complementary
+    unique : bool; default False
+        If True and given a series of intersecting `caselets` (specifically
+        geometry strings), return unique geometries per `caselet`.
+    combine : bool; default False
+        Combines `caselets` into a single case. Convenience, complementary
         keyword to Case(separate=True).
     #defaults_path : str
         Custom path from which to import Defaults().
 
-    Examples
-    ========
+    Raises
+    ------
+    ImportError
+        If default load parameters or materials properties cannot be set.
+    TypeError
+        If invalid caselet type detected or p is a non-integer.
 
+    Examples
+    --------
     Cases of different ps, accepting a list of geometry strings
 
     >>> from lamana.distributions import Cases
-    >>> cases = Cases('dft.geo_inputs['5-ply]', ps=[2,3])
+    >>> cases = Cases('dft.geo_inputs['5-ply'], ps=[2,3])
     >>> cases
     {0: <<class 'lamana.distributions.Case'> p=2, size=3>,
      1: <<class 'lamana.distributions.Case'> p=3, size=3>}
 
     Accepts a dict of listed geometry strings (precursors for caselets)
 
-    >>> dict_caselets = {0: ['350-400-500',  '400-200-800', '200-200-1200',
-                             '200-100-1400', '100-100-1600', '100-200-1400'],
-                         1: ['400-550-100', '400-500-200', '400-450-300',
-                             '400-400-400', '400-350-500', '400-300-600'],
-                         2: ['400-400-400', '350-400-500', '300-400-600',
-                             '200-400-700', '200-400-800', '150-400-990'],
-                         3: ['100-700-400', '150-650-400', '200-600-400',
-                             '250-550-400', '300-400-500', '350-450-400'],
-                         }
+    >>> dict_caselets = {
+        0: ['350-400-500',  '400-200-800', '200-200-1200',
+            '200-100-1400', '100-100-1600', '100-200-1400'],
+        1: ['400-550-100', '400-500-200', '400-450-300',
+            '400-400-400', '400-350-500', '400-300-600'],
+        2: ['400-400-400', '350-400-500', '300-400-600',
+            '200-400-700', '200-400-800', '150-400-990'],
+        3: ['100-700-400', '150-650-400', '200-600-400',
+            '250-550-400', '300-400-500', '350-450-400'],
+    }
     >>> cases = Cases(dict_caselets)
     >>> cases
     {0: <<class 'lamana.distributions.Case'> p=5, size=6>,
@@ -633,7 +613,14 @@ class Cases(ct.MutableMapping):
     >>> (LM for case in cases for LM in case.LMs)
     <generator object>
 
-    >>> # Cases accepts repeated geometry strings and returns unique sets
+    Notes
+    -----
+    - LM: `LaminateModel` object.
+    - LaminateModel: DataFrames of laminate info; `Snapshot`, `LFrame`, `LMFrame`.
+    - case: group of LMs with the same geometric, loading and material parameters.
+    - cases: group of cases, particularly with a similar pattern of interest or
+      different rows (`p`).
+    - caselet: a subset of cases or LMs; geometry string, list or case (See LPEP 003)
 
     '''
     def __init__(
@@ -694,7 +681,7 @@ class Cases(ct.MutableMapping):
                 else:
                     case_.apply(caselets)
                 self.caselets = [case_]
-                '''Brittle; need more robust try-except'''
+                # TODO: Brittle; need more robust try-except
             except(AttributeError):
                 try:
                     # if a list of lists
@@ -776,14 +763,17 @@ class Cases(ct.MutableMapping):
     def _get_unique(self, caselet_):
         '''Return a set of unique geometry strings given a caselet.
 
-        Here think of caselet as geometry strings that make a separate plot.
-        There is then only one type of caselet needed to make a set - a list
+        Notes
+        -----
+        Here think of `caselet` as geometry strings that make a separate plot.
+        There is then only one type of `caselet` needed to make a set - a list
         - since a single geometry string is already unique and a we need the
         strings from a case.  Let's ignore these types then and focus on
         list of geometry strings.
+
         '''
         if isinstance(caselet_, str):
-            print('Single geometry string detected. unique not applied. '
+            print('Single geometry string detected. unique not applied.'
                   'See combine=True keyword.')
             return caselet_
         elif isinstance(caselet_, la.distributions.Case):
@@ -851,11 +841,11 @@ class Cases(ct.MutableMapping):
 
     # The final two methods aren't required, but nice for demo purposes:
     def __str__(self):
-        '''Returns simple dict representation of the mapping'''
+        '''Return simple dict representation of the mapping.'''
         return str(self._dict_caselets)
 
     def __repr__(self):
-        '''Echoes class, id, & reproducible representation in the REPL'''
+        '''Echoes class, id, & reproducible representation in the REPL.'''
         return '{}, {}'.format(super(self.__class__, self).__repr__(),
                                self._dict_caselets)
 
@@ -863,17 +853,17 @@ class Cases(ct.MutableMapping):
     def select(self, nplies=None, ps=None, how='union'):
         '''Return a set (subset) of LaminateModels given keyword conditions.
 
-        Variables
-        =========
-        nplies : None; list
+        Parameters
+        ----------
+        nplies : list; default None
             List or int of number of plies.
-        ps : None; list
+        ps : list; default None
             List or int of number of points/rows.
-        how : str
+        how : str; default 'union'
             Use set operations union, difference, intersection, symmetric difference.
 
         Examples
-        ========
+        --------
         >>> list_ = dft.geos_dissimilar + dft.geos_symmetric
         >>> cases = Cases(geos=list_)
         >>> cases_selected = cases.select(name='7-ply')
@@ -927,8 +917,8 @@ class Cases(ct.MutableMapping):
         encourages to use Case().
 
         See Also
-        ========
-        la.distributions.Case(): single plots
+        --------
+        la.distributions.Case() : single plots
 
         '''
         caselets = self

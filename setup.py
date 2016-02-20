@@ -5,6 +5,8 @@ import codecs
 import os
 import re
 
+#TODO: Apparently setuptools "ruins the universe"; be cautious with continued use  
+
 try:
     from setuptools import setup, find_packages
 except ImportError:
@@ -59,13 +61,13 @@ setup(
     # Required to add files to wheels
     package_data={
         # Include root level items
-        # (Uncertain how this is adds to wheels...)
+        # (Uncertain how this is added to wheels...)
         '': ['LICENSE', 'requirements.txt'],
         # Include test *.py files and *.csv files in 'controls_LT' directory
         'lamana': ['tests/*.py', 'tests/controls_LT/*.csv'],
     },
     # Install latest dependencies; "hands-off" approach
-    # Invoke `-r requirements.txt` to install pinned dependencies; "hands-on"
+    # Invoke `-r requirements.txt` to install pinned dependencies; "hands-on" approach
     install_requires=[
         'matplotlib',
         'pandas',

@@ -1,11 +1,16 @@
 # https://github.com/github/gitignore/blob/master/Python.gitignore
+
+
 # Byte-compiled / optimized / DLL files
+# =====================================
 __pycache__/
 *.py[cod]
 *$py.class
 *.pyc
 
-# Distribution / packaging
+
+# Packaging
+# ==========
 .Python
 env/
 build/
@@ -23,17 +28,26 @@ var/
 .installed.cfg
 *.egg
 
-#Gitflow Bug
-(cd .git*/
 
 # IPython Notebooks
+# =================
 .ipynb_checkpoints/
+_notebooks/
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
 
-# Unit test / coverage reports
+# Sphinx Documentation
+# ====================
+docs/_build/
+docs/_static/
+docs/_templates/
+#docs/generated/
+
+
+# Testing
+# =======
+
+# Coverage Reports
+# ----------------
 htmlcov/
 .tox/
 .coverage
@@ -44,54 +58,83 @@ coverage.xml
 *,cover
 .hypothesis/
 
-# Sphinx documentation
-docs/_build/
+
+# Pip
+# ===
+
+# Installer Logs
+# --------------
+pip-log.txt
+pip-delete-this-directory.txt
 
 
+# Gitflow
+# =======
+
+# Bug
+# ---
+(cd .git*/
 
 
+# ====================================================
+
+
+# =======================
 # GitHub Desktop Defaults
-# =========================
+# ========================
 
 # Windows image file caches
+# -------------------------
 Thumbs.db
 ehthumbs.db
+
+# OneNote
+# -------
 *.onetoc2
 
 # Folder config file
+# ------------------
 Desktop.ini
 
 # Recycle Bin used on file shares
+# -------------------------------
 $RECYCLE.BIN/
 
 # Windows Installer files
+# -----------------------
 *.cab
 *.msi
 *.msm
 *.msp
 
 # Windows shortcuts
+# -----------------
 *.lnk
+
 
 # =========================
 # Operating System Files
 # =========================
 
+
 # OSX
-# =========================
+# ===
 
 .DS_Store
 .AppleDouble
 .LSOverride
 
 # Thumbnails
+# ----------
 ._*
 
 # Files that might appear on external disk
+# ----------------------------------------
 .Spotlight-V100
 .Trashes
 
 # Directories potentially created on remote AFP share
+# ---------------------------------------------------
 .AppleDB
 .AppleDesktop
 Network Trash Folder

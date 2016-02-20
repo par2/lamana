@@ -1,8 +1,8 @@
 # -----------------------------------------------------------------------------
-# A module that builds core objects, i.e. stacks and laminates
+'''A module that builds core objects, such as stacks and laminates.'''
 # Stack() : an dict of the order laminate layers.
 # Laminate() : pandas objects including laminate dimensions and calculations
-# flake8 constructs.py --ignore=E265,E501,N802,H806
+
 
 import traceback
 import itertools as it
@@ -26,36 +26,37 @@ class Stack(object):
 
     We need to go from a 3 item Geometry object to n-sized stack of labeled
     layers.  Two operations are performed:
-        1. Decode the Geometry object into a list of lamina thicknesses and
-        types "unfolded" (or mirrored) across the physical neutral axis.
-        2. Identify the unfolded geometry to build a StackTuple - a namedtuple
-        containing a dict of the stacking order, the number or plies, the
-        official stack name and alias.
 
-    Variables
-    =========
+    1. Decode the Geometry object into a list of lamina thicknesses and
+       types "unfolded" (or mirrored) across the physical neutral axis.
+    2. Identify the unfolded geometry to build a StackTuple - a namedtuple
+       containing a dict of the stacking order, the number or plies, the
+       official stack name and alias.
+
+    Parameters
+    ----------
     FeatureInput : dict or Geometry object
-        Use 'Geometry key to 'extract the GeometryTuple (converted geometry string)
-        Can directly accept a Geometry object
+        Use `Geometry` key to extract the `GeometryTuple` (converted geometry string)
+        Can directly accept a Geometry object.
 
     Methods
-    =======
-    decode_geometry --> generator
-        Iterating forward and backward over the Geometry object.
-    identify_geometry --> namedtuple
-        Lists are converted to dicts.
-    add_materials --> dict
-        Materials can be later added to a stack dict.
-    stack_to_df --> DataFrame
-        Convert the stack to a DataFrame.
+    -------
+    decode_geometry(Geometry)
+        Yield a generator, iterating forward and backward over the Geometry object.
+    identify_geometry(decoded)
+        Return a namedtuple; lists are converted to dicts.
+    add_materials(stack, materials)
+        Return a dict; materials can be later added to a stack dict.
+    stack_to_df(stack)
+        Return a DataFrame, converting the stack.
 
-    Object
-    ======
-    StackTuple : namedtuple; (dict, int, str, str)
-        Contains order, nplies, name, alias.
+    Returns
+    -------
+    namedtuple
+        A StackTuple (dict, int, str, str); contains order, nplies, name, alias.
 
     See Also
-    ========
+    --------
     collections.namedtuple : special tuple in the Python Standard Library.
 
     '''
@@ -78,8 +79,9 @@ class Stack(object):
         Interprets the stacking order and yields a tuple of the lamina type
         (ltype) and thickness.
 
-        A Geometry object has a .geometry attribute returning a namedtuple of
+        A `Geometry` object has a .geometry attribute returning a namedtuple of
         laminae thicknesses labeled:
+
         - ['outer', 'inner', 'middle', 'symmetric']        # symmetry convention
         - ['outer', 'inner', 'middle']                     # general conventions
 
@@ -88,16 +90,16 @@ class Stack(object):
         If the Symmetric Convention is detected, the tuples are converted
         to General Convention by popping the 'symmetric' list element.
 
-        Performance
-        ===========
-        %timeit decode_geometry(G)                        (with lists) : 10.3 us
-        %timeit decode_geometry(G)                        (with generators): 529 ns
-        %timeit decode_geometry(G)                        (with generators; 2nd refactor): 1.4 us
-        %timeit [layer_ for layer_ in decode_geometry(G)] (generators to lists): 57.1 us
-        %timeit [layer_ for layer_ in decode_geometry(G)] (generators to lists; 2nd refactor): 107 us
+        Performance profiling:
 
-        Example
-        =======
+        >>> %timeit decode_geometry(G)                        (with lists) : 10.3 us
+        >>> %timeit decode_geometry(G)                        (with generators): 529 ns
+        >>> %timeit decode_geometry(G)                        (with generators; 2nd refactor): 1.4 us
+        >>> %timeit [layer_ for layer_ in decode_geometry(G)] (generators to lists): 57.1 us
+        >>> %timeit [layer_ for layer_ in decode_geometry(G)] (generators to lists; 2nd refactor): 107 us
+
+        Examples
+        --------
         >>> G = la.input_.Geometry('400-[200]-800')
         >>> G
         Geometry object('400-[200]-800')
@@ -106,7 +108,7 @@ class Stack(object):
         >>> decoded
         <generator object>
 
-        >>>[tupled for tupled in decode_geometry(G)]
+        >>> [tupled for tupled in decode_geometry(G)]
         [('outer', 400.0),
          ('inner', 200.0),
          ('middle', 800.0),
@@ -126,12 +128,12 @@ class Stack(object):
             # Reverse: ... inner_i, outer
             for ltype, thickness in reversed(listify_layer(Geometry)[:-1]):
                 #yield from process_layer(ltype, thickness, reverse=True)
-                '''DEV: Converted for Python 2.7; see latter for Py 3.x'''
+                # NOTE: DEV: Converted for Python 2.7; see latter for Py 3.x
                 for layer_ in process_layer(ltype, thickness, reverse=True):
                     yield layer_
 
         def listify_layer(Geometry):                       # pure function 1
-            '''Convert Geometry namedtuple to a list of tuples; pops symmetric entry'''
+            '''Return a converted Geometry namedtuple to a list of tuples; pops symmetric entry'''
             layers = list(Geometry.geometry._asdict().items())
             if Geometry.is_symmetric:                      # clean up last element; see namedtuple of symmetric Geometry
                 layers.pop()
@@ -140,7 +142,7 @@ class Stack(object):
             return layers
 
         def process_layer(ltype, thickness, reverse=False):        # pure function 2
-            '''Get items out of inner_i thickness list and unfold Geometry stack.
+            '''Return items from inner_i thickness list and "unfold" Geometry stack.
             Reverse inner_i list if set True.'''
             if isinstance(thickness, list) & (reverse is False):     # parse inner_i list for forward iteration
                 for inner in thickness:
@@ -164,30 +166,33 @@ class Stack(object):
         non-zero thick laminae to the stack.  The number of plies (nplies),
         name and alias (if special) are then determined.
 
-        Variables
-        =========
-        decoded : generator; tuples
-            Decoded Geometry object, containing tuples of thickness and layer_ type.
-            Stacking order is preserved; result of Stack.decode_geometry().
+        Parameters
+        ----------
+        decoded : generator of tuples
+            Decoded Geometry object, containing tuples of thickness & `layer_` type.
+            Stacking order is preserved; result of `Stack.decode_geometry()`.
 
         Returns
-        =======
-        StackTuple : namedtuple; (dict, int, str, str)
-            - order: (dict) of the layer_ number as keys and decoded geometry values
+        -------
+        namedtuple
+            A StackTuple (dict, int, str, str):
+            - order: (dict) of the `layer_` number as keys and decoded geometry values
             - nplies: (int) number of plies
             - name: (str) name of laminate
             - alias: (str) common name
 
-        Performance
-        ===========
-        geo_input = '400-200-800
-        G = la.input_.Geometry(geo_input)
-        decoded = decode_geometry(G)
-        %timeit identify_geometry(decoded)                (with lists): 950 us
-        %timeit identify_geometry(decoded)                (with generators): 935 us  ?
+        Notes
+        -----
+        Performance profiling:
 
-        Example
-        =======
+        >>> geo_input = '400-200-800
+        >>> G = la.input_.Geometry(geo_input)
+        >>> decoded = decode_geometry(G)
+        >>> %timeit identify_geometry(decoded)                (with lists): 950 us
+        >>> %timeit identify_geometry(decoded)                (with generators): 935 us  ?
+
+        Examples
+        --------
         >>> geo_input = ('400-[200]-800')
         >>> G = la.input_.Geometry(geo_input)
         >>> identify_geometry(decode_geometry(G))
@@ -231,12 +236,12 @@ class Stack(object):
     def add_materials(cls, stack, materials):
         '''Return a defaultdict of the stack with extended material values.
 
-        Uses the Cycler which alternates while iterating the materials list,
+        Uses a cycler which alternates while iterating the materials list,
         keeping count.  Once the counter reaches the number of plies,
         the loop breaks.
 
-        Variables
-        =========
+        Parameters
+        ----------
         stack : dict
             Layer numbers as keys and layer type/thickness as values.
             Material are appended to list values.
@@ -245,7 +250,7 @@ class Stack(object):
             module or overridden by the user.
 
         Examples
-        ========
+        --------
         >>> import lamana as la
         >>> from lamana.models import Wilson_LT as wlt
         >>> dft = wlt.Defaults()
@@ -306,38 +311,44 @@ class Stack(object):
 
 
 class Laminate(Stack):
-    '''Generate a LaminateModel object.  Stores several representations.
+    '''Create a `LaminateModel` object.  Stores several representations.
 
-    Laminate inherits from Stack.  A FeatureInput is passed in from a certain
-    "Feature" module and exchanged between constructs and theories modules.
+    Laminate first inherits from the `Stack` class.  A `FeatureInput` is passed in
+    from a certain "Feature" module and exchanged between constructs and theories
+    modules.
 
-    Changes from legacy definitions marked with "*".
+    Native objects:
 
-    Objects
-    =======
-    - Snapshot : stack of unique layers (1, 2, ..., n), single rows and ID columns.
-    - LFrame : snapshot with multiple rows including Dimensional Data.
-    - LMFrame :LFrame w/Dimensional and Data variables via theories.Model data.
+    - `Snapshot` : stack of unique layers (1, 2, ..., n), single rows and ID columns.
+    - `LFrame` : snapshot with multiple rows including Dimensional Data.
+    - `LMFrame` : `LFrame` w/Dimensional and Data variables via `theories.Model` data.
 
-    Variable Types
-    ==============
-    ID
-    --
+    Finally this class build a `LamainateModel` object, which merges the LaminateModel
+    date with the Model data defined by an author in a separate `models` module;
+    models are related to classical laminate theory variables, i.e. `Q11`, `Q12`,
+    `D11`, `D12`, ..., `stress`, `strain`, etc.
+
+    The listed Parameters are "ID Variables".  The Other Parameters are "Dimensional
+    Variables".  There are special variables related to columns in DataFrames,
+    suffixed with trailing underscores.
+
+    Parameters
+    ----------
     layer_ : int
         Enumerates layers from bottom, tensile side up.
     side_ : str
         Side of the stress state; tensile (bottom) or compressive (top).
     type_ : str
         Type of layer; outer, inner or middle.
-    *matl_ : str
+    matl_ : str
         Type of material.
     t_ : float
         Total thickness per layer.
 
-    Dimensional
-    -----------
+    Other Parameters
+    ----------------
     label_ : str
-        Type of point; *interfacial, internal or discontinuity.
+        Type of point; interfacial, internal or discontinuity.
     h_ : float
         Lamina thickness for all lamina except middle layers (half thickness).
     d_ : float
@@ -345,39 +356,54 @@ class Laminate(Stack):
         `theories.Model` and used in testing. Units (m).
     intf_ : int
         Enumerates an interfaces from tensile side up.
-    *k_ : float
-        Lamina height level used in `Wilson_LT` - 1.
+    k_ : float
+        Relative height; includes fractional height of kth layer.
     Z_ : float
         Distance from the neutral axis to an interface (or sub-interface p).
     z_ : float
         Distance from the neutral axis to the lamina midplane (or sub-midplane_p).
 
-    Model
-    -----
-    ... : ...
-        Defined by the user in a models module; related to Laminate Theory,
-        i.e. Q11, Q12, D11, D12, ..., stress, strain, etc.
+    Attributes
+    ----------
+    p
+    total
+    max_stress
+    min_stress
+    extrema
+    summary
+    is_special
+    has_discont
+    has_neutaxis
+    FeatureInput : dict
+        Passed-in, user-defined object from Case.
+    Geometry : Geometry object
+        Converted Geometry string.
+    load_params : dict; default None
+        A dict of common loading parameters, sample and support radii, etc.
+    mat_props : dict; default None
+        A dict of materials and properties, i.e. elastic modulus and Poisson's ratio.
+    materials : DataFrame
+        Converted mat_props to pandas object; used for quick display.
+    parameters : Series
+        Converted load_params to pandas object; used for quick display.
+    model : str
+        Specified custom, laminate theory model.
+    {stack_order, nplies, name, alias} : list, str, str, str
+        StackTuple attributes.
+    {Snapshot, LFrame, LMFrame} : DataFrame
+        Laminate object.
+    {Middle, Inner_i, Outer} : DataFrame
+        Isolated layer types
+    {compressive, tensile} : DataFrame
+        Isolated layer stress sides.
 
-    Properties
-    ==========
-    p : float
-        Number of rows per layer for a given laminate.
-    total : float
-        Total laminate thickness (in m).
-    max_stress : Series
-        View of max principal stresses per layer.
-    min_stress : Series
-        View of min principal stresses per layer.
+    Raises
+    ------
+    AttributeError
+        If custom attributes could not be set to the `LaminateModel`.
 
-    is_special : bool
-        Return True if nplies < 5, i.e Monolith, Bilayer, Trilayer, 4-ply.
-    has_discont : bool
-        Return True if discontinuity points are found in a DataFrame.
-    has_neutaxis : bool
-        Return True if a row is found labeled 'neut. axis'.
-
-    Example
-    =======
+    Examples
+    --------
     >>> from lamana.models import Wilson_LT as wlt
     >>> import lamana as la
     >>> dft = wlt.Defaults()
@@ -445,7 +471,7 @@ class Laminate(Stack):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             # Auto check attrs if assigned to DataFrames/Series, then add to list
-            blacklisted  = [attr for attr in self.__dict__ if
+            blacklisted = [attr for attr in self.__dict__ if
                 isinstance(getattr(self, attr), (pd.DataFrame, pd.Series))]
 
             # Check DataFrames and Series
@@ -494,11 +520,14 @@ class Laminate(Stack):
 
     # PHASE 1
     def _build_laminate(self):
-        '''Build a primitive laminate from a stack.  Three steps:
+        '''Build a primitive laminate from a stack.
+
+        Build in three steps:
 
         1. Adopt the Snapshot and extend it with more rows.
         2. Define Lamina layers by types and multiple rows.
         3. Glue lamina together to make one DataFrame.
+
         '''
         df_snap = self.Snapshot.copy()
         p = self.FeatureInput['Parameters']['p']
@@ -528,15 +557,16 @@ class Laminate(Stack):
             '''Update Laminate DataFrame with new dimensional columns.
 
             This function takes a primitive LFrame (converted Stack) and adds
-            columns: label, h(m), d(m), intf, k, Z(m), z(m), z(m)*
+            columns: `label`, `h(m)`, `d(m)`, `intf`, `k`, `Z(m)`, `z(m)`, `z(m)*`
 
             A number of pandas-like implementations are performed to achieve this.
             So the coding has a different approach and feel.
 
-            Variables
-            =========
+            Parameters
+            ----------
             LFrame : DataFrame
                 A primitive Laminate DateFrame containing ID columns.
+
             '''
             # For Implementation
             nplies = self.nplies
@@ -740,17 +770,18 @@ class Laminate(Stack):
         # PHASE 3
         '''Remove LFrame and FeatureInput'''
         def _update_calculations():
-            '''Update LaminateModel DataFrame and FeatureInput.
+            '''Update `LaminateModel` DataFrame and `FeatureInput`.
 
             - populates stress data calculations from the selected model.
-            - may add Globals dict to FeatureInput.
+            - may add Globals dict to `FeatureInput`.
 
-            Tries to update LaminateModel. If an exception is raised
+            Tries to update `LaminateModel`. If an exception is raised
             (on the model side), no update is made, and the Laminate
-            (without Data columns) is set as the default LFrame.
+            (without Data columns) is set as the default `LFrame`.
+
             '''
 
-            '''Need to handle general INDET detection.  Roll-back to LFrame if detected.'''
+            '''Need to handle general INDET detection.  Roll-back to `LFrame` if detected.'''
             try:
                 self.LMFrame, self.FeatureInput = theories.handshake(self,
                                                                      adjusted_z=False)
@@ -772,14 +803,17 @@ class Laminate(Stack):
         '''Cross-check stacking order with layers of the snapshot object.
         Returns an abbreviated list of layer orders.
 
-        Example
-        =======
+        Notes
+        -----
+        Since 0.4.3c4d, `_type_cache` type list is replaced with ndarray.
+
+        Examples
+        --------
         >>> case = la.distributions.Case(load_params, mat_props)
         >>> laminate = case.apply(('400-200-800'))
         >>> laminate._check_layer_order()
         ['O','I','M','I','O']
 
-        NOTE: Since 0.4.3c4d, _type_cache type list is replaced with ndarray.
         '''
         stack_types = [row for row in self.Snapshot['type']]       # control
         #print(stack_types)
@@ -829,19 +863,27 @@ class Laminate(Stack):
         - Make a temp df joining intervals of d (d_intervals) to replicate values
         - Add the prior d_ row to the correl. interval for internal d_
 
-        Formulas
-        ========
-        x_i = x_0 + sigma_{i=1}^p (delta * i)
-        inv = (x_n - x_0)/(p-1)
-
-        Variables
-        =========
+        Parameters
+        ----------
         df_mod : DataFrame
             Passed in modified DataFrame.  CAUTION: Assumes label_ column is
             present.  Also assumes interface and discont. rows are correctly
             populated.
         column: str
             Column to assign internals.
+
+        Notes
+        -----
+        .. math::
+
+            x_i = x_0 + sigma_{i=1}^p (delta * i)
+            inv = (x_n - x_0)/(p-1)
+
+        Raises
+        ------
+        ZeroDivisionError
+            If p = 1, internals cannot be made.
+
         '''
         df = df_mod.copy()
 
@@ -873,7 +915,7 @@ class Laminate(Stack):
         ##'''cumsum is not working with groupby in pandas 0.17.1'''
         ##internal_sums = np.cumsum(
         ##    trunc.groupby('layer')['intervals'])               # delta; apply sigma from algo
-        internal_sums = trunc.groupby('layer')['intervals'].cumsum() # 0.17.2 work around; backwards compat.
+        internal_sums = trunc.groupby('layer')['intervals'].cumsum()  # 0.17.2 work around; backwards compat.
         #print(clipped)
         #print(internal_sums)
 
@@ -929,8 +971,8 @@ class Laminate(Stack):
     def summary(self):
         '''Print a summary of Laminate properties.
 
-        Variables
-        =========
+        Parameters
+        ----------
         nplies : int
             number of plies
         p : int
@@ -949,8 +991,10 @@ class Laminate(Stack):
 
     @property
     def has_discont(self):
+        '''Return True if discontinuity rows are present; generally p>2.'''
         return self.LMFrame['label'].str.contains('discont.')
 
     @property
     def has_neutaxis(self):
+        '''Return True if neutral axis row is present; for odd plies.'''
         return self.LMFrame['label'].str.contains('neut. axis')

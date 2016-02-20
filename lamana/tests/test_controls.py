@@ -1,18 +1,19 @@
 #------------------------------------------------------------------------------
-# Tests for DataFrame various cases.  Uses external csv control files
+'''Test for various DataFrame output.  Uses external csv control files.'''
 
 import os
 
 import numpy as np
-import pandas as pd
-import nose.tools as nt
+##import pandas as pd
+##import nose.tools as nt
 
 import lamana as la
 import lamana.utils.tools as ut
-from lamana import constructs as con
+##from lamana import constructs as con
 from lamana.models import Wilson_LT as wlt
 
 dft = wlt.Defaults()
+
 
 # SETUP -----------------------------------------------------------------------
 def fix_discontinuities(laminate, inner_i):
@@ -27,13 +28,15 @@ def fix_discontinuities(laminate, inner_i):
     df = laminate.copy()
 
     # Tensile side
-    discTensidx = df.loc[(df['label'] == 'discont.')
-                       & (df['type'] == 'inner')
-                       & (df['side'] == 'Tens.'), 't(um)'].index.tolist()
+    discTensidx = df.loc[
+        (df['label'] == 'discont.') & (df['type'] == 'inner')
+        & (df['side'] == 'Tens.'), 't(um)'
+    ].index.tolist()
     # Compressive side
-    discCompidx = df.loc[(df['label'] == 'discont.')
-                       & (df['type'] == 'inner')
-                       & (df['side'] == 'Comp.'), 't(um)'].index.tolist()
+    discCompidx = df.loc[
+        (df['label'] == 'discont.') & (df['type'] == 'inner')
+        & (df['side'] == 'Comp.'), 't(um)'
+    ].index.tolist()
     #print(discTensidx)
     #print(df)
     #print(inner_i)
@@ -46,28 +49,32 @@ def fix_discontinuities(laminate, inner_i):
         df.loc[discCompidx[i], 't(um)'] = inner_r
     return df
 
+
 def extract_dataframe(df):
     '''Parse corrected DataFrame from a csv file; legacy, automated or custom.'''
     df_expected = df.copy()
 
     # Mild cleanup
     if 'd(mm)' in df_expected.columns:
-        df_expected['d(m)'] = df_expected['d(mm)']/1000.
+        df_expected['d(m)'] = df_expected['d(mm)'] / 1000.
         del df_expected['d(mm)']
 
-    if 't(um)' not in df_expected.columns:             # for custom controls from legacy scripts
-        df_expected['t(um)'] = df_expected['h(m)']/1e-6
+    if 't(um)' not in df_expected.columns:                 # for custom controls from legacy scripts
+        df_expected['t(um)'] = df_expected['h(m)'] / 1e-6
         # Assign Nan to layer thickness of the discontinuity row
-        df_expected.loc[df_expected['label'] == 'discont.', 't(um)'
-                       ] = np.nan
+        df_expected.loc[
+            df_expected['label'] == 'discont.', 't(um)'
+        ] = np.nan
         # Twice the h in the middle
-        df_expected.loc[df_expected['type'] == 'middle', 't(um)'
-                       ] = df_expected.loc[df_expected['type'] == 'middle', 'h(m)'].multiply(2)/1e-6
+        df_expected.loc[
+            df_expected['type'] == 'middle', 't(um)'] = df_expected.loc[
+            df_expected['type'] == 'middle', 'h(m)'
+        ].multiply(2) / 1e-6
 
     # Parse data mainly for the Case
     nplies = len(df_expected['layer'].unique())
     p = df_expected.groupby('layer').size().iloc[0]
-    t_total = df_expected.iloc[-1]['d(m)']             # (in m)
+    t_total = df_expected.iloc[-1]['d(m)']                 # (in m)
 
     # Get a geometry string to feed the API
     if nplies < 5:
@@ -92,12 +99,14 @@ def extract_dataframe(df):
     else:
         inner_i = float(geo[1])
     #print(inner_i)
-    df_expected.loc[(df_expected['label'] == 'discont.')
-                    & (df_expected['type'] == 'outer'),'t(um)'] = outer
+    df_expected.loc[
+        (df_expected['label'] == 'discont.') & (df_expected['type'] == 'outer'),
+        't(um)'] = outer
     if ('discont.' in df_expected['label'].values) and ('inner' in df_expected['type'].values):
         df_expected = fix_discontinuities(df_expected, inner_i)
 
     return df_expected, geometry, nplies, p, t_total
+
 
 # TESTS -----------------------------------------------------------------------
 # Test Columns
@@ -109,7 +118,7 @@ def test_apply_LaminateModels_cols_dimensions1():
     # Prepare file path.
     # Depends which directory nosetests is rum
     #path = os.getcwd()                                     # use for the test in the correct path
-    path = os.path.join(os.getcwd(), 'lamana', 'tests', 'controls_LT') # for builds
+    path = os.path.join(os.getcwd(), 'lamana', 'tests', 'controls_LT')   # for builds
     #path = path + r'\lamana\tests\controls_LT'             # for Main Script. Comment out in tests
     #path = path + r'\tests\controls_LT'                    # for test
     #path = os.path.join(os.getcwd(), 'tests', 'controls_LT')          # for test
@@ -133,7 +142,7 @@ def test_apply_LaminateModels_cols_dimensions1():
         '''Bypassing z(m), z(m)*, intf and k for now'''
         '''UPDATE: k add back in 0.4.4b'''
         ###
-        cols = ['layer', 'side','type', 'matl',
+        cols = ['layer', 'side', 'type', 'matl',
         #        'label', 't(um)', 'h(m)', 'd(m)', 'intf', 'k', 'Z(m)', 'z(m)']
         #        'label', 't(um)', 'h(m)', 'd(m)', 'intf', 'k', 'Z(m)', ]
         #        'label', 't(um)', 'h(m)', 'd(m)', 'intf', 'Z(m)', ]      # removed; k redefined in 0.4.3c4d
@@ -152,6 +161,7 @@ def test_apply_LaminateModels_cols_dimensions1():
         print('\n')
         ut.assertFrameEqual(actual, expected)
 
+
 def test_apply_LaminateModels_cols_models1():
     '''Test .cvs files found in tests/controls_LT with API DataFrames.
     Comparing models columns only.
@@ -165,12 +175,12 @@ def test_apply_LaminateModels_cols_models1():
     '''Wait for skipcols kwarg in read_csv in pandas 0.17'''
 
     def remove_units(cols):
-        '''Return a dict of stress column lables with units removed.'''
+        '''Return a dict of stress column labels with units removed.'''
         #cols = cols.tolist()
         dict_ = {}
         for idx, colname in enumerate(cols):
             if 'stress' in colname:
-                tokens = colname.split(' ')                              # works even w/o units
+                tokens = colname.split(' ')                # works even w/o units
                 unitless_name = tokens[0]
                 #print(name)
                 dict_[colname] = unitless_name
@@ -200,7 +210,7 @@ def test_apply_LaminateModels_cols_models1():
         df = case.frames[0]
 
         # Compare only model-related columns; skip API columns
-        IDs =  ['layer','side', 'type', 'matl', 't(um)']   # except label_
+        IDs = ['layer', 'side', 'type', 'matl', 't(um)']   # except label_
         Dimensionals = ['h(m)', 'd(m)', 'intf', 'k', 'Z(m)', 'z(m)', 'z(m)*']
         #bypassed = ['z(m)', 'z(m)*', 'intf', 'k']
         skippedcols = IDs + Dimensionals

@@ -6,7 +6,7 @@ sudo: false                                                 # works w/Docker
 language: python
 python:
   - "2.7"
-  - "2.7.10"
+  - "2.7.11"
   - "3.3"
   - "3.4"
   - "3.5"
@@ -51,28 +51,36 @@ install:
   # Ensure pip and nose will install within the conda env
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas
   - source activate test-environment
+  - pip install coverage codecov nose-cov                  # code coverage; see other projects on how to install w/Miniconda
   ##- python setup.py install
   # Note: `pip` used inplace of `conda`; reason uncertain (REF 003)
   # Uses conda's pip on Travis' pip
-  - pip install -r requirements.txt                          # pre-install pinned dependencies
-  - pip install .                                            # install source and build/install wheels
+  - pip install -r dev_requirements.txt                    # pre-install pinned dependencies
+  - pip install .                                          # install source and build/install wheels
   #- "pip install wheel"
   #- "python setup.py bdist_wheel"
   #- "pip install dist/*.whl"
   - pip list
 
-
 # Command to run tests
 script:
-  - nosetests
+  - nosetests --with-cov --cov lamana
+  - ls -al
+  - coverage combine
+  - coverage xml
+  - which coverage
 
+# Code Coverage
+after_success:
+  - codecov
 # after_success:
 #  - coveralls
 
-branches:
-  only:
-    - master
-    - develop
+# Whitelist
+#branches:
+#  only:
+#    - master
+#    - develop
 
 
 # References
@@ -82,3 +90,4 @@ branches:
 # (003) Conda on Travis w/details           http://lmjohns3.com/2015/06/using-travis-ci-with-miniconda-scipy-and-nose.html
 # (004) Example yaml                        https://github.com/lmjohns3/theanets/blob/master/.travis.yml
 # (005) Example 2 yaml                      http://samueljackson.me/2015/12/12/better-python-travis-config.html
+# (006) Sample codecov w/miniconda          https://github.com/JIC-CSB/jicbioimage.illustrate/blob/master/.travis.yml#L31
