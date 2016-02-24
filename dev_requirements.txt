@@ -7,7 +7,7 @@ colorama==0.3.6
 cycler==0.10.0
 decorator==4.0.9
 docutils==0.12
-functools32==3.2.3.post2
+#functools32==3.2.3.post2                     # backport for Python 2.7 only
 ipykernel==4.2.2
 ipython==4.1.1
 ipython-genutils==0.1.0
