@@ -42,14 +42,11 @@ URL = 'https://github.com/par2/lamana'
 setup(
     name=NAME,
     version=VERSION,
-    ##version='0.4.9-dev',                                  ### edit
     description='An extensible Python package for laminate analysis',
     author='P. Robinson II',
     author_email='par2.get@gmail.com',
     url=URL,
-    ##url='https://github.com/par2/lamana',
     download_url='/'.join([URL, 'tarball', VERSION]),
-    ##download_url=''.join(['https://github.com/par2/lamana/tarball/', VERSION]),
     ##download_url='https://github.com/par2/lamana/tarball/0.4.9-dev',
     # Search all sub directories; specifics commented below
     packages=find_packages(),
