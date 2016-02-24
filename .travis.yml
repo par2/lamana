@@ -73,8 +73,6 @@ script:
 # Code Coverage
 after_success:
   - codecov
-# after_success:
-#  - coveralls
 
 # Whitelist
 #branches:
