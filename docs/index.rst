@@ -8,35 +8,6 @@
 LamAna Documentation
 ====================
 
-The LamAna project is an extensible Python library for interactive laminate analysis and visualization.
-
-.. sidebar:: What's New in LamAna
-
-   - appveyor builds (support on Windows)
-
-LamAna enables users to **calculate**/**export**/**analyze** and
-**author** custom models based on laminate theory.  *Feature modules*  can be
-used to plot stress distributions, analyze thickessness effects and
-predict failure trends.
-
-**User Benefits** The primary benefits to users is an scientific package that:
-
--  **Simplicity**: given a model and parameters, analysis begins with
-   three lines of code
--  **Visualization**: plotting and physical representations
--  **Analysis**: fast computational analysis using a Pandas backend
--  **Extensibility**: anyone with a little Python knowledge can
-   implement custom laminate models
--  **Speed**: data computed, plotting and exported for dozens of
-   configurations within seconds
-
-**Community Benefits** Long-term goals for the laminate community are:
-
--  **Standardization**: general abstractions for laminate theory
-   analysis
--  **Common Library**: R-like acceptance of model contributions for
-   everyone to use
-
 .. _gallery-docs:
 
 .. toctree::
