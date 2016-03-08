@@ -20,9 +20,7 @@ used to plot stress distributions, analyze thickessness effects and
 predict failure trends.
 
 
-**User Benefits**
-
-The primary benefits to users is an scientific package that:
+**User Benefits**: The primary benefits to users is an scientific package that:
 
 -  **Simplicity**: given a model and parameters, analysis begins with
    three lines of code
@@ -34,14 +32,13 @@ The primary benefits to users is an scientific package that:
    configurations within seconds
 
 
-**Community Benefits**
-
-Long-term goals for the laminate community are:
+**Community Benefits** : Long-term goals for the laminate community are:
 
 -  **Standardization**: general abstractions for laminate theory
    analysis
 -  **Common Library**: R-like acceptance of model contributions for
    everyone to use
+
 
 
 .. toctree::
