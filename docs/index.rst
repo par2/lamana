@@ -40,6 +40,7 @@ predict failure trends.
    everyone to use
 
 
+.. _gallery-docs:
 
 .. toctree::
    :maxdepth: 1
@@ -47,6 +48,8 @@ predict failure trends.
 
    showcase
 
+
+.. _user-docs:
 
 .. toctree::
    :maxdepth: 2
@@ -58,12 +61,16 @@ predict failure trends.
    support
 
 
+   .. _author-docs:
+
 .. toctree::
    :maxdepth: 2
    :caption: Author Documentation
 
    writecustom
 
+
+.. _dev-docs:
 
 .. toctree::
    :maxdepth: 2
