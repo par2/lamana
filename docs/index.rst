@@ -50,6 +50,7 @@ Long-term goals for the laminate community are:
 .. _gallery-docs:
 
 .. toctree::
+   :hidden:
    :maxdepth: 1
    :caption: Gallery
 
@@ -58,6 +59,7 @@ Long-term goals for the laminate community are:
 .. _user-docs:
 
 .. toctree::
+   :hidden:
    :maxdepth: 2
    :caption: User Documentation
 
@@ -69,6 +71,7 @@ Long-term goals for the laminate community are:
 .. _author-docs:
 
 .. toctree::
+   :hidden:
    :maxdepth: 2
    :caption: Author Documentation
 
@@ -77,6 +80,7 @@ Long-term goals for the laminate community are:
 .. _dev-docs:
 
 .. toctree::
+   :hidden:
    :maxdepth: 2
    :caption: Developer Documentation
 
