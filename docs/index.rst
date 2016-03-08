@@ -19,9 +19,8 @@ LamAna enables users to **calculate**/**export**/**analyze** and
 used to plot stress distributions, analyze thickessness effects and
 predict failure trends.
 
-=============
-User Benefits
-=============
+
+**User Benefits**
 
 The primary benefits to users is an scientific package that:
 
@@ -34,9 +33,8 @@ The primary benefits to users is an scientific package that:
 -  **Speed**: data computed, plotting and exported for dozens of
    configurations within seconds
 
-==================
-Community Benefits
-==================
+
+**Community Benefits**
 
 Long-term goals for the laminate community are:
 
@@ -47,7 +45,6 @@ Long-term goals for the laminate community are:
 
 
 .. toctree::
-   :hidden:
    :maxdepth: 1
    :caption: Gallery
 
@@ -55,7 +52,6 @@ Long-term goals for the laminate community are:
 
 
 .. toctree::
-   :hidden:
    :maxdepth: 2
    :caption: User Documentation
 
@@ -66,7 +62,6 @@ Long-term goals for the laminate community are:
 
 
 .. toctree::
-   :hidden:
    :maxdepth: 2
    :caption: Author Documentation
 
@@ -74,7 +69,6 @@ Long-term goals for the laminate community are:
 
 
 .. toctree::
-   :hidden:
    :maxdepth: 2
    :caption: Developer Documentation
 
