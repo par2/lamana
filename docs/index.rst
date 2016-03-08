@@ -4,9 +4,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-####################
+====================
 LamAna Documentation
-####################
+====================
 
 The LamAna project is an extensible Python library for interactive laminate analysis and visualization.
 
@@ -19,8 +19,7 @@ LamAna enables users to **calculate**/**export**/**analyze** and
 used to plot stress distributions, analyze thickessness effects and
 predict failure trends.
 
-
-**User Benefits**: The primary benefits to users is an scientific package that:
+**User Benefits** The primary benefits to users is an scientific package that:
 
 -  **Simplicity**: given a model and parameters, analysis begins with
    three lines of code
@@ -31,14 +30,12 @@ predict failure trends.
 -  **Speed**: data computed, plotting and exported for dozens of
    configurations within seconds
 
-
-**Community Benefits** : Long-term goals for the laminate community are:
+**Community Benefits** Long-term goals for the laminate community are:
 
 -  **Standardization**: general abstractions for laminate theory
    analysis
 -  **Common Library**: R-like acceptance of model contributions for
    everyone to use
-
 
 .. _gallery-docs:
 
@@ -47,7 +44,6 @@ predict failure trends.
    :caption: Gallery
 
    showcase
-
 
 .. _user-docs:
 
@@ -60,15 +56,13 @@ predict failure trends.
    api
    support
 
-
-   .. _author-docs:
+.. _author-docs:
 
 .. toctree::
    :maxdepth: 2
    :caption: Author Documentation
 
    writecustom
-
 
 .. _dev-docs:
 
@@ -87,9 +81,8 @@ predict failure trends.
    versions
 
 
-==================
 Indices and Tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
