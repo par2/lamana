@@ -8,16 +8,19 @@
 LamAna Documentation
 ====================
 
-The LamAna project is an extensible Python library for interactive laminate analysis and visualization.
+.. TODO: Not sure why the pdf renders this section incorrectly on RTD.
+
+The LamAna project is an extensible Python library for interactive laminate
+analysis and visualization.
 
 .. sidebar:: What's New in LamAna
 
-   - Official documentation hosted on readthedocs
-   - Docs support Jupyter notebooks (see `nbsphinx <https://nbsphinx.readthedocs.org/en/latest/>`_)
-   - Docs support Sphinx extensions: autodocs, autosummary, numpydoc/napolean, viewcode
+   - appveyor builds (support on Windows)
 
-Using the LamAna project, you can **calculate**/**export**/**analyze** data and
-**author** custom models based on laminate theory.  Featured components can be used to plot stress distributions, analyze thickessness effects and predict failure trends.
+LamAna enables users to **calculate**/**export**/**analyze** and
+**author** custom models based on laminate theory.  *Feature modules*  can be
+used to plot stress distributions, analyze thickessness effects and
+predict failure trends.
 
 User Benefits
 -------------
@@ -43,57 +46,58 @@ Long-term goals for the laminate community are:
 -  **Common Library**: R-like acceptance of model contributions for
    everyone to use
 
-The documentation for LamAna is organized into several sections by increasing complexity:
-
-  :ref:`User Documentation<user-docs>` |
-  :ref:`Author Documentation<author-docs>` |
-  :ref:`Developer Documentation<dev-docs>`
-
-Detailed information on ancillary topics can be found in the :ref:`Appendix<appendix-docs>`.
 
 .. _gallery-docs:
 
 .. toctree::
+   :hidden:
    :maxdepth: 1
    :caption: Gallery
-   :name: gallerydoc
 
    showcase
 
 .. _user-docs:
 
 .. toctree::
+   :hidden:
    :maxdepth: 2
    :caption: User Documentation
-   :name: usertoc
 
    installation
    gettingstarted
    api
    support
 
-
 .. _author-docs:
 
 .. toctree::
+   :hidden:
    :maxdepth: 2
    :caption: Author Documentation
-   :name: authortoc
 
    writecustom
-
 
 .. _dev-docs:
 
 .. toctree::
+   :hidden:
    :maxdepth: 2
    :caption: Developer Documentation
-   :name: devtoc
 
    package
    components
+   installation2
    contributions
    testing
    docs
    demo
    lpep
+   versions
+
+
+Indices and Tables
+------------------
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
