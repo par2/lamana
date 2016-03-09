@@ -7,6 +7,7 @@ class Error(Exception):
 
 
 class FormatError(Error):
+    '''Associate with geo_string formatting.'''
     pass
 
 

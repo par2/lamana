@@ -297,6 +297,7 @@ class Geometry(object):
                     " 'outer-[inner_i]-middle'"
                 )
         except(AttributeError):
+            # Needed in general and for distributions.Cases()
             raise TypeError(
                 "Cannot parse input type.  Supported types: str. {} given.".format(geo_input)
             )
