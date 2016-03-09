@@ -167,6 +167,7 @@ class Case(object):
             df_properties.reindex(self._materials)    # set index order in view
         return df_properties
 
+    # TODO: accept kwargs
     def apply(self, geo_strings=None, model='Wilson_LT', unique=False):
         '''Apply geometries and laminate theory model to a `LaminateModel`.
 
@@ -284,6 +285,7 @@ class Case(object):
                     #print(_geo_cache)
                     #print(FeatureInput)
                     '''Is there a way to save a general FI for the Case?'''
+                    # TODO: accept kwargs
                     yield la.constructs.Laminate(FeatureInput)
 
             # DEPRECATED AttributeError exception.

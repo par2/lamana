@@ -418,6 +418,7 @@ class Laminate(Stack):
     models : directory containing package models
 
     '''
+    # TODO: pass kwargs in
     def __init__(self, FeatureInput):
         super(Laminate, self).__init__(FeatureInput)
 
@@ -781,7 +782,8 @@ class Laminate(Stack):
 
             '''
 
-            '''Need to handle general INDET detection.  Roll-back to `LFrame` if detected.'''
+            # TODO: Need to handle general INDET detection.  Roll-back to `LFrame` if detected.
+            # TODO: No way to pass in kwargs to handshake;
             try:
                 self.LMFrame, self.FeatureInput = theories.handshake(self,
                                                                      adjusted_z=False)
