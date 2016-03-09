@@ -456,14 +456,21 @@ class Laminate(Stack):
         self._update_columns()                             # Phase 2 & 3
 
         # LaminateModel Attributes
-        if type(self.LMFrame) != list:
-            self.Middle = self.LMFrame[self.LMFrame['type'] == 'middle']
-            self.Inner_i = self.LMFrame[self.LMFrame['type'] == 'inner']
-            self.Outer = self.LMFrame[self.LMFrame['type'] == 'outer']
-            self.compressive = self.LMFrame[self.LMFrame['side'] == 'Comp.']
-            self.tensile = self.LMFrame[self.LMFrame['side'] == 'Tens.']
-        else:
-            raise AttributeError("Unable to set attributes to LMFrame.")
+        # Assumes DataFrames are safelt made by latter instance updates
+        self.Middle = self.LMFrame[self.LMFrame['type'] == 'middle']
+        self.Inner_i = self.LMFrame[self.LMFrame['type'] == 'inner']
+        self.Outer = self.LMFrame[self.LMFrame['type'] == 'outer']
+        self.compressive = self.LMFrame[self.LMFrame['side'] == 'Comp.']
+        self.tensile = self.LMFrame[self.LMFrame['side'] == 'Tens.']
+
+##        if type(self.LMFrame) != list:
+##            self.Middle = self.LMFrame[self.LMFrame['type'] == 'middle']
+##            self.Inner_i = self.LMFrame[self.LMFrame['type'] == 'inner']
+##            self.Outer = self.LMFrame[self.LMFrame['type'] == 'outer']
+##            self.compressive = self.LMFrame[self.LMFrame['side'] == 'Comp.']
+##            self.tensile = self.LMFrame[self.LMFrame['side'] == 'Tens.']
+##        else:
+##            raise AttributeError("Unable to set attributes to LMFrame.")
 
     def __repr__(self):
         return '<lamana LaminateModel object ({}), p={}>'.format(self.Geometry.__str__(),
