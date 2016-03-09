@@ -25,7 +25,7 @@ cases = ut.laminator(geos=dft.geos_all, ps=[2, 3, 4, 5], verbose=True)
 
 
 # Models ----------------------------------------------------------------------
-# NOTE: the test for errors are comment out because errors are caught
+# NOTE: the test for errors are commented out because errors are caught
 # in constructs and prevent breaking
 @nt.raises(ZeroDivisionError)
 def test_models_WisonLT_r1():
@@ -95,6 +95,32 @@ def test_models_WisonLT_a2():
             #print(LM.LMFrame)
             # Implementation unfinished; only used to trigger error
 
+
+@nt.raises(ValueError)
+def test_models_WisonLT_a3():
+    '''Raise exception if support radius, a, is larger than the sample radius, R.
+
+    See Also
+    --------
+    - test_models_WisonLT_diameter1()
+
+    '''
+    big_a = {
+        'R': 12e-3,                                        # specimen radius
+        'a': 7.5,                                          # support ring radius
+        'p': 5,                                            # points/layer
+        'P_a': 1,                                          # applied load
+        'r': 2e-4,                                         # radial distance from center loading
+    }
+    case = ut.laminator(geos=dft.geos_standard, load_params=big_a)
+    for case_ in case.values():
+        for LM in case_.LMs:
+            actual = LM.FeatureInput['Parameters']['a']
+    expected = LM.FeatureInput['Parameters']['R']
+    #assert actual < expected
+    nt.assert_less(actual, expected)
+
+
 # The following triggers an indeterminate error.  It is handled internally however.
 # This example stands to remind such errors exist.
 # @nt.raises(IndeterminateError)
@@ -106,6 +132,9 @@ def test_models_WisonLT_a2():
 #             actual = LM.LFrame
 #             #print(LM.LMFrame)
 #             # Implementation unfinished; only used to trigger error
+
+
+
 
 
 def test_models_WisonLT_diameter1():
