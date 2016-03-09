@@ -682,7 +682,7 @@ class Cases(ct.MutableMapping):
                     case_.apply(caselets)
                 self.caselets = [case_]
                 # TODO: Brittle; need more robust try-except
-            except(AttributeError):
+            except(AttributeError, TypeError):             # raised from Geometry._to_gen_convention()
                 try:
                     # if a list of lists
                     flattened_list = list(it.chain(*caselets))

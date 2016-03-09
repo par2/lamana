@@ -297,7 +297,9 @@ class Geometry(object):
                     " 'outer-[inner_i]-middle'"
                 )
         except(AttributeError):
-            raise TypeError("Cannot parse input type.  Supported types: str")
+            raise TypeError(
+                "Cannot parse input type.  Supported types: str. {} given.".format(geo_input)
+            )
 
         first = tokens[0]
         inside = tokens[1]
