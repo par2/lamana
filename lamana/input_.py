@@ -4,12 +4,14 @@
 # BaseDefaults(): library of general geometry defaults; subclassed by the user.
 # flake8 input_.py --ignore=E265, E501, N803, N806, N802, N813, E133
 
+import re
 import itertools as it
 import collections as ct
 
 import pandas as pd
 
 import lamana as la
+import lamana.lt_exceptions as exc
 from lamana.utils import tools as ut
 
 # =============================================================================
@@ -39,8 +41,8 @@ class Geometry(object):
 
     Parameters
     ----------
-    geo_input : list or tupled list
-        Geometry thicknesses of a laminate.
+    geo_input : str or tupled str
+        Geometry string of layer thicknesses in a laminate.
 
     Attributes
     ----------
@@ -83,15 +85,20 @@ class Geometry(object):
 
         # TODO: Consolidate into namedtuple or self
         # TODO: rename geometrytuple
-        self.namedtuple = self._parse_geometry(geo_input)  # a namedtuple; see collections lib
-        self.geometry = self._parse_geometry(geo_input)    # a namedtuple; see collections lib
+        self.string = self.__class__._to_gen_convention(geo_input)
+        self.namedtuple = self._parse_geometry(self.string)# a namedtuple; see collections lib
+        self.geometry = self._parse_geometry(self.string)  # a namedtuple; see collections lib
+
+##        self.namedtuple = self._parse_geometry(geo_input)  # a namedtuple; see collections lib
+##        self.geometry = self._parse_geometry(geo_input)    # a namedtuple; see collections lib
         self.middle = self.geometry.middle                 # attributes from namedtuple; symmetric sensitive
         self.inner = self.geometry.inner
         self.outer = self.geometry.outer
 
-        self.string = self.__class__._to_gen_convention(geo_input)
+##        self.string = self.__class__._to_gen_convention(geo_input)
 
         # Private attribute used for set comparisons and hashing
+        # TODO: should we pass in geo_string instead of geo_inputs?
         self._geometry_hash = self._parse_geometry(geo_input, hash_=True)
 
     def __str__(self):
@@ -130,7 +137,7 @@ class Geometry(object):
         #return hash(tuple(sorted(self.__dict__.items())))
         #return hash(self._geo_string)
 
-    def _parse_geometry(self, geo_input, hash_=False):
+    def _parse_geometry(self, geo_string, hash_=False):
         '''Return a namedtuple of outer-inner-middle geometry values.
 
         Per General Convention, a GeometryTuple has floats and an inner list.
@@ -141,8 +148,9 @@ class Geometry(object):
 
         Parameters
         ---------
-        geo_input : tupled str or str
-            outer-inner-middle values or outer-[inner]-middle values.
+        geo_string : tupled str or str
+            outer-inner-middle values or outer-[inner]-middle values;
+            formatted in general convention (0.4.11).
 
         Returns
         -------
@@ -190,8 +198,8 @@ class Geometry(object):
             Raises
             ------
             TypeError
-                If a non-string is passed in for the geo_input arg.
-            Exception
+                If a non-string is passed in for the geo_string arg.
+            FormatError
                 If the parsed geo string is less than 3 tokens.
 
             '''
@@ -218,7 +226,7 @@ class Geometry(object):
             middle = tuple(check_symmetry(tokens[-1]))
 
             '''Should warn the object is symmetric though.'''
-            if 'S' not in geo_input:
+            if 'S' not in geo_string:
                 GeometryTuple = ct.namedtuple(
                     'GeometryTuple', ['outer', 'inner', 'middle'])
                 if hashable:
@@ -233,22 +241,64 @@ class Geometry(object):
 
         # Create --------------------------------------------------------------
         '''Replace with try-except block.'''
-        # Crude exception handling
-        tokens = geo_input.split('-')
-        if not isinstance(geo_input, str):
-            raise TypeError("Cannot parse input type.  Supported types: str")
-        elif len(tokens) < 3:
+        # Tests geo_string is a string
+        # TODO: change to geo_string
+        tokens = geo_string.split('-')
+        # TODO: Find another name for hash_ which is a bool'''
+        # Gets hash_ bool passed in from parsed_geometry
+        return _make_GeometryTuple(tokens, hashable=hash_)
+
+        ##tokens = geo_input.split('-')
+        ##if not isinstance(geo_input, str):
+            ##raise TypeError("Cannot parse input type.  Supported types: str")
+        ##elif len(tokens) < 3:
                 # TODO: Replace with custom exception
-                raise Exception("Input token is too short. Supported geometry string format: 'outer-[inner_i]-middle'")
-        else:
-            '''Find another name for hash_ which is a bool'''
+                ##raise exc.FormatError(
+                ##    "Input token is too short. Supported geometry string format:"
+                ##    " 'outer-[inner_i]-middle'"
+                ##)
+        ##else:
+            # TODO: Find another name for hash_ which is a bool'''
             # Gets hash_ bool from parsed_geometry
-            return _make_GeometryTuple(tokens, hashable=hash_)
+            ##return _make_GeometryTuple(tokens, hashable=hash_)
 
     @classmethod
     def _to_gen_convention(cls, geo_input):
-        '''Return a geometry string converted to general convention.'''
-        tokens = geo_input.split('-')
+        '''Return a geometry string converted to general convention.
+
+        Handles string-validation Exceptions.
+        '''
+        try:
+            # Check geo_input is a string
+            tokens = geo_input.split('-')
+
+            # Check for letters in the input
+            any_letters = re.compile('[a-zA-Z]', re.IGNORECASE)
+            if any_letters.search(geo_input):
+                all_letters = any_letters.findall(geo_input)
+                # Raise if more than one letter in the Input
+                if len(all_letters) > 1:
+                    raise exc.FormatError(
+                        "Input must not contain more than one letter, 'S'."
+                    )
+                # Raise if 's' or 'S' is not the letter
+                if not set(all_letters).issubset(['s', 'S']):
+                    raise exc.FormatError(
+                        "Invalid letter detected; only 'S' allowed."
+                    )
+            if len(tokens) < 3:
+                raise exc.FormatError(
+                    "Input token is too short. Supported geometry string format:"
+                    " 'outer-[inner_i]-middle'"
+                )
+            if len(tokens) > 3:
+                raise exc.FormatError(
+                    "Input token is too long. Supported geometry string format:"
+                    " 'outer-[inner_i]-middle'"
+                )
+        except(AttributeError):
+            raise TypeError("Cannot parse input type.  Supported types: str")
+
         first = tokens[0]
         inside = tokens[1]
         last = tokens[-1]
@@ -448,7 +498,7 @@ class BaseDefaults(object):
 
         # To add keys, first add logic to automate appending dict_ in groupify
         # This should add a key to geo_inputs.  Geo_objects will auto-mimic this logic.
-        # Then define attributes (below) for geo_inputs and Geo_objects for API access.
+        # Then define attributes (below) of geo_inputs and Geo_objects for API access.
         self.geo_inputs = self._groupify_dict(self.geo_inputs)     # needed for next line
         self.Geo_objects = self._groupify_dict(self.geo_inputs, Geo_obj=True)
 
@@ -503,6 +553,13 @@ class BaseDefaults(object):
 
         This method is useful for automating groupings; new ply keys or
         values can be added to the dict with relative ease.
+
+        Parameters
+        ----------
+        dict_default : dict
+            Given a dict of plies-list of geo strings, key-value pairs
+        Geo_obj : bool; Default False
+            True if a returned dict is desired of Geometry objects.
 
         Returns
         -------
@@ -561,7 +618,8 @@ class BaseDefaults(object):
                     if '[' in geo_string:
                         #print(geo_string)
                         d['general conv.'].append(geo_string)
-                    elif '[' not in geo_string:
+                    # TODO: refactor logic; test_BaseDefaults_unconventional1() should cover this
+                    if '[' not in geo_string:
                         d['unconventional'].append(geo_string)
 
         dict_.update(d)

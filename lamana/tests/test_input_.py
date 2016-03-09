@@ -4,6 +4,7 @@
 import nose.tools as nt
 
 import lamana as la
+import lamana.lt_exceptions as exc
 from lamana.input_ import BaseDefaults
 from lamana.models import Wilson_LT as wlt
 from lamana.utils import tools as ut
@@ -70,6 +71,55 @@ mat_props = {
 # Or geometry lists (geo_name) are iterated to test Geometry object creation.
 '''Can the list comparison be sped up.'''
 '''https://pythonhosted.org/testfixtures/comparing.html#generators'''
+
+
+# Test String Conversion and Types
+def test_geo_inner1():
+    '''Check non-decimal inner converts to decimal.'''
+    # Convert inside string '200' to 200.0 if brackets aren't found
+    conv = la.input_.Geometry._to_gen_convention
+    geo1 = '400-200-800'
+    geo2 = '400-200.0-800'
+    expected = '400.0-[200.0]-800.0'
+    nt.assert_equal(conv(geo1), expected)
+    nt.assert_equal(conv(geo2), expected)
+
+
+# Test Exception Handling in _to_gen_convention()
+@nt.raises(TypeError)
+def test_geo_string1():
+    '''Throw TypeError if geo_input is non-string; list'''
+    err = G(['400-200-800'])                               # list
+
+
+@nt.raises(TypeError)
+def test_geo_string2():
+    '''Throw TypeError if geo_input is non-string; floats'''
+    err = G(400, 200, 800)                                 # floats
+
+
+@nt.raises(exc.FormatError)
+def test_geo_token1():
+    '''Check geo_input throws Exception if less than 3 tokens.'''
+    G('400-200')
+
+
+@nt.raises(exc.FormatError)
+def test_geo_token2():
+    '''Check geo_input throws Exception if more than 3 tokens; 4 splits.'''
+    G('400-200-800-100')
+
+
+@nt.raises(exc.FormatError)
+def test_geo_letters1():
+    '''Check geo_input throws Exception if non-'S' letter found.'''
+    G('400-200-800A')
+
+
+@nt.raises(exc.FormatError)
+def test_geo_letters2():
+    '''Check geo_input throws Exception if more than one letter found.'''
+    G('400-200-800SS')
 
 
 # Test Geometry() Attributes
@@ -803,7 +853,7 @@ def test_BaseDefaults_inner_i1():
 
 
 def test_BaseDefaults_genconvention1():
-    '''Confirm general conventions of are in a 'variable' attribute.'''
+    '''Confirm general conventions are in a 'variable' attribute.'''
     default_dict = bdft.geo_inputs['general conv.']        # dict
     default_attr = bdft.geos_general                       # attribute
     expected = [
@@ -826,7 +876,7 @@ def test_BaseDefaults_genconvention1():
 
 
 def test_BaseDefaults_unconventional1():
-    '''Confirm unconventionals of are in a 'variable' attribute.'''
+    '''Confirm unconventionals are in a 'variable' attribute.'''
     default_dict = bdft.geo_inputs['unconventional']       # dict
     default_attr = bdft.geos_unconventional                # attribute
     expected = [
@@ -839,6 +889,7 @@ def test_BaseDefaults_unconventional1():
         '400-200-800',
         '400-200-400S',
     ]
+    print(default_attr)
     # Allows extension in BaseDefaults().geo_inputs
     actual1 = (set(default_dict) >= set(expected))
     actual2 = (set(default_attr) >= set(expected))
@@ -969,6 +1020,14 @@ def test_BaseDefaults_generate_Geos3():
         nt.assert_true(Geo_object3.is_symmetric)
 
 
+def test_BaseDefaults_generate_Geo4():
+    '''Check TypeError is consumed if invalid None key given to Geo_objects dict.'''
+    gen = bdft.generate(selection=None, geo_inputs=False)
+    actual = list(gen)
+    expected = bdft.Geo_objects['all']
+    nt.assert_equal(actual, expected)
+
+
 def test_BaseDefaults_generate_geo1():
     '''Check .generate yields a consumable generator.'''
     gen = bdft.generate(selection=['5-ply'], geo_inputs=True)
@@ -1009,10 +1068,18 @@ def test_BaseDefaults_generate_geos3():
         nt.assert_equal(geo_input1, geo_input3)
 
 
+def test_BaseDefaults_generate_geo5():
+    '''Check TypeError is consumed if invalid None key given to geos_input dict.'''
+    gen = bdft.generate(selection=None, geo_inputs=True)
+    actual = list(gen)
+    expected = bdft.geo_inputs['all']
+    nt.assert_equal(actual, expected)
+
+
 @nt.raises(KeyError)
-def test_BaseDefaults_generate_geo4():
+def test_BaseDefaults_generate_geo5():
     '''Check KeyError is raised is key is not found in geos_input dict.'''
-    gen = bdft.generate(selection=['non-key'], geo_inputs=True)
+    gen = bdft.generate(selection=['invalid-key'], geo_inputs=True)
     actual = list(gen)
     expected = ['400-200-800', '400-[200]-800', '400-200-400S']
     nt.assert_equal(actual, expected)
