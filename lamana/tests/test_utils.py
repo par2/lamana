@@ -30,24 +30,9 @@ mat_props = {
 
 # TESTS -----------------------------------------------------------------------
 
-
-# Defaults --------------------------------------------------------------------
-# Minor checks for subclasses
-def test_Defaults_load_params1():
-    '''Confirm defaults geometric parameters for Wilson_LT are constant.'''
-    actual = dft.load_params
-    expected = load_params
-    nt.assert_equal(actual, expected)
-
-
-def test_Defaultsmat_props1():
-    '''Confirm default material parameters (Standard) for Wilson_LT are constant.'''
-    actual = dft.mat_props
-    expected = {
-        'Modulus': {'HA': 5.2e10, 'PSu': 2.7e9},
-        'Poissons': {'HA': 0.25, 'PSu': 0.33}
-    }
-    nt.assert_equal(actual, expected)
+# =============================================================================
+# TOOLS -----------------------------------------------------------------------
+# =============================================================================
 
 
 # Laminator -------------------------------------------------------------------
@@ -65,3 +50,30 @@ def test_laminator_consistency1():
         #print(actual)
         #print(expected)
         ut.assertFrameEqual(actual.LMFrame, expected.LMFrame)
+
+
+# Natural Sort ----------------------------------------------------------------
+def test_natural_sort1():
+    '''Check natural sorting of keys in a dict; keys are passed in from the dict.'''
+    dict_ = {'3-ply': None, '1-ply': None, '10-ply': None, '2-ply': None}
+    # actual = [k for k, v in sorted(dict_(), key=natural_sort)]    # equivalent
+    actual = [k for k in sorted(dict_.keys(), key=ut.natural_sort)]
+    expected = ['1-ply', '2-ply', '3-ply', '10-ply']
+    nt.assert_equal(actual, expected)
+
+
+def test_natural_sort2():
+    '''Check natural sorting of keys from tuples; key-value pairs are passed in from the dict.'''
+    dict_ = {'3-ply': None, '1-ply': None, '10-ply': None, '2-ply': None}
+    actual = [k for k in sorted(dict_.items(), key=ut.natural_sort)]
+    expected = [('1-ply', None), ('2-ply', None), ('3-ply', None), ('10-ply', None)]
+    nt.assert_equal(actual, expected)
+
+
+def test_natural_sort3():
+    '''Check if non-digits are in keys.'''
+    dict_ = {'3-ply': None, 'foo-ply': None, '10-ply': None, '2-ply': None}
+    # actual = [k for k, v in sorted(dict_(), key=natural_sort)]    # equivalent
+    actual = [k for k in sorted(dict_.keys(), key=ut.natural_sort)]
+    expected = ['2-ply', '3-ply', '10-ply', 'foo-ply']
+    nt.assert_equal(actual, expected)
