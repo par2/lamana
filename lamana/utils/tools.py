@@ -533,14 +533,15 @@ def read_csv_dir(path, *args, **kwargs):
 
 # TODO: Rename to int extractor.  sorting happen else where with an iterator and sorted().
 # TODO: Refine explanation, especially the return.  Why is it a 3-item list.
+# TODO: call data data_keys
 def natural_sort(data):
-    '''Return list of naturally sorted, numeric strings, as humans read them (REF 027).
+    '''Return a list naturally sorted by numeric strings, as read by humans (REF 027).
 
     Parameters
     ----------
     data : string-like
-        String, tuple or dict key containing a string, e.g. '14-ply', 'foo-ply',
-        ('1-ply', None).  Numeric strings are used to sort.
+        Assumes a key (str), or key-value pair (tuple) containing a string,
+        e.g. '14-ply', ('1-ply', None).  Numeric strings are used to sort.
 
     Notes
     -----
@@ -550,31 +551,43 @@ def natural_sort(data):
     such as ['', 1, '-ply'].  The `sorted()` function is smart enough to sort by
     numerical order.  Use this function in an iterator.
 
+    This helper function is used as a "key=" parameter with the `sorted()` function,
+    so it's design is a bit different than typical functions.  Some preparation
+    is required to pass the appropriate data-type in.
+
     Examples
     --------
-    >>> # Dicts are not normally sorted; we could therefore invoke `sorted`
-    >>> # However, sorted() does not order numberic strings like humans.
-    >>> data = {'3-ply': None, '1-ply': None, '10-ply': None, '2-ply': None}
-    >>> data_sorted = sorted(data)
+    >>> # Dicts are not normally sorted; we could therefore invoke `sorted()`
+    >>> # However, `sorted()`` does not order numeric strings like humans, e.g.
+    >>> dict_ = {'3-ply': None, '1-ply': None, '10-ply': None, '2-ply': None}
+    >>> data_sorted = sorted(dict_)
     >>> data_sorted
-    ['1-ply', '10-ply', '2-ply', '3-ply']                  # not naturally sorted
+    ['1-ply', '10-ply', '2-ply', '3-ply']                  # not naturally sorted; NOTE only keys returned
 
-    >>> # We thus use `natural_sort` as in combination with `sorted()`.
-    >>> # Now we can make a naturally sorted list of dict keys.
-    >>> [k for k, v in sorted(data.items(), key=natural_sort)]
+    >>> # Therefore, we use `natural_sort()` in combination with `sorted()`.
+    >>> # Now we can naturally sort the keys of the dict.
+    >>> [k for k in sorted(dict_, key=natural_sort)]
     ['1-ply', '2-ply', '3-ply', '10-ply']
-    >>> [k for k in sorted(data, key=natural_sort)]        # iter dict.keys()
+
+    >>> # Notice, `sorted()` automatically sorts dicts by keys; the following is equivalent
+    >>> [k for k in sorted(dict_.keys(), key=natural_sort)]
     ['1-ply', '2-ply', '3-ply', '10-ply']
+
+    >>> # `natural_sort()` can also handle data as key-value tuples
+    >>> [k for k in sorted(dict_.items(), key=natural_sort)]
+    [('1-ply', None), ('2-ply', None), ('3-ply', None), ('10-ply', None)]
 
     '''
+    #print(data, type(data))
+    # Extract string from a key in a sorted dict; if data.keys() used
     if isinstance(data, str):
-        string_ = data
-    # Extract string from tuple of a sorted dict
-    elif isinstance(data, tuple):
-        string_ = data[0]
-    #print(string_)
-    # TODO:add if isinstance(data, dict): string_ = data.keys()
-    # to less preparsing of dict
+        string_ = data                                     # only key
 
-    #TODO: complete.  doesn't really do any sorting  just sets up the iterator.  Redo.
+    # Extract string from a key-value tuple in a sorted dict; if data.items() used
+    elif isinstance(data, tuple):
+        #string_ = data[0]
+        string_, list_ = data                             # key, value pair
+    #print(string_)
+
+    #TODO: Need to complete; doesn't really do any sorting, just sets up the iterator.  Redo.
     return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]

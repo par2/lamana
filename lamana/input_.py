@@ -565,7 +565,7 @@ class BaseDefaults(object):
         Parameters
         ----------
         dict_default : dict
-            Given a dict of plies-list of geo strings, key-value pairs
+            Given a dict of "plies (str):geo strings (list)", key-value pairs.
         Geo_obj : bool; Default False
             True if a returned dict is desired of Geometry objects.
 
