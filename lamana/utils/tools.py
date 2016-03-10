@@ -473,6 +473,32 @@ def set_column_sequence(df, seq):
     seq : list-like
         List of column names in desired order.
 
+    Notes
+    -----
+    If DataFrame columns are not found in the given sequence, they are appended
+    of the end of the DataFrame.
+
+    Examples
+    --------
+    >>> # Pandas orders DataFrame columns alphabetically
+    >>> data = {'apple': 4, 'orange': 3, 'banana': 2, 'blueberry': 3}
+    >>> df = pd.DataFrame(data, index=['amount'])
+    >>> df
+            apple  banana  blueberry  orange
+    amount      4       2          3       3
+
+    >>> # We can resequence the columns
+    >>> seq = ['apple', 'orange', 'banana', 'blueberry']
+    >>> set_column_sequence(df, seq)
+            apple  banana  orange  blueberry
+    amount      4       2       3          3
+
+    >>> # Excluded names are appended to the end of the DataFrame
+    >>> seq = ['apple', 'orange']
+    >>> set_column_sequence(df, seq)
+            apple  banana  orange  blueberry
+    amount      4       2       3          3
+
     '''
     cols = seq[:]                                          # copy so we don't mutate seq
     for x in df.columns:
@@ -523,6 +549,7 @@ def read_csv_dir(path, *args, **kwargs):
     # Read all files in path
     for dir_entry in os.listdir(path):
         dir_entry_path = os.path.join(path, dir_entry)
+        # TODO: How to test this if branch?
         if os.path.isfile(dir_entry_path):
             # TODO: clean up and remove my_file; test affects
             with open(dir_entry_path, 'r') as my_file:
