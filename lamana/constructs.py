@@ -878,6 +878,8 @@ class Laminate(Stack):
             Passed in modified DataFrame.  CAUTION: Assumes label_ column is
             present.  Also assumes interface and discont. rows are correctly
             populated.
+        p : int
+            Passed in self.p; number of data points.
         column: str
             Column to assign internals.
 
@@ -903,6 +905,7 @@ class Laminate(Stack):
         first = df.groupby('layer').first()                    # make series of intervals
         last = df.groupby('layer').last()
 
+        # TODO: Unsure if this is accessed; check flow to see if this case is triggered
         if p == 1:
             raise ZeroDivisionError('p-1.  Interval cannot be calculated.')
         else:
@@ -995,15 +998,26 @@ class Laminate(Stack):
     # Read from DataFrames
     @property
     def is_special(self):
-        '''Return true if nplies < 5; Monolith, Bilayer, Trilayer, 4-ply.'''
+        '''Return True if nplies < 5; Monolith, Bilayer, Trilayer, 4-ply.'''
         return self.nplies < 5
 
+    # TODO: only return pertinent rows
     @property
     def has_discont(self):
-        '''Return True if discontinuity rows are present; generally p>2.'''
+        '''Return Series, True at rows where discontinuities are present.
+
+        Notes
+        -----
+        Generally, disconts are present for laminates with p >= 2 for all nplies.
+        Disconts are not present for monoliths with p = 2.
+
+        '''
         return self.LMFrame['label'].str.contains('discont.')
 
+    # TODO: only return True, not series
     @property
     def has_neutaxis(self):
-        '''Return True if neutral axis row is present; for odd plies.'''
+        '''Return Series, True at row where neutral axis row is present; for odd plies.'''
         return self.LMFrame['label'].str.contains('neut. axis')
+        # TODO: repalce with below
+        #return self.LMFrame['label'].str.contains('neut. axis').any()

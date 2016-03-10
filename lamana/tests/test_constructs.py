@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 
 import lamana as la
+from lamana.lt_exceptions import IndeterminateError
 from lamana.input_ import BaseDefaults
 from lamana import constructs as con
 from lamana.utils import tools as ut
@@ -1027,6 +1028,19 @@ def test_Laminate_sanity9():
         ut.assertFrameEqual(actual, expected)
 
 
+# Test Exception Handling
+@nt.raises(ZeroDivisionError)
+def test_Laminate_internals1():
+    '''Check internal function raises ZeroDivisionError if p = 1 is given to _make_internals.'''
+    # Function needs a DataFrame to work on
+    # Try to feed random DataFrame (LMFrame), random column with p=1
+    case1 = ut.laminator(dft.geo_inputs['1-ply'], ps=[1])
+    for case_ in case1.values():
+        for LM in case_.LMs:
+            df_random = LM.LMFrame
+            la.constructs.Laminate._make_internals(df_random, 1, 'k')
+
+
 # Test attributes
 def test_Laminate_attr_max():
     '''Check the max attribute and maximum stresses.'''
@@ -1048,7 +1062,7 @@ def test_Laminate_attr_max():
             ut.assertSeriesEqual(actual, expected, check_less_precise=True)
 
 
-def test_Laminate_attr_min():
+def test_Laminate_attr_min1():
     '''Check the min attribute and minimum stresses.'''
     for case_ in case.values():
         for LM in case_.LMs:
@@ -1066,6 +1080,15 @@ def test_Laminate_attr_min():
             ut.assertSeriesEqual(actual, expected, check_less_precise=True)
 
 
+def test_Laminate_attr_min2():
+    '''Check the min attribute and minimum stresses returns None if no disconts.'''
+    # Monoliths do not have disconts; will use to trigger the return
+    for case in cases.values():
+        actual = [LM.min_stress for LM in case.LMs if LM.alias == 'Monolith']
+        expected = [None] * len(actual)
+        nt.assert_equal(actual, expected)
+
+
 def test_Laminate_attr_extrema():
     case1 = ut.laminator(dft.geos_full, ps=[5])
     case2 = ut.laminator(dft.geos_full, ps=[2])
@@ -1080,19 +1103,73 @@ def test_Laminate_attr_extrema():
             ut.assertFrameEqual(actual, expected)
 
 
+# TODO: Fix static expected
 def test_Laminate_attr_isspecial():
     '''Check the is_special attribute works for different ps.'''
-    expected = [True, True, True, True, True, True, True,
-                False, False, False, False, False, False,
-                False, False, False, False, False]
-
-    # Uses Defaults().geo_all; will grow if more defaults are added
+    expected = [
+        True, True, True, True, True, True, True,
+        False, False, False, False, False, False,
+        False, False, False, False, False
+    ]
+    # Uses Defaults().geos_all
+    # Caution: will grow if more defaults are added; need to amend expected
     for case in cases.values():
         # Make a list for each case by p, then assert
         actual = [LM.is_special for LM in case.LMs]
         #print(actual)
         #assert actual == expected
         nt.assert_equal(actual, expected)
+
+
+# TODO: Fix static expected
+def test_Laminate_attr_hasdiscont1():
+    '''Check the has_discont attribute works for different ps; even ply.'''
+    # Disconts exist for p > 2 at interfaces for even and odd plies
+    expected_by_p = [False, True, True, True, True]        # False for p < 2
+    # Make a case of standards for each p
+    cases = ut.laminator(geos=dft.geos_even, ps=[1, 2, 3, 4, 5])
+    # Uses Defaults().geos_standard
+    # Caution: will grow if more defaults are added; need to amend expected
+    for case, e in zip(cases.values(), expected_by_p):
+        # Make a list of series for each case by p
+        # All cases should be the same per case; return True only if discont found
+        # Return True if any disconts are found per cases
+        actual = all([LM.has_discont.any() for LM in case.LMs])
+        expected = e                                       # expected for all geos per case
+        #print(actual)
+        #assert actual == expected
+        nt.assert_equal(actual, expected)
+
+
+def test_Laminate_attr_hasdiscont2():
+    '''Check the has_discont attribute works for different ps; odd ply.'''
+    # Disconts exist for p > 2 at interfaces for even and odd plies
+    expected_by_p = [True, True, True, True]               # False for p < 2
+
+    # Make a case of standards for each p
+    # p = 1 throws IndeterminateError
+    # Monoliths do not have disconts
+    # TODO: use Cases to test all odds but exclude monoliths
+    cases = ut.laminator(geos=dft.geos_standard, ps=[2, 3, 4, 5])
+    # Uses Defaults().geos_standard
+    # Caution: will grow if more defaults are added; need to amend expected
+    for case, e in zip(cases.values(), expected_by_p):
+        # Make a list of series for each case by p
+        # All cases should be the same per case; return True only if discont found
+        # Return True if any disconts are found per cases
+        actual = all([LM.has_discont.any() for LM in case.LMs if LM.alias != 'Monolith'])
+        expected = e
+        #print(actual)
+        #assert actual == expected
+        nt.assert_equal(actual, expected)
+
+
+# Test Error Handling
+# TODO: Doesn't seem to catch the Exception; needs work
+#@nt.raises(IndeterminateError)
+#def test_Laminate_indeterminate1():
+#    '''Check IndeterminateError is thrown when p=1 odd-ply is made.'''
+#    ut.laminator(geos=dft.geos_odd, ps=[1])
 
 
 # Test Comparisons
@@ -1107,6 +1184,14 @@ def test_Laminate_eq1():
     nt.assert_true(actual)
 
 
+def test_Laminate_eq2():
+    '''Check returns NotImplemented if classes are not equal in __eq__'''
+    L = la.constructs.Laminate(dft.FeatureInput)
+    actual = L.__eq__(1)
+    expected = NotImplemented
+    nt.assert_equal(actual, expected)
+
+
 def test_Laminate_ne1():
     '''Compare 5-ply to even plies should be False; testing != of LaminateModels'''
     case1 = ut.laminator(dft.geos_standard)
@@ -1119,6 +1204,14 @@ def test_Laminate_ne1():
             print(standard[0])
             print(actual)
             nt.assert_true(actual)
+
+
+def test_Laminate_ne2():
+    '''Check returns NotImplemented if classes are not equal in __ne__'''
+    L = la.constructs.Laminate(dft.FeatureInput)
+    actual = L.__ne__(1)
+    expected = NotImplemented
+    nt.assert_equal(actual, expected)
 
 
 def test_Laminate_compare_sets1():
