@@ -27,6 +27,7 @@ class BaseModel(object):
 
     '''
     def __init__(self):
+        # TODO: add test to cover sub-classing
         super(BaseModel, self).__init__()
         '''Change model_name to name.'''
         self.model_name = None
