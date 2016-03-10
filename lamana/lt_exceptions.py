@@ -20,5 +20,11 @@ class NotImplementedError(Error):
 
 
 class IndeterminateError(Error):
-    '''Associate with INDET exceptions.'''
+    '''Associate with INDET exceptions.
+
+    See Also
+    --------
+    - "More on IndeterminateError" in the documentation.
+
+    '''
     pass

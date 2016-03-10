@@ -11,7 +11,8 @@ import collections as ct
 import pandas as pd
 
 import lamana as la
-import lamana.lt_exceptions as exc
+#import lamana.lt_exceptions as exc
+from lamana.lt_exceptions import FormatError
 from lamana.utils import tools as ut
 
 # =============================================================================
@@ -278,21 +279,25 @@ class Geometry(object):
                 all_letters = any_letters.findall(geo_input)
                 # Raise if more than one letter in the Input
                 if len(all_letters) > 1:
-                    raise exc.FormatError(
+                    ##raise exc.FormatError(
+                    raise FormatError(
                         "Input must not contain more than one letter, 'S'."
                     )
                 # Raise if 's' or 'S' is not the letter
                 if not set(all_letters).issubset(['s', 'S']):
-                    raise exc.FormatError(
+                    ##raise exc.FormatError(
+                    raise FormatError(
                         "Invalid letter detected; only 'S' allowed."
                     )
             if len(tokens) < 3:
-                raise exc.FormatError(
+                ##raise exc.FormatError(
+                raise FormatError(
                     "Input token is too short. Supported geometry string format:"
                     " 'outer-[inner_i]-middle'"
                 )
             if len(tokens) > 3:
-                raise exc.FormatError(
+                ##raise exc.FormatError(
+                raise FormatError(
                     "Input token is too long. Supported geometry string format:"
                     " 'outer-[inner_i]-middle'"
                 )
