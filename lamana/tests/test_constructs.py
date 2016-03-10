@@ -1174,7 +1174,7 @@ def test_Laminate_attr_hasdiscont2():
 
 # Test Comparisons
 def test_Laminate_eq1():
-    '''Compare 5-ply to self should be True; testing == of LaminateModels'''
+    '''Compare 5-ply to self should be True; testing == of LaminateModels.'''
     case1 = ut.laminator('400-[200]-800')
     case2 = ut.laminator('400-200-800')
     standard = [LM for case_ in case1.values() for LM in case_.LMs]
@@ -1185,7 +1185,7 @@ def test_Laminate_eq1():
 
 
 def test_Laminate_eq2():
-    '''Check returns NotImplemented if classes are not equal in __eq__'''
+    '''Check returns NotImplemented if classes are not equal in __eq__.'''
     L = la.constructs.Laminate(dft.FeatureInput)
     actual = L.__eq__(1)
     expected = NotImplemented
@@ -1193,7 +1193,7 @@ def test_Laminate_eq2():
 
 
 def test_Laminate_ne1():
-    '''Compare 5-ply to even plies should be False; testing != of LaminateModels'''
+    '''Compare 5-ply to even plies should be False; testing != of LaminateModels.'''
     case1 = ut.laminator(dft.geos_standard)
     cases1 = ut.laminator(dft.geos_even)
     standard = [LM for case_ in case1.values() for LM in case_.LMs]
@@ -1207,7 +1207,7 @@ def test_Laminate_ne1():
 
 
 def test_Laminate_ne2():
-    '''Check returns NotImplemented if classes are not equal in __ne__'''
+    '''Check returns NotImplemented if classes are not equal in __ne__.'''
     L = la.constructs.Laminate(dft.FeatureInput)
     actual = L.__ne__(1)
     expected = NotImplemented
