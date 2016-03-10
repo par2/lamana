@@ -134,9 +134,6 @@ def test_models_WisonLT_a3():
 #             # Implementation unfinished; only used to trigger error
 
 
-
-
-
 def test_models_WisonLT_diameter1():
     '''Check the support radius, a, is smaller than the sample radius, R.'''
     case = ut.laminator(geos=dft.geos_standard)
@@ -223,10 +220,10 @@ def test_WilsonLT_Defaults_attrs1():
     nt.assert_true(actual1, expected)
     nt.assert_true(actual2, expected)
 
-'''Fix Geometry object comparisons. Add aprop. tests.'''
+# TODO: Fix Geometry object comparisons. Add approp. tests.
 
 
-def test_WilsonLT_Defaults_params1():
+def test_WilsonLT_Defaults_load_params1():
     '''Confirm default load_param values.'''
     actual = dft.load_params
     expected = {
@@ -239,8 +236,15 @@ def test_WilsonLT_Defaults_params1():
     nt.assert_equal(actual, expected)
 
 
-def test_WilsonLT_Defaults_params2():
-    '''Confirm default mat_param values.'''
+def test_WilsonLT_Defaults_load_params2():
+    '''Confirm defaults geometric parameters for Wilson_LT are constant.'''
+    actual = dft.load_params
+    expected = dft.load_params
+    nt.assert_equal(actual, expected)
+
+
+def test_WilsonLT_Defaults_mat_props1():
+    '''Confirm default material parameters (Standard) for Wilson_LT are constant.'''
     actual = dft.mat_props
 #     expected = {'HA' : [5.2e10, 0.25],
 #                 'PSu' : [2.7e9, 0.33],
