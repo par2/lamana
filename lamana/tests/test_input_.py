@@ -4,7 +4,7 @@
 import nose.tools as nt
 
 import lamana as la
-import lamana.lt_exceptions as exc
+from lamana.lt_exceptions import FormatError
 from lamana.input_ import BaseDefaults
 from lamana.models import Wilson_LT as wlt
 from lamana.utils import tools as ut
@@ -98,25 +98,25 @@ def test_geo_string2():
     err = G(400, 200, 800)                                 # floats
 
 
-@nt.raises(exc.FormatError)
+@nt.raises(FormatError)
 def test_geo_token1():
     '''Check geo_input throws Exception if less than 3 tokens.'''
     G('400-200')
 
 
-@nt.raises(exc.FormatError)
+@nt.raises(FormatError)
 def test_geo_token2():
     '''Check geo_input throws Exception if more than 3 tokens; 4 splits.'''
     G('400-200-800-100')
 
 
-@nt.raises(exc.FormatError)
+@nt.raises(FormatError)
 def test_geo_letters1():
     '''Check geo_input throws Exception if non-'S' letter found.'''
     G('400-200-800A')
 
 
-@nt.raises(exc.FormatError)
+@nt.raises(FormatError)
 def test_geo_letters2():
     '''Check geo_input throws Exception if more than one letter found.'''
     G('400-200-800SS')
