@@ -2,6 +2,7 @@
 '''Test for consistency of utils.'''
 
 import nose.tools as nt
+import pandas as pd
 
 import lamana as la
 ##from lamana.input_ import BaseDefaults
@@ -50,6 +51,35 @@ def test_laminator_consistency1():
         #print(actual)
         #print(expected)
         ut.assertFrameEqual(actual.LMFrame, expected.LMFrame)
+
+
+# Sort DataFrame Columns ------------------------------------------------------
+def test_set_columns_seq1():
+    '''Check reorders columns to existing sequence.'''
+    # Pandas orders DataFrame columns alphabetically
+    data = {'apple': 4, 'orange': 3, 'banana': 2, 'blueberry': 3}
+    df = pd.DataFrame(data, index=['amount'])
+    # apple  banana  blueberry  orange
+
+    # We can resequence the columns
+    seq = ['apple', 'orange', 'banana', 'blueberry']
+    actual = ut.set_column_sequence(df, seq)
+    expected = pd.DataFrame(data, index=['amount'], columns=seq)
+    ut.assertFrameEqual(actual, expected)
+
+
+def test_set_columns_seq2():
+    '''Check reorders columns and adds columns not in sequence to the end.'''
+    data = {'apple': 4, 'strawberry': 3, 'orange': 3, 'banana': 2}
+    df = pd.DataFrame(data, index=['amount'])
+
+    # Excluded names are appended to the end of the DataFrame
+    seq = ['apple', 'strawberry']
+    # apple  strawberry banana  orange
+    actual = ut.set_column_sequence(df, seq)
+    expected = pd.DataFrame(data, index=['amount'],
+                            columns=['apple', 'strawberry', 'banana', 'orange'])
+    ut.assertFrameEqual(actual, expected)
 
 
 # Natural Sort ----------------------------------------------------------------
