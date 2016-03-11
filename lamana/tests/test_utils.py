@@ -50,6 +50,36 @@ def test_laminator_consistency1():
         ut.assertFrameEqual(actual.LMFrame, expected.LMFrame)
 
 
+#def test_laminator_gencon1():
+#    '''Check returns a geometry string in General Convention; converts 'S'.'''
+#    case = ut.laminator(['400-0-400S'])
+#    for case_ in case.values():
+#        for LM in case_.LMs:
+#            actual = ut.get_special_geometry(LM.LMFrame)
+#            expected = '400.0-[0.0]-800.0'
+#            nt.assert_equal(actual, expected)
+
+
+# Get Specials ----------------------------------------------------------------
+def test_getspecialgeo1():
+    '''Check strings are extracted from a special laminate Frame, nplies <= 4.'''
+    case = ut.laminator(['400-200-0'])
+    for case_ in case.values():
+        for LM in case_.LMs:
+            actual = ut.get_special_geometry(LM.LMFrame)
+            expected = '400-[200]-0'
+            nt.assert_equal(actual, expected)
+
+
+@nt.raises(Exception)
+def test_getspecialgeo2():
+    '''Check error is raised if not special, nplies > 4.'''
+    case = ut.laminator(['400-200-800'])
+    for case_ in case.values():
+        for LM in case_.LMs:
+            actual = ut.get_special_geometry(LM.LMFrame)
+
+
 # Sets ------------------------------------------------------------------------
 def test_compare_subset():
     '''Check the comparison of subsets.'''
