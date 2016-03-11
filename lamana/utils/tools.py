@@ -296,6 +296,7 @@ def get_frames(cases, name=None, nplies=None, ps=None):
         print('Finished getting DataFrames.')
 
 
+# TODO: How to test writing files w/o making residual files?
 def write_csv(LM, path=None, verbose=True, overwrite=False):
     '''Convert DataFrame to csv files and write them to a specified directory.
 
@@ -315,7 +316,6 @@ def write_csv(LM, path=None, verbose=True, overwrite=False):
     -------
     csv
         Writes csv file of data contained in LM (a DataFrame) to a path.
-
 
     '''
     # Parse Laminate Properties
@@ -362,7 +362,7 @@ def compare_set(it, others, how='union', test=None):
     ----------
     it, others : iterable
         A container of unique or non-unique values.
-    how : {'union', 'intersection', 'difference', 'symmetric_difference'}; default 'union'
+    how : {'union', 'intersection', 'difference', 'symmetric_difference'}; default 'union'.
         Determine which type of set to use.  Applies set theory.
     test : {'issubset', 'issuperset', 'isdisjoint'}; default `None`
         Test the type of subset.
@@ -380,7 +380,7 @@ def compare_set(it, others, how='union', test=None):
     # Subset: [1,2] < [1,2,3] -> True; [1,2] <= [1,2] -> True
     if test.startswith('issub'):
         return set(it).issubset(others)
-    # Subset: [1,2,3] > [1,2] -> True; [1,2,3] >= [1,2,3] -> True
+    # Superset: [1,2,3] > [1,2] -> True; [1,2,3] >= [1,2,3] -> True
     if test.startswith('issuper'):
         return set(it).issuperset(others)
     # Disjoint: [1,2] , [3,4] -> True
