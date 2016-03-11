@@ -423,38 +423,50 @@ def ndframe_equal(ndf1, ndf2):
         return False
 
 
-def is_matched(pattern, string):
+# Refactore to favor string as first arg (0.4.11.dev0)
+def is_matched(string, pattern=None):
     '''Return True if container brackets or parentheses have equal count; matched.
 
     Parameters
     ----------
-    pattern : str
-        Regular expression pattern.
     string : str
         String to which the pattern in search.
+    pattern : str; Default None
+        Regular expression pattern.  If None, defaults to test all characters i.e. '.'.
+
+    Notes
+    -----
+    This function was made to help validate parsed input strings.
 
     Examples
     --------
     >>> s = 'Here the [brackets] are matched.'
-    >>> p = '.'                                            # regular expression pattern for all
-    >>> is_matched(p, s)
+    >>> is_matched(s)
     True
 
     >>> s = 'Here the [brackets][ are NOT matched.'
-    >>> p = '.'                                           # regular expression pattern
-    >>> is_matched(p, s)
+    >>> is_matched(s)
+    False
+
+    >>> s = 'Only accept [letters] in brackets that are [CAPITALIZED[.'
+    >>> p = '\W[A-Z]+\W'                                   # regex for all only capital letters and non-alphannumerics
+    >>> is_matched(s, p)
     False
 
     '''
-    # TODO: all default pattern for 'all' (.) if none supplied; make pattern optional
+    if pattern is None:
+        pattern = '.+'                                     # default for all characters together (greedily)
+    bra, ket, par, ren = 0, 0, 0, 0
+
     search = re.findall(pattern, string)                   # quick, non-iterative extraction
-    if '[' or ']' in search:
-        bra = search.count('[')
-        ket = search.count(']')
-    if '(' or ')' in search:
-        par = search.count('(')
-        ren = search.count(')')
-    #print(bra, ket, par, ren)
+    for item in search:
+        if '[' or ']' in item:
+            bra, ket = item.count('['), item.count(']')
+        if '(' or ')' in item:
+            par, ren = item.count('('), item.count(')')
+    #print(search, len(search))
+    #print('l_bracket: {0}, r_bracket: {1}, '
+    #      'l_paren {2}, r_paren: {3}'.format(bra, ket, par, ren))
     return bra == ket and par == ren
 
 # =============================================================================
