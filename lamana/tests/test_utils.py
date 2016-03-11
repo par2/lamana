@@ -53,6 +53,41 @@ def test_laminator_consistency1():
         ut.assertFrameEqual(actual.LMFrame, expected.LMFrame)
 
 
+# Matching Brackets -----------------------------------------------------------
+def test_ismatched1():
+    '''Check matching pair of brackets or parentheses returns True.'''
+    s1 = 'Here the [brackets] are matched.'
+    s2 = 'Here the (parentheses) are matched.'
+    actual1 = ut.is_matched(s1)
+    actual2 = ut.is_matched(s2)
+    expected = True
+    nt.assert_equal(actual1, expected)
+    nt.assert_equal(actual2, expected)
+
+
+def test_ismatched2():
+    '''Check non-matching pair of brackets brackets or parentheses returns False.'''
+    s1 = 'Here the [brackets][ are NOT matched.'
+    s2 = 'Here the ((parentheses) are NOT matched.'
+    actual1 = ut.is_matched(s1)
+    actual2 = ut.is_matched(s2)
+    expected = False
+    nt.assert_equal(actual1, expected)
+    nt.assert_equal(actual2, expected)
+
+
+def test_ismatched3():
+    '''Check non-matching pair of brackets brackets or parentheses returns False.'''
+    s1 = 'Only accept [letters] in brackets that are [CAPITALIZED[.'
+    s2 = 'Only accept (letters) in parentheses that are ((CAPITALIZED(.'
+    p = '\W[A-Z]+\W'                                       # regex for all only capital letters and non-alphannumerics
+    actual1 = ut.is_matched(s1, p)
+    actual2 = ut.is_matched(s2, p)
+    expected = False
+    nt.assert_equal(actual1, expected)
+    nt.assert_equal(actual2, expected)
+
+
 # Sort DataFrame Columns ------------------------------------------------------
 def test_set_columns_seq1():
     '''Check reorders columns to existing sequence.'''
