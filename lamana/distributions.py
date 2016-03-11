@@ -537,7 +537,7 @@ class Cases(ct.MutableMapping):
 
     - if user-defined, tries to import `Defaults()` to simplify instantiations
     - dict-like storage and access of cases
-    - iterable by values
+    - iterable by values (not keys)!
     - sliceable; returns a selection of cases
     - subset selection methods of LaminateModels
     - set operations for subset selections
@@ -578,11 +578,14 @@ class Cases(ct.MutableMapping):
     Cases of different ps, accepting a list of geometry strings
 
     >>> from lamana.distributions import Cases
-    >>> cases = Cases('dft.geo_inputs['5-ply'], ps=[2,3])
+    >>> cases = Cases(dft.geo_inputs['5-ply'], ps=[2,3])
     >>> cases
     {0: <<class 'lamana.distributions.Case'> p=2, size=3>,
-     1: <<class 'lamana.distributions.Case'> p=3, size=3>}
+     1: <<class 'lamana.distributions.Case'> p=3, size=3>
+     ...
+     }
 
+    # TODO: Fix example
     Accepts a dict of listed geometry strings (precursors for caselets)
 
     >>> dict_caselets = {
@@ -601,16 +604,16 @@ class Cases(ct.MutableMapping):
      1: <<class 'lamana.distributions.Case'> p=5, size=6>}
      2: <<class 'lamana.distributions.Case'> p=5, size=6>,}
 
-    Cases instances are iterable by values (default)
+    `Cases` instances are iterable by values (default)
 
     >>> for case in cases:
     ...    print(case.LMs)
-    [<lamana LaminateModel object (400.0-[200.0]-800.0), p=2>,
+    [[<lamana LaminateModel object (400.0-[200.0]-800.0), p=2>,
      <lamana LaminateModel object (400.0-[200.0]-800.0), p=2>,
-     <lamana LaminateModel object (400.0-[200.0]-400.0S), p=2>]
+     <lamana LaminateModel object (400.0-[200.0]-400.0S), p=2>],
     [<lamana LaminateModel object (400.0-[200.0]-800.0), p=3>,
      <lamana LaminateModel object (400.0-[200.0]-800.0), p=3>,
-     <lamana LaminateModel object (400.0-[200.0]-400.0S), p=3>]
+     <lamana LaminateModel object (400.0-[200.0]-400.0S), p=3>]]
 
     >>> (LM for case in cases for LM in case.LMs)
     <generator object>
@@ -623,6 +626,10 @@ class Cases(ct.MutableMapping):
     - cases: group of cases, particularly with a similar pattern of interest or
       different rows (`p`).
     - caselet: a subset of cases or LMs; geometry string, list or case (See LPEP 003)
+
+    See Also
+    --------
+    - Demonstration notebook for applied API
 
     '''
     def __init__(
