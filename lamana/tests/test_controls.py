@@ -16,6 +16,7 @@ dft = wlt.Defaults()
 
 
 # SETUP -----------------------------------------------------------------------
+# TODO: Move to utils and test
 def fix_discontinuities(laminate, inner_i):
     '''Replace t_ Nan values at discontinuities with adjacent value for inner_i.
 
@@ -50,6 +51,7 @@ def fix_discontinuities(laminate, inner_i):
     return df
 
 
+# TODO: Move to utils and test
 def extract_dataframe(df):
     '''Parse corrected DataFrame from a csv file; legacy, automated or custom.'''
     df_expected = df.copy()
@@ -89,6 +91,10 @@ def extract_dataframe(df):
     # Primarily for custom controls
     geo = geometry.split('-')
     #print(geo)
+
+    #### Look closely at affects of this commit 6f5f518fa42099fcbda37c1a15986a88a04e38c5
+    #### Check that files are not influenced; reverting should be commenting _to_gen_convention get_..._geometry
+    # TODO: Refactor; this section is not needed with _to_gen_convention in get_multi_geometry and get_special_geometry
     outer = float(geo[0])
     if '[' in geo[1]:
         inners = geo[1][1:-1].split(',')
@@ -99,6 +105,8 @@ def extract_dataframe(df):
     else:
         inner_i = float(geo[1])
     #print(inner_i)
+    ####
+
     df_expected.loc[
         (df_expected['label'] == 'discont.') & (df_expected['type'] == 'outer'),
         't(um)'] = outer

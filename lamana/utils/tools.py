@@ -119,7 +119,10 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
 
 
 # Helpers
-# NOTE: Decommission 0.4.11.dev0 post laminator deprecation
+
+#### Pick up here.  Extract chunks and functions from controls into utils; make tests.
+
+
 def get_multi_geometry(laminate):
     '''Return geometry string parsed from a multi-plied laminate DataFrame.
 
@@ -127,7 +130,12 @@ def get_multi_geometry(laminate):
     in middle and outer.  Splits the inner_i list by p.  Used in controls.py.
     Refactored for even multi-plies in 0.4.3d4.
 
+    Notes
+    -----
+    Used in controls.py, extract_dataframe() to parse data from files.
+
     '''
+    #TODO: Move to separate function in utils
     def chunks(lst, n):
         '''Split up a list into n-sized smaller lists; (REF 018)'''
         for i in range(0, len(lst), n):
@@ -193,7 +201,6 @@ def get_multi_geometry(laminate):
     return geo_string
 
 
-# NOTE: Decommission 0.4.11.dev0 post laminator deprecation
 #def get_special_geometry(laminate):
 def get_special_geometry(Frame):
     '''Return geometry string parsed from a special-plied (<5) laminate DataFrame.
@@ -206,7 +213,7 @@ def get_special_geometry(Frame):
 
     Notes
     -----
-    Used in controls.py to parse data from files.
+    Used in controls.py, extract_dataframe() to parse data from files.
 
     '''
     #nplies = len(laminate['layer'].unique())
