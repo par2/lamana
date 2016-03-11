@@ -4,6 +4,7 @@
 import nose.tools as nt
 
 import lamana as la
+#from lamana.lt_exceptions import FormatError, InvalidError
 from lamana.lt_exceptions import FormatError
 from lamana.input_ import BaseDefaults
 from lamana.models import Wilson_LT as wlt
@@ -84,7 +85,6 @@ def test_geo_inner1():
     nt.assert_equal(conv(geo1), expected)
     nt.assert_equal(conv(geo2), expected)
 
-
 # Test Exception Handling in _to_gen_convention()
 @nt.raises(TypeError)
 def test_geo_string1():
@@ -120,6 +120,14 @@ def test_geo_letters1():
 def test_geo_letters2():
     '''Check geo_input throws Exception if more than one letter found.'''
     G('400-200-800SS')
+
+
+# Test Validations of geo_strings
+
+#@nt.raises(InvalidError)
+#def test_laminator_validation1():
+#    '''Check valid: if inner, must have outer.'''
+#    case = ut.laminator(['0-200-400S'])
 
 
 # Test Geometry() Attributes

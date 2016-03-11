@@ -11,6 +11,11 @@ class FormatError(Error):
     pass
 
 
+class InvalidError(Error):
+    '''Associate with invalid, impossible geo_strings.'''
+    pass
+
+
 class KeyError(Error):
     pass
 
