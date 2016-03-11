@@ -185,19 +185,36 @@ def get_multi_geometry(laminate):
     geo.extend(out_con)
     geo.append(str(in_lst))
     geo.extend(mid_con)
-    geometry = '-'.join(geo)
-    return geometry
+    geo_string = '-'.join(geo)
+    # TODO: format geo_strings to General Convention
+    # geo_string = la.input_.Geometry._to_gen_convention(geo_string)
+    return geo_string
 
 
-def get_special_geometry(laminate):
+#def get_special_geometry(laminate):
+def get_special_geometry(Frame):
     '''Return geometry string parsed from a special-plied (<5) laminate DataFrame.
-    Used in controls.py.
+
+    Parameters
+    ----------
+    Frame : DataFrame
+        A laminate DataFrame, typically extracted from a file.  Therefore,
+        it is unknown whether it is LMFrame or LFrame.
+
+    Notes
+    -----
+    Used in controls.py to parse data from files.
 
     '''
-    nplies = len(laminate['layer'].unique())
+    #nplies = len(laminate['layer'].unique())
+    #geo = [
+    #    str(int(thickness)) for thickness               # gets unique values
+    #    in laminate.groupby('type', sort=False)['t(um)'].first()
+    #]
+    nplies = len(Frame['layer'].unique())
     geo = [
         str(int(thickness)) for thickness               # gets unique values
-        in laminate.groupby('type', sort=False)['t(um)'].first()
+        in Frame.groupby('type', sort=False)['t(um)'].first()
     ]
     #print(geo)
 
@@ -214,17 +231,20 @@ def get_special_geometry(laminate):
         #ply = 'Trilayer'
         geo.insert(1, '0')
     elif nplies == 4:
-        #ply = '4ply'
+        #ply = '4-ply'
         geo.append('0')
         # TODO: use join
         geo[1] = '[' + geo[1] + ']'                        # redo inner in General Convention notation
     else:
+        # TODO: use custom Exception
         raise Exception('Number of plies > 4.  Use get_multi_geometry() instead.')
 
     #print('nplies:', nplies)
     #print(geo)
-    geometry = '-'.join(geo)
-    return geometry
+    geo_string = '-'.join(geo)
+    # TODO: format geo_strings to General Convention
+    # geo_string = la.input_.Geometry._to_gen_convention(geo_string)
+    return geo_string
 
 
 # DEPRECATE: remove and replace with Cases() (0.4.11.dev0)
