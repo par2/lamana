@@ -5,12 +5,9 @@ import nose.tools as nt
 import pandas as pd
 
 import lamana as la
-##from lamana.input_ import BaseDefaults
-#from lamana.utils.tools import BaseDefaults
 from lamana.models import Wilson_LT as wlt
 from lamana.utils import tools as ut
 
-##bdft = BaseDefaults()                                      # from base class
 dft = wlt.Defaults()                                       # from inherited class in models; user
 
 
