@@ -37,7 +37,7 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
     See Also
     --------
     test_sanity#() : set of test functions that run sanity checks
-    utils.tools.get_frames() : utility function to parse DataFrames
+    utils.tools.select_frames() : utility function to parse DataFrames
 
     Notes
     -----
@@ -227,73 +227,81 @@ def get_special_geometry(laminate):
     return geometry
 
 
-# TODO: Change to `select_frames`
-def get_frames(cases, name=None, nplies=None, ps=None):
-    '''Yield and print a subset of case DataFrames given a keyword.
-    Else, print all DataFrames for all cases.
+# DEPRECATE: remove and replace with Cases() (0.4.11.dev0)
+# Does not print cases accurately
+# Did not fail test although alias given for name
+#def get_frames(cases, name=None, nplies=None, ps=None):
+# def select_frames(cases, name=None, nplies=None, ps=None):
+#     '''Yield and print a subset of case DataFrames given cases.
 
-    Parameters
-    ----------
-    cases : list of DataFrames
-        Contains case objects.
-    name : str
-        Common name.
-    nplies : int
-        Number of plies.
-    ps : int
-        Number of points per layer.
+#     Else, print all DataFrames for all cases.
 
-    Examples
-    --------
-    >>> cases_selected = ut.get_frames(cases, name='Trilayer', ps=[])
-    >>> LMs_list = list(cases)                              # capture generator contents
-    >>> LMs_list = [LM for LM in cases_selected]            # capture and exhaust generator
-    >>> for LMs in cases_selected:                          # exhaust generator; see contents
-    ...    print(LMs)
+#     Parameters
+#     ----------
+#     cases : list of DataFrames
+#         Contains case objects.
+#     name : str
+#         Common name.
+#     nplies : int
+#         Number of plies.
+#     ps : int
+#         Number of points per layer.
 
-    See Also
-    --------
-    lamana.distributions.Cases.select() : canonical way to select df subsets.
+#     Examples
+#     --------
+#     >>> cases_selected = ut.select_frames(cases, name='Trilayer', ps=[])
+#     >>> LMs_list = list(cases)                              # capture generator contents
+#     >>> LMs_list = [LM for LM in cases_selected]            # capture and exhaust generator
+#     >>> for LMs in cases_selected:                          # exhaust generator; see contents
+#     ...    print(LMs)
 
-    Yields
-    ------
-    DataFrame
-        Extracted data from a sequence of case objects.
+#     Notes
+#     -----
+#     This function is a predecessor to the modern Cases.select() method.  It is
+#     no longer maintained (0.4.11.dev0), though possibly useful for extracting
+#     selected DataFrames from existing cases.  Formerly `get_frames()`.
 
-    '''
-    # TODO: Add a verbose mode
+#     See Also
+#     --------
+#     lamana.distributions.Cases.select() : canonical way to select df subsets.
 
-    # Default
-    if ps is None:
-        ps = []
+#     Yields
+#     ------
+#     DataFrame
+#         Extracted data from a sequence of case objects.
 
-    try:
-        for i, case in enumerate(cases.values()):          # Python 3
-            print('case', i + 1)
-            for LM in case.LMs:
-                #print(LM.Geometry)
-                #print(name, nplies, ps)
-                # Select based on what is not None
-                if not not ps:                             # if list not empty
-                    for p in ps:
-                        #print('p', p)
-                        if ((LM.name == name) | (LM.nplies == nplies)) & (LM.p == p):
-                            #print(LM.LMFrame)
-                            print(LM.Geometry)
-                            yield LM.LMFrame
-                # All ps in the case suite
-                elif ((LM.name == name) | (LM.nplies == nplies)):
-                    #print(LM.LMFrame)
-                    print(LM.Geometry)
-                    yield LM.LMFrame
-                # No subset --> print all
-                if (name is None) & (nplies is None) & (ps == []):
-                    #print(LM.LMFrame)
-                    print(LM.Geometry)
-                    yield LM.LMFrame
-    finally:
-        print('\n')
-        print('Finished getting DataFrames.')
+#     '''
+#     # Default
+#     if ps is None:
+#         ps = []
+
+#     try:
+#         for i, case in enumerate(cases.values()):          # Python 3
+#             print('case', i + 1)
+#             for LM in case.LMs:
+#                 #print(LM.Geometry)
+#                 #print(name, nplies, ps)
+#                 # Select based on what is not None
+#                 if not not ps:                             # if list not empty
+#                     for p in ps:
+#                         #print('p', p)
+#                         if ((LM.name == name) | (LM.nplies == nplies)) & (LM.p == p):
+#                             #print(LM.LMFrame)
+#                             print(LM.Geometry)
+#                             yield LM.LMFrame
+#                 # All ps in the case suite
+#                 elif ((LM.name == name) | (LM.nplies == nplies)):
+#                     #print(LM.LMFrame)
+#                     print(LM.Geometry)
+#                     yield LM.LMFrame
+#                 # No subset --> print all
+#                 if (name is None) & (nplies is None) & (ps == []):
+#                     #print(LM.LMFrame)
+#                     print(LM.Geometry)
+#                     yield LM.LMFrame
+#     finally:
+#         print('\n')
+#         print('Finished getting DataFrames.')
 
 
 # TODO: How to test writing files w/o making residual files?
@@ -423,7 +431,7 @@ def ndframe_equal(ndf1, ndf2):
         return False
 
 
-# Refactore to favor string as first arg (0.4.11.dev0)
+# Refactor to favor string as first arg (0.4.11.dev0)
 def is_matched(string, pattern=None):
     '''Return True if container brackets or parentheses have equal count; matched.
 
