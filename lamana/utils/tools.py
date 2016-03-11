@@ -119,12 +119,14 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
 
 
 # Helpers
+# NOTE: Decommission 0.4.11.dev0 post laminator deprecation
 def get_multi_geometry(laminate):
     '''Return geometry string parsed from a multi-plied laminate DataFrame.
 
     Uses pandas GroupBy to extract indices with unique values
     in middle and outer.  Splits the inner_i list by p.  Used in controls.py.
     Refactored for even multi-plies in 0.4.3d4.
+
     '''
     def chunks(lst, n):
         '''Split up a list into n-sized smaller lists; (REF 018)'''
@@ -191,6 +193,7 @@ def get_multi_geometry(laminate):
     return geo_string
 
 
+# NOTE: Decommission 0.4.11.dev0 post laminator deprecation
 #def get_special_geometry(laminate):
 def get_special_geometry(Frame):
     '''Return geometry string parsed from a special-plied (<5) laminate DataFrame.
@@ -199,7 +202,7 @@ def get_special_geometry(Frame):
     ----------
     Frame : DataFrame
         A laminate DataFrame, typically extracted from a file.  Therefore,
-        it is unknown whether it is LMFrame or LFrame.
+        it is ambigouous whether Frame is an LFrame or LMFrame.
 
     Notes
     -----
@@ -243,7 +246,7 @@ def get_special_geometry(Frame):
     #print(geo)
     geo_string = '-'.join(geo)
     # TODO: format geo_strings to General Convention
-    # geo_string = la.input_.Geometry._to_gen_convention(geo_string)
+    geo_string = la.input_.Geometry._to_gen_convention(geo_string)
     return geo_string
 
 
@@ -256,6 +259,10 @@ def get_special_geometry(Frame):
 
 #     Else, print all DataFrames for all cases.
 
+#    .. note:: DEPRECATE LamAna 0.4.11.dev0
+#            `lamanator` will be removed in LamAna 0.5 and replaced by
+#            `lamana.distributions.Cases` because the latter is more efficient.
+#
 #     Parameters
 #     ----------
 #     cases : list of DataFrames
