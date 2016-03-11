@@ -1012,20 +1012,52 @@ def test_Laminate_sanity8():
             nt.assert_almost_equals(actual, expected)
 
 
+# DEPRECATE: use refactored version that invokes Cases()
 def test_Laminate_sanity9():
     '''Check Monoliths, p=1 have positive values.
-    Now using ut.get_frames() for specific case selections.
+
+    Uses select_frames() to extract a subset of selected cases.
+
     '''
-    cases_selected = ut.get_frames(cases, name='Monolith', ps=[1])
+    cases_selected = ut.select_frames(cases, name='Monolith', ps=[1])
     for LMs in cases_selected:
         df_numeric = LMs.select_dtypes(include=[np.number])
         df = df_numeric
         #print(df_numeric)
         actual = df_numeric[(df_numeric < 0)]              # catches negative numbers if any
         expected = pd.DataFrame(index=df.index, columns=df.columns).fillna(np.nan)
-        print(actual)
-        print(expected)
+        #print(actual)
+        #print(expected)
         ut.assertFrameEqual(actual, expected)
+
+
+def test_Laminate_sanity9_refactored():
+    '''Check Monoliths with p=1 only have positive values.
+
+    Notes
+    -----
+    1. Uses Cases() to extract a subset of selected cases, i.e. Monoliths, p=1.
+       (Triggers exceptions that rollback Laminate; actually yields an LFrame).
+    2. Cases iterates over values, i.e. separate cases.
+    3. Each case is a Monolith of p=1.
+    4. actual is a DataFrame of negative numeric values.  NaN if None found
+    5. expect is a DataFrame with no negative values, i.e. only NaN.
+
+    '''
+    cases_monoliths = la.distributions.Cases(dft.geo_inputs['1-ply'], ps=[1])
+    for case in cases_monoliths:
+        for psuedoLM in case.LMs:
+            df = psuedoLM.LMFrame
+            df_numeric = df.select_dtypes(include=[np.number]) # print number columns
+            # test = df_numeric[(df_numeric > 0)]                # catches positive numbers if any
+            actual = df_numeric[(df_numeric < 0)]              # catches negative numbers if any
+            expected = pd.DataFrame(index=df_numeric.index,
+                                    columns=df_numeric.columns).fillna(np.nan)
+            #print(df)
+            #print(df_numeric)
+            #print(actual)
+            #print(expected)
+            ut.assertFrameEqual(actual, expected)
 
 
 # Test Exception Handling
