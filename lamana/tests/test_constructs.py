@@ -1012,23 +1012,23 @@ def test_Laminate_sanity8():
             nt.assert_almost_equals(actual, expected)
 
 
-# DEPRECATE: use refactored version that invokes Cases()
-def test_Laminate_sanity9():
-    '''Check Monoliths, p=1 have positive values.
+# # DEPRECATE: use refactored version that invokes Cases() (0.4.11.dev0)
+# def test_Laminate_sanity9():
+#     '''Check Monoliths, p=1 have positive values.
 
-    Uses select_frames() to extract a subset of selected cases.
+#     Uses select_frames() to extract a subset of selected cases.
 
-    '''
-    cases_selected = ut.select_frames(cases, name='Monolith', ps=[1])
-    for LMs in cases_selected:
-        df_numeric = LMs.select_dtypes(include=[np.number])
-        df = df_numeric
-        #print(df_numeric)
-        actual = df_numeric[(df_numeric < 0)]              # catches negative numbers if any
-        expected = pd.DataFrame(index=df.index, columns=df.columns).fillna(np.nan)
-        #print(actual)
-        #print(expected)
-        ut.assertFrameEqual(actual, expected)
+#     '''
+#     cases_selected = ut.select_frames(cases, name='1-ply', ps=[1])
+#     for LMs in cases_selected:
+#         df_numeric = LMs.select_dtypes(include=[np.number])
+#         df = df_numeric
+#         #print(df_numeric)
+#         actual = df_numeric[(df_numeric < 0)]              # catches negative numbers if any
+#         expected = pd.DataFrame(index=df.index, columns=df.columns).fillna(np.nan)
+#         #print(actual)
+#         #print(expected)
+#         ut.assertFrameEqual(actual, expected)
 
 
 def test_Laminate_sanity9_refactored():
