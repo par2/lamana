@@ -53,6 +53,115 @@ def test_laminator_consistency1():
         ut.assertFrameEqual(actual.LMFrame, expected.LMFrame)
 
 
+# Sets ------------------------------------------------------------------------
+def test_compare_subset():
+    '''Check the comparison of subsets.'''
+    # Subset: [1,2] < [1,2,3] -> True; [1,2] <= [1,2] -> True
+    it = [[1, 2], [1, 2], [1, 2]]
+    others = [[1, 2, 3], [1, 2], [3, 4]]
+
+    actual = []
+    for i, o in zip(it, others):
+        result = ut.compare_set(i, o, how='union', test='issubset')
+        actual.append(result)
+    expected = [True, True, False]
+    nt.assert_equal(actual, expected)
+
+
+def test_compare_superset():
+    '''Check the comparison of supersets.'''
+    # Superset: [1,2,3] > [1,2] -> True; [1,2,3] >= [1,2,3] -> True
+    it = [[1, 2, 3], [1, 2, 3], [1, 2]]
+    others = [[1, 2], [1, 2, 3], [3, 4]]
+
+    actual = []
+    for i, o in zip(it, others):
+        result = ut.compare_set(i, o, how='union', test='issuperset')
+        actual.append(result)
+    expected = [True, True, False]
+    nt.assert_equal(actual, expected)
+
+
+def test_compare_disjoint():
+    '''Check the comparison of dijoints.'''
+    # Superset: [1,2,3] > [1,2] -> True; [1,2,3] >= [1,2,3] -> True
+    it = [[1, 2]]
+    others = [[3, 4]]
+
+    actual = []
+    for i, o in zip(it, others):
+        result = ut.compare_set(i, o, how='union', test='isdisjoint')
+        actual.append(result)
+    expected = [True]
+    nt.assert_equal(actual, expected)
+
+
+def test_compare_union():
+    '''Check set union.'''
+    # Union: [1,2] | [3,4] -> {1,2,3,4}
+    it = [[1, 2]]
+    others = [[3, 4]]
+
+    actual = []
+    for i, o in zip(it, others):
+        result = ut.compare_set(i, o, how='union')
+        actual.append(result)
+    expected = [{1, 2, 3, 4}]
+    nt.assert_equal(actual, expected)
+
+
+def test_compare_intersection():
+    '''Check set intersection.'''
+    # Intersection: [1] & [1,2] -> {1}
+    it = [[1]]
+    others = [[1, 2]]
+
+    actual = []
+    for i, o in zip(it, others):
+        result = ut.compare_set(i, o, how='intersection')
+        actual.append(result)
+    expected = [{1}]
+    nt.assert_equal(actual, expected)
+
+
+def test_compare_difference():
+    '''Check set difference.'''
+    # Difference: [1,2,3] - [3,4] -> {1,2}
+    it = [[1, 2, 3]]
+    others = [[3, 4]]
+
+    actual = []
+    for i, o in zip(it, others):
+        result = ut.compare_set(i, o, how='difference')
+        actual.append(result)
+    expected = [{1, 2}]
+    nt.assert_equal(actual, expected)
+
+
+def test_compare_symmetric():
+    '''Check set symmetric difference.'''
+    # Symmetric Difference: [1,2,3] ^ [3,4] -> {1,2,4}
+    it = [[1, 2, 3]]
+    others = [[3, 4]]
+
+    actual = []
+    for i, o in zip(it, others):
+        result = ut.compare_set(i, o, how='symmetric difference')
+        actual.append(result)
+    expected = [{1, 2, 4}]
+    nt.assert_equal(actual, expected)
+
+
+def test_compare_iterables():
+    '''Check set comparision works if given non-iterables e.g. int.'''
+    # Symmetric Difference: [1,2,3] ^ [3,4] -> {1,2,4}
+    actual1 = ut.compare_set(1, [2, 3], how='union')       # it is int
+    actual2 = ut.compare_set([1, 2], 3, how='union')       # other is int
+    expected = {1, 2, 3}
+    nt.assert_equal(actual1, expected)
+    nt.assert_equal(actual2, expected)
+
+
 # Matching Brackets -----------------------------------------------------------
 def test_ismatched1():
     '''Check matching pair of brackets or parentheses returns True.'''
