@@ -61,7 +61,27 @@ def test_laminator_gencon1():
             nt.assert_equal(actual, expected)
 
 
-# Get Specials ----------------------------------------------------------------
+# Extract geo_strings ---------------------------------------------------------
+def test_getmultigeo1():
+    '''Check strings are extracted from a "multi" laminate Frame, nplies >= 5.'''
+    case = ut.laminator(['400-200-800'])
+    for case_ in case.values():
+        for LM in case_.LMs:
+            actual = ut.get_multi_geometry(LM.LMFrame)
+            #expected = '400-[200]-800'                       # pre to_gen_convention()
+            expected = '400.0-[200.0]-800.0'
+            nt.assert_equal(actual, expected)
+
+
+@nt.raises(Exception)
+def test_getmultigeo2():
+    '''Check error is raised if not "multi", rather a special, nplies < 4.'''
+    case = ut.laminator(['400-200-0'])
+    for case_ in case.values():
+        for LM in case_.LMs:
+            actual = ut.get_multi_geometry(LM.LMFrame)
+
+
 def test_getspecialgeo1():
     '''Check strings are extracted from a special laminate Frame, nplies <= 4.'''
     case = ut.laminator(['400-200-0'])

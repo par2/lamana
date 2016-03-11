@@ -123,16 +123,26 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
 #### Pick up here.  Extract chunks and functions from controls into utils; make tests.
 
 
-def get_multi_geometry(laminate):
+def get_multi_geometry(Frame):
     '''Return geometry string parsed from a multi-plied laminate DataFrame.
 
     Uses pandas GroupBy to extract indices with unique values
     in middle and outer.  Splits the inner_i list by p.  Used in controls.py.
     Refactored for even multi-plies in 0.4.3d4.
 
+    Parameters
+    ----------
+    Frame : DataFrame
+        A laminate DataFrame, typically extracted from a file.  Therefore,
+        it is ambigouous whether Frame is an LFrame or LMFrame.
+
     Notes
     -----
     Used in controls.py, extract_dataframe() to parse data from files.
+
+    See Also
+    --------
+    - get_special_geometry: for getting geo_strings of laminates w/nplies<=4.
 
     '''
     #TODO: Move to separate function in utils
@@ -141,16 +151,17 @@ def get_multi_geometry(laminate):
         for i in range(0, len(lst), n):
             yield lst[i:i + n]
 
+    # TODO: why convert to int?; consider conversion to str
     def convert_lists(lst):
         '''Convert numeric contents of lists to int then str'''
         return [str(int(i)) for i in lst]
 
-    #print(laminate)
-    group = laminate.groupby('type')
-    nplies = len(laminate['layer'].unique())
+    #print(Frame)
+    group = Frame.groupby('type')
+    nplies = len(Frame['layer'].unique())
     if nplies < 5:
         raise Exception('Number of plies < 5.  Use get_special_geometry() instead.')
-    p = laminate.groupby('layer').size().iloc[0]           # should be same for each group
+    p = Frame.groupby('layer').size().iloc[0]              # should be same for each group
 
     # Identify laminae types by creating lists of indices
     # These lists must consider the the inner lists as well
@@ -171,16 +182,19 @@ def get_multi_geometry(laminate):
     # Make lists of inner_i indices for a single stress side_
     # TODO: Would like to make this inner_i splitting more robust
     # TODO: better for it to auto differentiate subsets within inner_i
+    # NOTE: inner values are converting to floats somewhere, i.e. 400-200-800 --> 400-[200.0]-800
+    # Might be fixed with _gen_convention, but take note o the inconsistency.
+    # Looks like out_lst, in_lst, mid_lst are all floats.  Out and mid convert to ints.
     in_lst = []
     for inner_i_idx in chunks(in_idx, p):
         #print(inner_i_idx)
-        t = laminate.ix[inner_i_idx, 't(um)'].dropna().unique().tolist()
+        t = Frame.ix[inner_i_idx, 't(um)'].dropna().unique().tolist()
         in_lst.append(t)
 
     if nplies % 2 != 0:
-        mid_lst = laminate.ix[mid_idx, 't(um)'].dropna().unique().tolist()
+        mid_lst = Frame.ix[mid_idx, 't(um)'].dropna().unique().tolist()
     in_lst = sum(in_lst, [])                               # flatten list
-    out_lst = laminate.ix[out_idx, 't(um)'].dropna().unique().tolist()
+    out_lst = Frame.ix[out_idx, 't(um)'].dropna().unique().tolist()
     #print(out_lst, in_lst, mid_lst)
 
     # Convert list thicknesses to strings
@@ -197,7 +211,8 @@ def get_multi_geometry(laminate):
     geo.extend(mid_con)
     geo_string = '-'.join(geo)
     # TODO: format geo_strings to General Convention
-    # geo_string = la.input_.Geometry._to_gen_convention(geo_string)
+    # NOTE: geo_string comes in int-[float]-int format; _to_gen_convention should patch
+    geo_string = la.input_.Geometry._to_gen_convention(geo_string)
     return geo_string
 
 
@@ -214,6 +229,10 @@ def get_special_geometry(Frame):
     Notes
     -----
     Used in controls.py, extract_dataframe() to parse data from files.
+
+    See Also
+    --------
+    - get_multi_geometry: for getting geo_strings of laminates w/nplies>=5.
 
     '''
     #nplies = len(laminate['layer'].unique())
@@ -256,6 +275,8 @@ def get_special_geometry(Frame):
     geo_string = la.input_.Geometry._to_gen_convention(geo_string)
     return geo_string
 
+
+# TODO: Add extract_dataframe and fix_discontinuities here from controls.py; make tests.
 
 # DEPRECATE: remove and replace with Cases() (0.4.11.dev0)
 # Does not print cases accurately
