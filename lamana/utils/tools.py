@@ -1,6 +1,18 @@
 #------------------------------------------------------------------------------
-'''Handy tools for global use.'''
+'''Handy tools for global use.
+
+- build cases quickly
+- read geo_strings from DataFrames
+- write/read csv files to DataFrames
+- compare sets
+- resequence columns in DataFrame
+- determine if brackets/parentheses match in a string
+- assert pandas Series/DataFrames
+- natural sort strings
+
+'''
 # flake8 utils/tools.py --ignore=E265,E501,F841,N802,N803
+
 
 import os
 import re
@@ -120,10 +132,6 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
 
 
 # Helpers
-
-#### Pick up here.  Extract chunks and functions from controls into utils; make tests.
-
-
 def get_multi_geometry(Frame):
     '''Return geometry string parsed from a multi-plied laminate DataFrame.
 
@@ -217,7 +225,6 @@ def get_multi_geometry(Frame):
     return geo_string
 
 
-#def get_special_geometry(laminate):
 def get_special_geometry(Frame):
     '''Return geometry string parsed from a special-plied (<5) laminate DataFrame.
 
@@ -360,26 +367,36 @@ def get_special_geometry(Frame):
 #         print('Finished getting DataFrames.')
 
 
-# TODO: How to test writing files w/o making residual files?
-def write_csv(LM, path=None, verbose=True, overwrite=False):
+def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
     '''Convert DataFrame to csv files and write them to a specified directory.
 
     Parameters
     ----------
     LM : DataFrame
-        LaminateModel containing data calculations.
-    path : str, optional; default `./lamana/output` directory
+        LaminateModel containing data calculations and attributes.
+    path : str, optional; default "lamana/export" directory
         Directory path to store resulting csv files.
     verbose : bool; default True
         Print additional information during the writing process.
     overwrite : bool; default False
         Save over files with the same name.  Prevents file incrementation
         and excess files after cyclic calls.
+    prefix : str; default None
+        Add a prefix to the file name; good for temporary files.
+        - '' : legacy
+        - 'w': written
+        - 'r': redone; altered from legacy
+        - 'temp': temporary
+
+    Notes
+    -----
+    Writes csv file of data contained in LM (a DataFrame) to a given or default
+    path.  Contents are written into an "export" directory.
 
     Returns
     -------
-    csv
-        Writes csv file of data contained in LM (a DataFrame) to a path.
+    str
+        Full path of the created file.
 
     '''
     # Parse Laminate Properties
@@ -389,32 +406,53 @@ def write_csv(LM, path=None, verbose=True, overwrite=False):
     geometry = LM.Geometry.string
     df = LM.LMFrame
 
-    # Default csv to output directory
+    # Send default csv to export directory
     if path is None:
         # TODO: write file paths pythonically; use abspath()
         path = os.getcwd()                                 # use for the test in the correct path
         ##path = path + r'\lamana\tests\controls_LT'         # for Main Script. Comment out in tests
-        path = ''.join([path, r'\lamana\output'])
+        ##path = ''.join([path, r'\lamana\output'])
+        dirpath = ''.join([path, r'\export'])              # \export in root dir
+    else:
+        dirpath = path
+
+    # Filename
+    if prefix is None:
+        prefix = r'w'                                       # for written by lamana
+
+    prefix = ''.join([prefix, '_'])
 
     # Prepend files with 'w' for "written" by the package
-    template = '\w_laminate_{}ply_p{}_t{:.1f}_'.format(nplies, p, t_total)
-    suffix = '.csv'
-    fullpath = ''.join([path, template, geometry, suffix])
+    filename = r'\{}laminate_{}ply_p{}_t{:.1f}_{}'.format(
+        prefix, nplies, p, t_total, geometry
+    )
+    suffix = r'.csv'
+    fullpath = ''.join([dirpath, filename, suffix])
     #print(path)
 
-    # Read for duplicates; overwrite protection
+    # Force create  export directory or path (REF 047)
+    if not os.path.exists(dirpath):
+        os.makedirs(dirpath)
+
+    # Check for duplicates before writing; overwrite protection
     if not overwrite:
-        #Read dir if file exists.  Then append counter to path name
+        # Read dir if file exists.  Append counter to path name if exists.
         counter = 1
         while os.path.isfile(fullpath):
-            print('Overwrite protection: File exists.  Writing new file...')
-            fullpath = ''.join([path, template, geometry, '_', str(counter), suffix])
+            print('Overwrite protection: File exists.  Incrementing file...')
+            increment = ''.join(['(', str(counter), ')'])
+            fullpath = ''.join([dirpath, filename, increment, suffix])
             counter += 1
-    df.to_csv(fullpath)
 
-    # Write files
+    # Write DataFrame to csv file
     if verbose:
         print('Writing DataFrame to csv in:', fullpath)
+
+    df.to_csv(fullpath)
+    return fullpath
+
+
+# TODO: Add write functions from controls.py here
 
 
 def compare_set(it, others, how='union', test=None):
