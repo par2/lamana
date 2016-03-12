@@ -24,7 +24,7 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
     Parameters
     ----------
     geos : list; default `None`
-        Contains tuples of geometry strings.
+        Contains (optionally tuples of) geometry strings.
     load_params : dict; default `None`
         Passed-in geometric parameters if specified; else default is used.
     mat_props : dict; default `None`
@@ -83,7 +83,8 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
     if isinstance(geos, str):
         geos = [geos]
     elif (geos is not None) and not (isinstance(geos, list)):
-        raise Exception('geos must be a list of tupled strings')
+        # TODO: use custom Exception
+        raise Exception('geos must be a list of strings')
 
     if load_params is None:
         ''' UPDATE: pull from Defaults()'''
