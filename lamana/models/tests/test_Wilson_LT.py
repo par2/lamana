@@ -217,6 +217,7 @@ def test_WilsonLT_Defaults_attrs1():
     actual1 = (set(default_attr1) >= set(expected))
     actual2 = (set(default_attr2) >= set(expected))
     #print(actual1)
+    # TODO: is this supposed to be assert_true?
     nt.assert_true(actual1, expected)
     nt.assert_true(actual2, expected)
 
