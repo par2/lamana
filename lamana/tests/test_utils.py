@@ -1,8 +1,6 @@
 #------------------------------------------------------------------------------
 '''Test for consistency of utils.'''
 
-import os
-
 import nose.tools as nt
 import pandas as pd
 
@@ -89,76 +87,6 @@ def test_laminator_gencon1():
             ##expected = '400-[0]-800'                       # pre to_gen_convention()
             expected = '400.0-[0.0]-800.0'
             nt.assert_equal(actual, expected)
-
-
-# Write CSV -------------------------------------------------------------------
-def test_write1():
-    '''Check DataFrame is written of csv and read DataFrame is the same.
-
-    Notes
-    -----
-    Builds case(s), pulls the DataFrame, write a temporary csv in the default
-    "export" directory (overwrites if the temporary file exists to keep clean).
-    Then use pandas to read the csv back as a DataFrame.  Finally compare
-    equality between DataFrames, then removes the file.
-
-    DEV: File is removed even if fails to keep the export dir clean.  Comment
-    if debugging required.
-
-    See also
-    --------
-    - test_write2(): overwrite=False; may give unexpected results in tandem
-
-    '''
-    try:
-        case = ut.laminator(['400-200-800'])
-        # Write files to default output dir
-        for case_ in case.values():
-            for LM in case_.LMs:
-                expected = LM.LMFrame
-                filepath = ut.write_csv(LM, overwrite=True, prefix='temp')
-
-                # Read a file
-                actual = pd.read_csv(filepath, index_col=0)
-                ut.assertFrameEqual(actual, expected)
-    finally:
-        # Remove temporary file
-        os.remove(filepath)
-        #pass
-
-
-def test_write2():
-    '''Check if overwrite=False retains files.
-
-    Notes
-    -----
-    Make two files of the same name.  Force write_csv to increment files.
-    Check the filepath names exist.  Finally remove all files.
-
-    DEV: Files are removed even if fails to keep the export dir clean.  Comment
-    if debugging required.
-
-    '''
-    try:
-        case = ut.laminator(['400-200-800', '400-200-800'])
-        # Write files to default output dir
-        filepaths = []
-        for case_ in case.values():
-            for LM in case_.LMs:
-                #filepath = ut.write_csv(LM, overwrite=False, verbose=True, prefix='temp')
-                filepath = ut.write_csv(LM, overwrite=False, prefix='temp')
-                filepaths.append(filepath)
-    finally:
-        # Remove temporary file
-        for file_ in filepaths:
-            actual = os.path.isfile(file_)
-            nt.assert_true(actual)
-            os.remove(file_)
-
-
-# Read CSV --------------------------------------------------------------------
-# TODO: add modified write file
-
 
 
 # Extract geo_strings ---------------------------------------------------------
