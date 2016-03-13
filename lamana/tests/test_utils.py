@@ -1,7 +1,10 @@
 #------------------------------------------------------------------------------
 '''Test for consistency of utils.'''
+# CAUTION: This module writes and removes temporary files in the "export" dir
+
 
 import os
+import collections as ct
 
 import nose.tools as nt
 import pandas as pd
@@ -148,17 +151,68 @@ def test_write2():
                 #filepath = ut.write_csv(LM, overwrite=False, verbose=True, prefix='temp')
                 filepath = ut.write_csv(LM, overwrite=False, prefix='temp')
                 filepaths.append(filepath)
-    finally:
-        # Remove temporary file
+
         for file_ in filepaths:
             actual = os.path.isfile(file_)
             nt.assert_true(actual)
+
+    finally:
+        # Remove temporary file
+        for file_ in filepaths:
             os.remove(file_)
 
 
 # Read CSV --------------------------------------------------------------------
 # TODO: add modified write file
+def test_read1():
+    try:
+        case = ut.laminator(['400-200-800', '400-[100,100]-800'])
 
+        # Expected: Write LaminateModels
+        # Make files in a default export dir, and catch expected dfs
+        list_l = []
+        for case_ in case.values():
+            for LM in case_.LMs:
+                df_l = LM.LMFrame
+                filepath_l = ut.write_csv(LM, overwrite=False, prefix='temp')
+                list_l.append((df_l, filepath_l))
+
+        # Actual: Read Files
+        # Get dirpath from last filepath_l; assumes default path structure from write_csv
+        dirpath = os.path.dirname(filepath_l)
+        gen_r = ut.read_csv_dir(dirpath)                   # yields (file, filepath)
+
+        # Use a defaultdict to place same dfs with matching paths
+        # {'...\filename': [df_l, df_r]}
+        d = ct.defaultdict(list)
+        for df_l, filepath_l in list_l:
+            d[filepath_l].append(df_l)
+
+        for df_r, filepath_r in gen_r:
+            d[filepath_r].append(df_r)
+
+        # If files are already present in export dir, the # write files < # read files
+        # Need to filter the dict entries that don't have both read and write (left-right) values
+        # Only need to iterate over keys for the written files i.e. filepath_l
+        written_filepaths = [path for df, path in list_l]
+
+        # Verify Equivalence
+        # Compare DataFrames sharing the same pathname (ensure correct file for left and right)
+        for k, v in d.items():
+            filename = k
+            if filename in written_filepaths:
+                expected, actual = v
+                #print(filename)
+                #print(expected.info)
+                ut.assertFrameEqual(actual, expected)
+
+    # Cleanup
+    # Only remove the written temporary files
+    finally:
+        for file_ in d:
+            if file_ in written_filepaths:
+                print('Cleaning up temporary files ...')
+                os.remove(file_)
 
 
 # Extract geo_strings ---------------------------------------------------------
