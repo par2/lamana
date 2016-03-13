@@ -133,7 +133,7 @@ def test_apply_LaminateModels_cols_dimensions1():
     #path = path + r'\controls_LT'                          # for test
 
     # Read all files in the path (REF 013)
-    for file in ut.read_csv_dir(path):
+    for file, filepath in ut.read_csv_dir(path):
         #df_expected = file
         df = file
         #print(df_expected)
@@ -204,7 +204,7 @@ def test_apply_LaminateModels_cols_models1():
     #path = path + r'\controls_LT'                          # for test
 
     # Read all files in the path (REF 013)
-    for file in ut.read_csv_dir(path):
+    for file, filepath in ut.read_csv_dir(path):
         #df_expected = file
         df = file
         #print(df_expected)
