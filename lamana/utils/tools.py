@@ -658,18 +658,25 @@ def assertFrameEqual(df1, df2, **kwds):
 
 
 # TODO: Remove unused "my_file" and test
-def read_csv_dir(path, *args, **kwargs):
-    '''Yield all csv files in a directory (REF 013).'''
+def read_csv_dir(dirpath, *args, **kwargs):
+    '''Yield all csv files in a directory (REF 013).
+
+    Notes
+    -----
+    Makes a generator containing DataFrames for all csv files in a directory.
+
+    '''
     # Read all files in path
-    for dir_entry in os.listdir(path):
-        dir_entry_path = os.path.join(path, dir_entry)
+    for itemname in os.listdir(dirpath):                  # list files, folders, etc in a dir
+        dir_item_path = os.path.join(dirpath, itemname)
         # TODO: How to test this if branch?
-        if os.path.isfile(dir_entry_path):
+        if os.path.isfile(dir_item_path):
             # TODO: clean up and remove my_file; test affects
-            with open(dir_entry_path, 'r') as my_file:
+            ##with open(dir_item_path, 'r') as my_file:
+            with open(dir_item_path, 'r'):
                 # Assumes first column are indices
-                file = pd.read_csv(dir_entry_path, *args, index_col=0, **kwargs)
-                yield file
+                file = pd.read_csv(dir_item_path, *args, index_col=0, **kwargs)
+                yield file, dir_item_path
 
 
 # TODO: Rename to int extractor.  sorting happen else where with an iterator and sorted().
