@@ -6,6 +6,7 @@
 
 import os
 import importlib
+#import logging
 import collections as ct
 import itertools as it
 
@@ -495,20 +496,16 @@ class Case(object):
     def snapshots(self):
         '''Return a list of DataFrames of laminate snapshots without theory
         applied.  Gives a quick view of the stack (as if p = 1).
+
         '''
         print('Accessing snapshot method.')
         return list(LM.Snapshot for LM in self.LaminateModels)
 
     @property
     def frames(self):
-        '''Return a list of DataFrames of the LaminateModel object from the
-        Laminate class.
-
-        Examples
-        --------
-        >>> case1.frames
-        [<LaminateModel object>]
-        '''
+        '''Return a list of LaminateModel DataFrames (LMFrames) `Laminate()` class.'''
+        # TODO Convert to logging
+        #logging.INFO('Accessing frames method in self.__class__.__name__ ...')
         print('Accessing frames method.')
         return list(LM.LMFrame for LM in self.LaminateModels)
 
@@ -522,11 +519,11 @@ class Case(object):
         '''Return number of a Laminates.'''
         return len(self.LaminateModels)
 
+
 # =============================================================================
 # UTILITY ---------------------------------------------------------------------
 # =============================================================================
 # Builds and handles multiple cases simultaneously
-
 class Cases(ct.MutableMapping):
     '''Return a dict of Case objects.
 
@@ -542,8 +539,10 @@ class Cases(ct.MutableMapping):
     - subset selection methods of LaminateModels
     - set operations for subset selections
 
-    Parameters
+    Attributes
     ----------
+    LMs
+    frames
     caselets : list
         Containing geometry strings, lists of geometry strings or cases
         (as of 0.4.4b3).
@@ -565,6 +564,15 @@ class Cases(ct.MutableMapping):
         keyword to Case(separate=True).
     #defaults_path : str
         Custom path from which to import Defaults().
+
+    Methods
+    -------
+    select(nplies=None, ps=None, how='union')
+        Return a set (subset) of LaminateModels given keyword conditions.
+    plot(**kwargs)
+        BETA (0.4.4b3): Plot caselets as subplots.
+    to_csv(path=None, verbose=True, **kwargs):
+        Write all collected LaminateModels as csv files to a specified path.
 
     Raises
     ------
@@ -965,17 +973,56 @@ class Cases(ct.MutableMapping):
                               subplots_kw=subplots_kw, suptitle_kw=suptitle_kw,
                               **kwargs)
 
-    def to_csv(self, path=None):
-        '''Write all DataFrames to a path; output directory (default).'''
-        if path is None:
-            path = os.getcwd()                             # use for the test in the correct path
-            path = path + r'\lamana\output'                # default
+    def to_csv(self, path=None, verbose=True, **kwargs):
+        '''Write all collected LaminateModels as csv files to a specified path.
 
-        for LM in self.LMs:
-            ut.write_csv(LM, path=path, verbose=True)
+        Parameters
+        ----------
+        path : str, default: None
+            Send files to this path; "export" directory (default).
+        verbose : bool, default: True
+            Inform on what files have been written and where.
+        kwargs : {overwrite|prefix}, optional
+            Optional keyword arguments for write_csv function.
+
+        See Also
+        --------
+        - utils.tools.write_csv: defaults writing any csv file to to export directory.
+        - test_tools_write1: useful function for writing, testing and removing files.
+
+        Returns
+        -------
+        list
+            List of pathnames of written files.
+
+        '''
+        # DEPRECATED 0.4.11.dev0
+#        if path is None:
+#            path = os.getcwd()                             # use for the test in the correct path
+#            path = path + r'\lamana\output'                # default
+        #for LM in self.LMs:
+            #ut.write_csv(LM, path=path, verbose=verbose, **kwargs)
+
+        return list(ut.write_csv(LM, path=path, verbose=verbose, **kwargs)
+            for LM in self.LMs)
 
     @property
     def LMs(self):
         '''Return a unified list of LaminateModels by processing all cases.'''
         cases = self                                       # since self iters values
         return list(LM for case in cases for LM in case.LMs)
+
+    @property
+    def frames(self):
+        '''Return a list of LaminateModels DataFrames (LMFrames).
+
+        See Also
+        --------
+        - Case().frames: original frames method.
+
+        '''
+        # TODO: Add logging here and in Case()
+        #logging.INFO('Accessing frames method in self.__class__.__name__ ...')
+        print('Accessing frames method.')
+        cases = self
+        return list(LM.LMFrame for case in cases for LM in case.LMs)
