@@ -1,11 +1,12 @@
 #------------------------------------------------------------------------------
 '''Confirm accurate execution of building cases.'''
 
+import os
 import copy
+
 import itertools as it
 
 import nose.tools as nt
-
 import pandas as pd
 
 import lamana as la
@@ -1150,10 +1151,9 @@ def test_Cases_mthd_tocsv():
             actual = pd.read_csv(filepath, index_col=0)
             ut.assertFrameEqual(actual, expected)
     finally:
-        # Remove temporary file
+        # Remove temporary files
         for filepath in filepaths:
             os.remove(filepath)
-        pass
 
 
 def test_Cases_mtd_frames():
