@@ -1136,6 +1136,7 @@ def test_Laminate_attr_extrema():
 
 
 # TODO: Fix static expected
+# TODO: make cases once, and filter from premade cases to save time
 def test_Laminate_attr_isspecial():
     '''Check the is_special attribute works for different ps.'''
     expected = [
@@ -1161,15 +1162,14 @@ def test_Laminate_attr_hasdiscont1():
     # Make a case of standards for each p
     cases = ut.laminator(geos=dft.geos_even, ps=[1, 2, 3, 4, 5])
     # Uses Defaults().geos_standard
-    # Caution: will grow if more defaults are added; need to amend expected
+    # NOTE: will grow if more defaults are added; need to amend expected
     for case, e in zip(cases.values(), expected_by_p):
-        # Make a list of series for each case by p
+        # Make a list of pd.Series for each case by p
         # All cases should be the same per case; return True only if discont found
         # Return True if any disconts are found per cases
         actual = all([LM.has_discont.any() for LM in case.LMs])
         expected = e                                       # expected for all geos per case
         #print(actual)
-        #assert actual == expected
         nt.assert_equal(actual, expected)
 
 
@@ -1184,15 +1184,38 @@ def test_Laminate_attr_hasdiscont2():
     # TODO: use Cases to test all odds but exclude monoliths
     cases = ut.laminator(geos=dft.geos_standard, ps=[2, 3, 4, 5])
     # Uses Defaults().geos_standard
-    # Caution: will grow if more defaults are added; need to amend expected
+    # NOTE: will grow if more defaults are added; need to amend expected
     for case, e in zip(cases.values(), expected_by_p):
-        # Make a list of series for each case by p
+        # Make a list of pd.Series for each case by p
         # All cases should be the same per case; return True only if discont found
         # Return True if any disconts are found per cases
         actual = all([LM.has_discont.any() for LM in case.LMs if LM.alias != 'Monolith'])
         expected = e
         #print(actual)
-        #assert actual == expected
+        nt.assert_equal(actual, expected)
+
+
+def test_Laminate_attr_hasneutaxis1():
+    '''Check attribute returns true if neutral axis found; only in odd-plies with odd ps'''
+    expected_by_p = [False, True, False, True]
+    cases = ut.laminator(geos=dft.geos_odd, ps=[2, 3, 4, 5])
+    for case, e in zip(cases.values(), expected_by_p):
+        # any() obviates the ambiguity error from Pandas
+        actual = all([LM.has_neutaxis.any() for LM in case.LMs])
+        expected = e
+        #print(actual)
+        nt.assert_equal(actual, expected)
+
+
+def test_Laminate_attr_hasneutaxis2():
+    '''Check attribute returns False if neutral axis not found; only in even-plies.'''
+    expected_by_p = [False, False, False, False]
+    cases = ut.laminator(geos=dft.geos_even, ps=[2, 3, 4, 5])
+    for case, e in zip(cases.values(), expected_by_p):
+        # any() obviates the ambiguity error from Pandas
+        actual = all([LM.has_neutaxis.any() for LM in case.LMs])
+        expected = e
+        #print(actual)
         nt.assert_equal(actual, expected)
 
 
