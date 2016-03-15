@@ -566,8 +566,8 @@ def test_Geo_print1():
     actual = la.input_.Geometry(geo_input).__repr__()
     expected = 'Geometry object (400.0-[200.0]-800.0)'
     #print(actual, expected)
-    assert actual == expected
-    #nt.assert_equal(actual, expected)
+    #assert actual == expected
+    nt.assert_equal(actual, expected)
 
 
 def test_Geo_print2():
@@ -576,8 +576,8 @@ def test_Geo_print2():
     actual = la.input_.Geometry(geo_input).__repr__()
     expected = 'Geometry object (400.0-[200.0]-400.0S)'
     #print(actual, expected)
-    assert actual == expected
-    #nt.assert_equal(actual, expected)
+    #assert actual == expected
+    nt.assert_equal(actual, expected)
 
 
 def test_Geo_print3():
@@ -586,8 +586,8 @@ def test_Geo_print3():
     actual = la.input_.Geometry(geo_input).__str__()
     expected = '400.0-[200.0]-800.0'
     #print(actual, expected)
-    assert actual == expected
-    #nt.assert_equal(actual, expected)
+    #assert actual == expected
+    nt.assert_equal(actual, expected)
 
 
 def test_Geo_print4():
@@ -596,8 +596,9 @@ def test_Geo_print4():
     actual = la.input_.Geometry(geo_input).__str__()
     expected = '400.0-[200.0]-400.0S'
     #print(actual, expected)
-    assert actual == expected
-    #nt.assert_equal(actual, expected)
+    #assert actual == expected
+    nt.assert_equal(actual, expected)
+
 
 # BaseDefaults ----------------------------------------------------------------
 # Defaults can change.  If Defaults are altered, static tests will break.
