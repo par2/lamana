@@ -868,6 +868,7 @@ def test_apply_LaminateModels_None1():
 # CASES
 #------------------------------------------------------------------------------
 dft = wlt.Defaults()
+# TODO: Why deepcopy?  Why not dft.load_params everywhere?
 load_params = copy.deepcopy(dft.load_params)
 #load_params = dft.load_params
 
@@ -902,6 +903,7 @@ cases3b5 = la.distributions.Case(load_params, dft.mat_props)
 cases3b5.apply(mix)
 
 
+# Cases Attributes
 def test_Cases_attr_len1():
     '''Check __len__ of all cases contained in cases.'''
     actual1 = cases1a.__len__()
@@ -951,6 +953,7 @@ def test_Cases_attr_del1():
     nt.assert_equal(actual1, expected)
 
 
+# Cases Properties
 def test_Cases_prop_LMs1():
     '''Check viewing inside cases gives correct list.'''
     actual1 = cases1a.LMs
@@ -972,7 +975,6 @@ def test_Cases_prop_LMs1():
     nt.assert_equal(actual1, expected)
 
 
-# Cases selections
 def test_Cases_prop_select1():
     '''Check output of select method; single nplies only.'''
     actual = cases2a.select(nplies=4)
@@ -1011,8 +1013,8 @@ def test_Cases_prop_select4():
     nt.assert_set_equal(actual, expected)
 
 
-# Cases cross selections
-def test_Cases_prop_crossselect1():
+# Cases `select` Cross-Selections
+def test_Cases_prop_select_crossselect1():
     '''Check (union) output of select method; single nplies and ps.'''
     actual1 = cases2a.select(nplies=4, ps=3)
     actual2 = cases2a.select(nplies=4, ps=3, how='union')
@@ -1024,7 +1026,7 @@ def test_Cases_prop_crossselect1():
     nt.assert_set_equal(actual2, expected)
 
 
-def test_Cases_prop_crossselect2():
+def test_Cases_prop_select_crossselect2():
     '''Check (intersection) output of select method; single nplies and ps.'''
     actual = cases2a.select(nplies=4, ps=3, how='intersection')
     expected1 = {LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
@@ -1034,7 +1036,7 @@ def test_Cases_prop_crossselect2():
     nt.assert_set_equal(actual, expected2)
 
 
-def test_Cases_prop_crossselect3():
+def test_Cases_prop_select_crossselect3():
     '''Check (difference) output of select method; single nplies and ps.'''
     actual = cases2a.select(nplies=4, ps=3, how='difference')
     expected1 = cases2a.select(ps=3) - cases2a.select(nplies=4)
@@ -1043,7 +1045,7 @@ def test_Cases_prop_crossselect3():
     nt.assert_set_equal(actual, expected2)
 
 
-def test_Cases_prop_crossselect4():
+def test_Cases_prop_select_crossselect4():
     '''Check (symmetric difference) output of select method; single nplies and ps.'''
     actual = cases2a.select(nplies=4, ps=3, how='symmetric difference')
     expected1 = {
@@ -1058,7 +1060,7 @@ def test_Cases_prop_crossselect4():
     nt.assert_set_equal(actual, expected2)
 
 
-def test_Cases_prop_crossselect5():
+def test_Cases_prop_select_crossselect5():
     '''Check (union) output of select method; multiple nplies and ps.'''
     actual1 = cases2a.select(nplies=[2, 4], ps=[3, 4])
     actual2 = cases2a.select(nplies=[2, 4], ps=[3, 4], how='union')
@@ -1070,7 +1072,7 @@ def test_Cases_prop_crossselect5():
     nt.assert_set_equal(actual2, expected)
 
 
-def test_Cases_prop_crossselect6():
+def test_Cases_prop_select_crossselect6():
     '''Check (intersection) output of select method; multiple nplies and ps.'''
     actual = cases2a.select(nplies=[2, 4], ps=[3, 4], how='intersection')
     expected1 = {
@@ -1080,7 +1082,7 @@ def test_Cases_prop_crossselect6():
     nt.assert_set_equal(actual, expected1)
 
 
-def test_Cases_prop_crossselect7():
+def test_Cases_prop_select_crossselect7():
     '''Check (difference) output of select method; multiple nplies and single ps.'''
     # Subtracts nplies from ps.
     actual = cases2a.select(nplies=[2, 4], ps=3, how='difference')
@@ -1090,7 +1092,7 @@ def test_Cases_prop_crossselect7():
     nt.assert_set_equal(actual, expected2)
 
 
-def test_Cases_prop_crossselect8():
+def test_Cases_prop_select_crossselect8():
     '''Check (symmetric difference) output of select method; single nplies, multi ps.'''
     actual = cases2a.select(nplies=4, ps=[3, 4], how='symmetric difference')
     expected1 = {
@@ -1115,6 +1117,56 @@ case_3.apply(['350-400-500', '400-200-800', '400-400-400'])
 case_caselets = [case_1, case_2, case_3]
 
 
+# Cases methods
+def test_Cases_mthd_plot():
+    '''Check plot implementation.'''
+    pass
+
+
+def test_Cases_mthd_tocsv():
+    '''Check utils.write_csv is called, file is written to default directory.
+
+    Notes
+    -----
+    Add files to export, then removes them.  Adapted from test_tools_write1().
+    Instantiate a Cases object, iterate, call `to_csv` that writes the file.
+    The read those temporary files.
+
+    See Also
+    --------
+    - utils.tools.write_csv(): main writer for csv files.
+    - test_tools_write1(): writes, tests and cleans up temporary files.
+
+    '''
+    try:
+        # TODO: Add standard case to the module namespace to reduce building.
+        cases = la.distributions.Cases(['400-200-800'])
+        # Write files to default output dir
+        # CAUTION: assumes the order of case.to_csv is the same as Cases.LMs
+        expected_dfs = cases.frames
+        filepaths = cases.to_csv(prefix='temp')
+        for filepath, expected in zip(filepaths, expected_dfs):
+            # Read a file, get DataFrames
+            actual = pd.read_csv(filepath, index_col=0)
+            ut.assertFrameEqual(actual, expected)
+    finally:
+        # Remove temporary file
+        for filepath in filepaths:
+            os.remove(filepath)
+        pass
+
+
+def test_Cases_mtd_frames():
+    '''Check frames method outputs DataFrames.  See other detailed Case().frames tests.'''
+    dfs = cases1a.frames
+
+    for df in dfs:
+        actual = isinstance(df, pd.DataFrame)
+        nt.assert_true(actual)
+
+####
+
+# TODO: Rename/Move.  Caselets are an attribute here, no?  test_Cases_attr_caselets#()
 def test_Cases_caselets1():
     '''Check cases from caselets of geometry strings.'''
     cases = la.distributions.Cases(str_caselets)
