@@ -954,6 +954,29 @@ def test_Cases_attr_del1():
     nt.assert_equal(actual1, expected)
 
 
+def test_Cases_attr_print1():
+    '''Check Cases.__repr__ output.'''
+    geo_strings= ['400-[200]-800', '400-[200]-400S']
+    representation = la.distributions.Cases(geo_strings).__repr__()
+    # Unable replicate the address of the first entry
+    # e.g. '<lamana.distributions.Cases object at 0x0000000007D65860>'
+    # Thus trimming the actual repr
+    expected = (" {0: <<class 'lamana.distributions.Case'> p=5, size=1>,"
+                " 1: <<class 'lamana.distributions.Case'> p=5, size=1>}")
+    trimmed = representation.split(',')
+    actual = ','.join(trimmed[1:])
+    nt.assert_equal(actual, expected)
+
+
+def test_Cases_attr_print2():
+    '''Check Cases.__str__ output.'''
+    geo_strings = ['400-[200]-800', '400-[200]-400S']
+    actual = la.distributions.Cases(geo_strings).__str__()
+    expected = ("{0: <<class 'lamana.distributions.Case'> p=5, size=1>,"
+                " 1: <<class 'lamana.distributions.Case'> p=5, size=1>}")
+    nt.assert_equal(actual, expected)
+
+
 # Cases Properties
 def test_Cases_prop_LMs1():
     '''Check viewing inside cases gives correct list.'''
