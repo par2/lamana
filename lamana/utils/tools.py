@@ -393,6 +393,9 @@ def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
     Writes csv file of data contained in LM (a DataFrame) to a given or default
     path.  Contents are written into an "export" directory.
 
+    It is decided in 0.4.11.dev0 to set default paths here; a global approach
+    to handling all uses of this function from any module.
+
     Returns
     -------
     str
