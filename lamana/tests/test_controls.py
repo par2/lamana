@@ -30,13 +30,11 @@ def fix_discontinuities(laminate, inner_i):
 
     # Tensile side
     discTensidx = df.loc[
-        (df['label'] == 'discont.') & (df['type'] == 'inner')
-        & (df['side'] == 'Tens.'), 't(um)'
+        (df['label'] == 'discont.') & (df['type'] == 'inner') & (df['side'] == 'Tens.'), 't(um)'
     ].index.tolist()
     # Compressive side
     discCompidx = df.loc[
-        (df['label'] == 'discont.') & (df['type'] == 'inner')
-        & (df['side'] == 'Comp.'), 't(um)'
+        (df['label'] == 'discont.') & (df['type'] == 'inner') & (df['side'] == 'Comp.'), 't(um)'
     ].index.tolist()
     #print(discTensidx)
     #print(df)
@@ -197,7 +195,7 @@ def test_apply_LaminateModels_cols_models1():
     # Prepare file path.
     # Depends which directory nosetests is rum
     #path = os.getcwd()                                     # use for the test in the correct path
-    path = os.path.join(os.getcwd(), 'lamana', 'tests', 'controls_LT') # for builds
+    path = os.path.join(os.getcwd(), 'lamana', 'tests', 'controls_LT')  # for builds
     #path = path + r'\lamana\tests\controls_LT'             # for Main Script. Comment out in tests
     #path = path + r'\tests\controls_LT'                    # for test
     #path = os.path.join(os.getcwd(), 'tests', 'controls_LT')          # for test
@@ -260,6 +258,7 @@ def test_apply_LaminateModels_cols_models1():
         #print(expected1.dtypes)
         #print(actual1.dtypes)
         print('\n')
+
         ut.assertFrameEqual(actual1, expected1, check_dtype=False)  # max stress rows
         if p > 1:                                                   # min stress rows
             ut.assertFrameEqual(actual2, expected2, check_dtype=False)
