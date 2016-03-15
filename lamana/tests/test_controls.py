@@ -146,7 +146,7 @@ def test_apply_LaminateModels_cols_dimensions1():
 
         # Compare the dimensional columns only
         '''Bypassing z(m), z(m)*, intf and k for now'''
-        '''UPDATE: k add back in 0.4.4b'''
+        # UPDATE: `k` added back in 0.4.4b
         ###
         cols = ['layer', 'side', 'type', 'matl',
         #        'label', 't(um)', 'h(m)', 'd(m)', 'intf', 'k', 'Z(m)', 'z(m)']
