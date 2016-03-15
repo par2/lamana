@@ -820,7 +820,9 @@ class Cases(ct.MutableMapping):
         #print(self.mat_props)
 
     def __setitem__(self, key, value):
-        raise NotImplementedError('Reinstantiate Cases instead.')
+        # As the dict type is custom, setting to a Cases() object is prohibited.
+        raise NotImplementedError('Setting to a Cases() object is prohibited.'
+                                  ' Please reinstantiate Cases() instead.')
 
     def __getitem__(self, key):
         if isinstance(key, slice):
