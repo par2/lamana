@@ -95,7 +95,7 @@ def test_laminator_gencon1():
 
 
 # Write CSV -------------------------------------------------------------------
-def test_write1():
+def test_tools_write1():
     '''Check DataFrame is written of csv and read DataFrame is the same.
 
     Notes
@@ -130,7 +130,7 @@ def test_write1():
         #pass
 
 
-def test_write2():
+def test_tools_write2():
     '''Check if overwrite=False retains files.
 
     Notes
