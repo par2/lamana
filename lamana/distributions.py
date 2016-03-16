@@ -864,10 +864,10 @@ class Cases(ct.MutableMapping):
             else:
                 step = key.step
             ##slicedkeys = range(key.start, key.stop, step)
-            print(len(self._dict_caselets), self._dict_caselets)
-            print(start, stop, step)
+            #print(len(self._dict_caselets), self._dict_caselets)
+            #print(start, stop, step)
             slicedkeys = range(start, stop, step)
-            print(slicedkeys)
+            #print(slicedkeys)
             return [self._dict_caselets[k] for k in slicedkeys]
         return self._dict_caselets[key]
 
