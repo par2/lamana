@@ -1242,7 +1242,7 @@ def test_Laminate_eq1():
 def test_Laminate_eq2():
     '''Check returns NotImplemented if classes are not equal in __eq__.'''
     L = la.constructs.Laminate(dft.FeatureInput)
-    actual = L.__eq__(1)
+    actual = L.__eq__(1)                                   # isinstance(1, Cases()) is False
     expected = NotImplemented
     nt.assert_equal(actual, expected)
 
@@ -1264,7 +1264,7 @@ def test_Laminate_ne1():
 def test_Laminate_ne2():
     '''Check returns NotImplemented if classes are not equal in __ne__.'''
     L = la.constructs.Laminate(dft.FeatureInput)
-    actual = L.__ne__(1)
+    actual = L.__ne__(1)                                   # isinstance(1, Cases()) is False
     expected = NotImplemented
     nt.assert_equal(actual, expected)
 
