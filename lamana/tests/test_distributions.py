@@ -868,10 +868,14 @@ def test_apply_LaminateModels_None1():
 #------------------------------------------------------------------------------
 # CASES
 #------------------------------------------------------------------------------
+# Setup -----------------------------------------------------------------------
+
 dft = wlt.Defaults()
 # TODO: Why deepcopy?  Why not dft.load_params everywhere?
+# Looks like to change load_params without affecting default dft.load_params
 load_params = copy.deepcopy(dft.load_params)
 #load_params = dft.load_params
+
 
 # Manual and Auto Cases for Attribute Tests
 cases1a = la.distributions.Cases(dft.geo_inputs['5-ply'], ps=[2, 3, 4])
@@ -881,6 +885,7 @@ cases1b = la.distributions.Cases(dft.geo_inputs['5-ply'], ps=[2, 3, 4])
 load_params['p'] = 2
 cases1c = la.distributions.Case(load_params, dft.mat_props)
 cases1c.apply(dft.geo_inputs['5-ply'])
+
 
 # Manual Cases for Selection Tests
 cases2a = la.distributions.Cases(dft.geos_special, ps=[2, 3, 4])
@@ -895,6 +900,7 @@ load_params['p'] = 4
 cases2b4 = la.distributions.Case(load_params, dft.mat_props)
 cases2b4.apply(dft.geos_special)
 
+
 # Manual for mixed geometry string inputs
 mix = dft.geos_most + dft.geos_standard                   # 400-[200]-800 common to both
 cases3a = la.distributions.Cases(mix, unique=True)
@@ -904,19 +910,24 @@ cases3b5 = la.distributions.Case(load_params, dft.mat_props)
 cases3b5.apply(mix)
 
 
-# Cases Attributes
-def test_Cases_attr_len1():
-    '''Check __len__ of all cases contained in cases.'''
-    actual1 = cases1a.__len__()
-    actual2 = len(cases1a)
-    ps = {case.p for case in cases1a}
-    ncases = len(dft.geo_inputs['5-ply']) * len(ps)
-    expected = ncases
-    nt.assert_equal(actual1, expected)
-    nt.assert_equal(actual2, expected)
+# Manual for standard Cases for comparisons and others
+cases4a = la.distributions.Cases(['400-[200]-800'])
+cases4b = la.distributions.Cases(['400-[200]-800'])
+cases4c = la.distributions.Cases(['400-200-800'])
+cases4d = la.distributions.Cases(['1000-[0]-0'])
+cases4e = la.distributions.Cases(['400-[150,50]-800'])
 
 
-def test_Cases_attr_get1():
+# TESTS -----------------------------------------------------------------------
+# Cases Special Methods -------------------------------------------------------
+@nt.raises(NotImplementedError)
+def test_Cases_spmthd_set1():
+    '''Check __setitem__ is not implemented.'''
+    # Setting to Cases() would be difficult due to the custom dict type; reinstantiation is encouraged.
+    cases1a[2] = 'test'
+
+
+def test_Cases_spmthd_get1():
     '''Check __getitem__ of all cases contained in cases.'''
     actual1 = cases1a.__getitem__(0)
     actual2 = cases1a.get(0)
@@ -928,22 +939,17 @@ def test_Cases_attr_get1():
 
 
 @nt.raises(KeyError)
-def test_Cases_attr_get2():
+def test_Cases_spmthd_get2():
     '''Check __getitem__ of non-item in cases.'''
     actual1 = cases1a[300]
     expected = 'dummy'
     nt.assert_equal(actual1, expected)
 
 
-@nt.raises(NotImplementedError)
-def test_Cases_attr_set1():
-    '''Check __setitem__ is not implemented.'''
-    actual1 = cases1a[2] = 'test'
-    expected = NotImplemented
-    nt.assert_equal(actual1, expected)
+# TODO: test for __getslice__ Cases
 
 
-def test_Cases_attr_del1():
+def test_Cases_spmthd_del1():
     '''Check __del__ of all cases contained in cases.'''
     cases = cases1b
     del cases[1]
@@ -954,9 +960,91 @@ def test_Cases_attr_del1():
     nt.assert_equal(actual1, expected)
 
 
-def test_Cases_attr_print1():
+# TODO: test for __iter__ Cases
+
+
+def test_Cases_spmthd_len1():
+    '''Check __len__ of all cases contained in cases.'''
+    actual1 = cases1a.__len__()
+    actual2 = len(cases1a)
+    ps = {case.p for case in cases1a}
+    ncases = len(dft.geo_inputs['5-ply']) * len(ps)
+    expected = ncases
+    nt.assert_equal(actual1, expected)
+    nt.assert_equal(actual2, expected)
+
+
+# Instance comparisons; See Also test_input for Geometry comparisons
+def test_Cases_spmthd_eq_1():
+    '''Check __eq__ between hashable Cases object instances.'''
+    # Compare Cases with single standards
+    nt.assert_equal(cases4a, cases4b)
+    #nt.assert_equal(cases4a, cases4c)
+    nt.assert_equal(cases4b, cases4a)
+    #nt.assert_equal(cases4c, cases4a)
+
+
+def test_Cases_spmthd_eq_2():
+    '''Check __eq__ between hashable Cases object instances.'''
+    # Compare Cases with single standards
+    nt.assert_true(cases4a == cases4b)
+    #nt.assert_true(cases4a == cases4c)
+    nt.assert_true(cases4b == cases4a)
+    #nt.assert_true(cases4c == cases4a)
+
+
+def test_Cases_spmthd_eq_3():
+    '''Check __eq__ between unequal hashable Geometry object instances.'''
+    nt.assert_false(cases4a == cases4d)
+    nt.assert_false(cases4a == cases4e)
+    nt.assert_false(cases4d == cases4a)
+    nt.assert_false(cases4e == cases4a)
+
+
+def test_Cases_spmthd_eq_4():
+    '''Check returns NotImplemented if classes are not equal in __eq__.'''
+    # See Also original implementation in test_constructs.py
+    actual = cases4a.__eq__(1)                             # isinstance(1, Cases()) is False
+    expected = NotImplemented
+    nt.assert_equal(actual, expected)
+
+
+def test_Cases_spmthd_ne_1():
+    '''Check __ne__ between hashable Geometry object instances.'''
+    nt.assert_false(cases4a != cases4b)
+    #nt.assert_false(cases4a != cases4c)
+    nt.assert_false(cases4b != cases4a)
+    #nt.assert_false(cases4c != cases4a)
+
+
+def test_Cases_spmthd_ne_2():
+    '''Check __ne__ between unequal hashable Geometry object instances.'''
+    nt.assert_true(cases4a != cases4d)
+    nt.assert_true(cases4a != cases4e)
+    nt.assert_true(cases4d != cases4a)
+    nt.assert_true(cases4e != cases4a)
+
+
+def test_Cases_spmthd_ne_3():
+    '''Check returns NotImplemented if classes are not equal in __ne__.'''
+    actual = cases4a.__ne__(1)                             # isinstance(1, Cases()) is False
+    expected = NotImplemented
+    nt.assert_equal(actual, expected)
+
+
+# String representations
+def test_Cases_spmthd_str1():
+    '''Check Cases.__str__ output.'''
+    geo_strings = ['400-[200]-800', '400-[200]-400S']
+    actual = la.distributions.Cases(geo_strings).__str__()
+    expected = ("{0: <<class 'lamana.distributions.Case'> p=5, size=1>,"
+                " 1: <<class 'lamana.distributions.Case'> p=5, size=1>}")
+    nt.assert_equal(actual, expected)
+
+
+def test_Cases_spmthd_repr1():
     '''Check Cases.__repr__ output.'''
-    geo_strings= ['400-[200]-800', '400-[200]-400S']
+    geo_strings = ['400-[200]-800', '400-[200]-400S']
     representation = la.distributions.Cases(geo_strings).__repr__()
     # Unable replicate the address of the first entry
     # e.g. '<lamana.distributions.Cases object at 0x0000000007D65860>'
@@ -968,16 +1056,55 @@ def test_Cases_attr_print1():
     nt.assert_equal(actual, expected)
 
 
-def test_Cases_attr_print2():
-    '''Check Cases.__str__ output.'''
-    geo_strings = ['400-[200]-800', '400-[200]-400S']
-    actual = la.distributions.Cases(geo_strings).__str__()
-    expected = ("{0: <<class 'lamana.distributions.Case'> p=5, size=1>,"
-                " 1: <<class 'lamana.distributions.Case'> p=5, size=1>}")
-    nt.assert_equal(actual, expected)
+# Cases Methods ---------------------------------------------------------------
+def test_Cases_mthd_plot():
+    '''Check plot implementation.'''
+    # TODO: Try checking return is an ax instance
+    pass
 
 
-# Cases Properties
+def test_Cases_mthd_tocsv():
+    '''Check utils.write_csv is called, file is written to default directory.
+
+    Notes
+    -----
+    Add files to export, then removes them.  Adapted from test_tools_write1().
+    Instantiate a Cases object, iterate, call `to_csv` that writes the file.
+    The read those temporary files.
+
+    See Also
+    --------
+    - utils.tools.write_csv(): main writer for csv files.
+    - test_tools_write1(): writes, tests and cleans up temporary files.
+
+    '''
+    try:
+        # TODO: Add standard case to the module namespace to reduce building.
+        cases = la.distributions.Cases(['400-200-800'])
+        # Write files to default output dir
+        # CAUTION: assumes the order of case.to_csv is the same as Cases.LMs
+        expected_dfs = cases.frames
+        filepaths = cases.to_csv(prefix='temp')
+        for filepath, expected in zip(filepaths, expected_dfs):
+            # Read a file, get DataFrames
+            actual = pd.read_csv(filepath, index_col=0)
+            ut.assertFrameEqual(actual, expected)
+    finally:
+        # Remove temporary files
+        for filepath in filepaths:
+            os.remove(filepath)
+
+
+def test_Cases_mthd_frames():
+    '''Check frames method outputs DataFrames.  See other detailed Case().frames tests.'''
+    dfs = cases1a.frames
+
+    for df in dfs:
+        actual = isinstance(df, pd.DataFrame)
+        nt.assert_true(actual)
+
+
+# Cases Properties ------------------------------------------------------------
 def test_Cases_prop_LMs1():
     '''Check viewing inside cases gives correct list.'''
     actual1 = cases1a.LMs
@@ -1141,51 +1268,7 @@ case_3.apply(['350-400-500', '400-200-800', '400-400-400'])
 case_caselets = [case_1, case_2, case_3]
 
 
-# Cases methods
-def test_Cases_mthd_plot():
-    '''Check plot implementation.'''
-    pass
 
-
-def test_Cases_mthd_tocsv():
-    '''Check utils.write_csv is called, file is written to default directory.
-
-    Notes
-    -----
-    Add files to export, then removes them.  Adapted from test_tools_write1().
-    Instantiate a Cases object, iterate, call `to_csv` that writes the file.
-    The read those temporary files.
-
-    See Also
-    --------
-    - utils.tools.write_csv(): main writer for csv files.
-    - test_tools_write1(): writes, tests and cleans up temporary files.
-
-    '''
-    try:
-        # TODO: Add standard case to the module namespace to reduce building.
-        cases = la.distributions.Cases(['400-200-800'])
-        # Write files to default output dir
-        # CAUTION: assumes the order of case.to_csv is the same as Cases.LMs
-        expected_dfs = cases.frames
-        filepaths = cases.to_csv(prefix='temp')
-        for filepath, expected in zip(filepaths, expected_dfs):
-            # Read a file, get DataFrames
-            actual = pd.read_csv(filepath, index_col=0)
-            ut.assertFrameEqual(actual, expected)
-    finally:
-        # Remove temporary files
-        for filepath in filepaths:
-            os.remove(filepath)
-
-
-def test_Cases_mtd_frames():
-    '''Check frames method outputs DataFrames.  See other detailed Case().frames tests.'''
-    dfs = cases1a.frames
-
-    for df in dfs:
-        actual = isinstance(df, pd.DataFrame)
-        nt.assert_true(actual)
 
 ####
 
