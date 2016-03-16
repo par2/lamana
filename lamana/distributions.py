@@ -525,19 +525,22 @@ class Case(object):
 # =============================================================================
 # Builds and handles multiple cases simultaneously
 class Cases(ct.MutableMapping):
-    '''Return a dict of Case objects.
+    '''Return a dict-like object of enumerated Case objects.
 
     This is useful for situations requiring laminates with different geometries,
-    thicknesses and ps.
+    thicknesses and ps.  This is not a dict.
 
     Characteristics:
 
     - if user-defined, tries to import `Defaults()` to simplify instantiations
     - dict-like storage and access of cases
-    - iterable by values (not keys)!
-    - sliceable; returns a selection of cases
-    - subset selection methods of LaminateModels
-    - set operations for subset selections
+    - list-like ordering of cases
+    - gettable: list-like, get items by index (including negative indicies)
+    - sliceable: slices the dict keys of the Cases object
+    - viewable: contained LaminateModels
+    - iterable: by values (unlike normal dicts, not by keys)
+    - writable: write DataFrames to csv files
+    - selectable: perform set operations and return unique subsets
 
     Attributes
     ----------
@@ -635,6 +638,7 @@ class Cases(ct.MutableMapping):
     - cases: group of cases, particularly with a similar pattern of interest or
       different rows (`p`).
     - caselet: a subset of cases or LMs; geometry string, list or case (See LPEP 003)
+    - DEPRECATED (0.4.11.dev0) __getslice__; affects < Python 2.6
 
     See Also
     --------
@@ -834,16 +838,46 @@ class Cases(ct.MutableMapping):
                                   ' Please reinstantiate Cases() instead.')
 
     def __getitem__(self, key):
-        if isinstance(key, slice):
+        ##if isinstance(key, int) and key == -1:
+        ##    # Turn key = -1 to key = slice(0, -1, 0)
+        ##    key = slice(key)
+        if isinstance(key, int) and key < 0:
+            # Allow key to act as a negative slice index; case[-1] --> slice(None, -1, None)
+            key = len(self._dict_caselets) + key
+        elif isinstance(key, slice):
+            # Needs to handle None since dict doesn't know
             #print(key.start, key.stop, key.step)
+            if key.start is None:
+                start = 0
+            else:
+                start = key.start
+            if key.stop is None:
+                stop = len(self._dict_caselets)
+            elif key.stop < 0:
+                # Negative stop indicies
+                stop = len(self._dict_caselets) + key.stop
+            else:
+                stop = key.stop
             if key.step is None:
                 step = 1
-            slicedkeys = range(key.start, key.stop, step)
+            # TODO: implement negative steps and reverse index [::-1]
+            else:
+                step = key.step
+            ##slicedkeys = range(key.start, key.stop, step)
+            print(len(self._dict_caselets), self._dict_caselets)
+            print(start, stop, step)
+            slicedkeys = range(start, stop, step)
+            print(slicedkeys)
             return [self._dict_caselets[k] for k in slicedkeys]
         return self._dict_caselets[key]
 
-    def __getslice__(self, i, j):                          # Python 2
-        return self.__getitem__(slice(i, j))
+    ##def __getslice__(self, i, j):                          # Python 2
+    ##    return self.__getitem__(slice(i, j))
+
+    # DEPRECATED 0.4.11.dev0: caused conflict using [:]
+    ##def __getslice__(self, *args):                           # Python < 2.6
+    ##    #print(args)
+    ##    return self.__getitem__(slice(*args))
 
     def __delitem__(self, key):
         del self._dict_caselets[key]
@@ -930,6 +964,7 @@ class Cases(ct.MutableMapping):
             '''Order of set is important here'''
         elif how.startswith('dif'):
             return set(LMs_by_ps).difference(LMs_by_nplies)
+        # TODO: there is a test for sym diff.  Not sure why this branch is missing.
         elif how.startswith('sym'):
             return set(LMs_by_ps).symmetric_difference(LMs_by_nplies)
 
