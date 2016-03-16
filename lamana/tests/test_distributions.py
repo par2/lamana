@@ -883,6 +883,7 @@ cases1b = la.distributions.Cases(dft.geo_inputs['5-ply'], ps=[2, 3, 4])
 #cases1a = Cases(dft.geo_inputs['5-ply'], ps=[2,3,4])     # assumes Defaults
 #cases1b = Cases(dft.geo_inputs['5-ply'], ps=[2,3,4])     # assumes Defaults
 load_params['p'] = 2
+# TODO: Rename; this is a case not cases
 cases1c = la.distributions.Case(load_params, dft.mat_props)
 cases1c.apply(dft.geo_inputs['5-ply'])
 
@@ -891,6 +892,7 @@ cases1c.apply(dft.geo_inputs['5-ply'])
 cases2a = la.distributions.Cases(dft.geos_special, ps=[2, 3, 4])
 #cases2a = Cases(dft.geos_special, ps=[2,3,4])
 load_params['p'] = 2
+# TODO: Rename following.  These are Case objects, not Cases
 cases2b2 = la.distributions.Case(load_params, dft.mat_props)
 cases2b2.apply(dft.geos_special)
 load_params['p'] = 3
@@ -917,6 +919,9 @@ cases4c = la.distributions.Cases(['400-200-800'])
 cases4d = la.distributions.Cases(['1000-[0]-0'])
 cases4e = la.distributions.Cases(['400-[150,50]-800'])
 
+# Manual fixed length for slicing
+cases5a = la.distributions.Cases(['400-[200]-800', '400-[100,100]-400', '400-[400]-400'])
+
 
 # TESTS -----------------------------------------------------------------------
 # Cases Special Methods -------------------------------------------------------
@@ -938,15 +943,56 @@ def test_Cases_spmthd_get1():
     nt.assert_equal(actual3, expected)
 
 
-@nt.raises(KeyError)
 def test_Cases_spmthd_get2():
+    '''Check __getitem__ handles negative indicies.'''
+    full_range = [case for case in cases5a]
+    actual1 = cases5a[-1]                                  # negative index
+    actual2 = cases5a[-2]                                 # negative index
+    expected1 = full_range[-1]
+    expected2 = full_range[-2]
+    nt.assert_equal(actual1, expected1)
+    nt.assert_equal(actual2, expected2)
+
+
+def test_Cases_spmthd_get3():
+    '''Check __getitem__ of Cases using slice notation.'''
+    #'''Check __getslice__ of Cases object; can use slice notation.'''
+    # NOTE: most implementation is actually in __getitem__
+    actual1 = cases5a[0:2]                                 # range of dict keys
+    actual2 = cases5a[0:3]                                 # full range of dict keys
+    actual3 = cases5a[:]                                   # full range
+    actual4 = cases5a[1:]                                  # start:None
+    actual5 = cases5a[:2]                                  # None:stop
+    actual6 = cases5a[:-1]                                 # None:negative index
+    actual7 = cases5a[:-2]                                 # None:negative index
+    # TODO: Following are negative steps; NotImplemented (0.4.11.dev0)
+    #actual8 = cases5a[0:-1:-2]                             # start:stop:step
+    #actual9 = cases5a[::-1]                                # reverse
+
+    full_range = [case for case in cases5a]
+    expected1 = full_range[0:2]
+    expected2 = full_range[0:3]
+    expected3 = full_range[:]
+    expected4 = full_range[1:]
+    expected5 = full_range[:2]
+    expected6 = full_range[:-1]
+    expected7 = full_range[:-2]
+
+    nt.assert_equal(actual1, expected1)
+    nt.assert_equal(actual2, expected2)
+    nt.assert_equal(actual3, expected3)
+    nt.assert_equal(actual4, expected4)
+    nt.assert_equal(actual5, expected5)
+    nt.assert_equal(actual6, expected6)
+    nt.assert_equal(actual7, expected7)
+
+
+@nt.raises(KeyError)
+def test_Cases_spmthd_get4():
     '''Check __getitem__ of non-item in cases.'''
     actual1 = cases1a[300]
     expected = 'dummy'
     nt.assert_equal(actual1, expected)
-
-
-# TODO: test for __getslice__ Cases
 
 
 def test_Cases_spmthd_del1():
@@ -1137,6 +1183,7 @@ def test_Cases_prop_select1():
 def test_Cases_prop_select2():
     '''Check output of select method; single ps only.'''
     actual = cases2a.select(ps=3)
+    # Using a set expression to filter normal Case objects
     expected = {
         LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
         cases2b4.LMs) if LM.p == 3
@@ -1158,8 +1205,8 @@ def test_Cases_prop_select4():
     '''Check output of select method; ps only.'''
     actual = cases2a.select(ps=[2, 4])
     expected = {
-        LM for LM in it.chain(cases2b2.LMs,
-        cases2b3.LMs, cases2b4.LMs) if LM.p in (2, 4)
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if LM.p in (2, 4)
     }
     nt.assert_set_equal(actual, expected)
 
@@ -1170,8 +1217,8 @@ def test_Cases_prop_select_crossselect1():
     actual1 = cases2a.select(nplies=4, ps=3)
     actual2 = cases2a.select(nplies=4, ps=3, how='union')
     expected = {
-        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs, cases2b4.LMs) if (
-        LM.nplies == 4) | (LM.p == 3)
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if (LM.nplies == 4) | (LM.p == 3)
     }
     nt.assert_set_equal(actual1, expected)
     nt.assert_set_equal(actual2, expected)
@@ -1180,8 +1227,10 @@ def test_Cases_prop_select_crossselect1():
 def test_Cases_prop_select_crossselect2():
     '''Check (intersection) output of select method; single nplies and ps.'''
     actual = cases2a.select(nplies=4, ps=3, how='intersection')
-    expected1 = {LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
-                                       cases2b4.LMs) if (LM.nplies == 4) & (LM.p == 3)}
+    expected1 = {
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if (LM.nplies == 4) & (LM.p == 3)
+    }
     expected2 = {cases2b3.LMs[-1]}
     nt.assert_set_equal(actual, expected1)
     nt.assert_set_equal(actual, expected2)
@@ -1200,12 +1249,12 @@ def test_Cases_prop_select_crossselect4():
     '''Check (symmetric difference) output of select method; single nplies and ps.'''
     actual = cases2a.select(nplies=4, ps=3, how='symmetric difference')
     expected1 = {
-        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs, cases2b4.LMs) if (
-        LM.nplies == 4) ^ (LM.p == 3)
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if (LM.nplies == 4) ^ (LM.p == 3)
     }
     list_p3 = list(cases2b3.LMs[:-1])                  # copy list
-    list_p3 .append(cases2b2.LMs[-1])
-    list_p3 .append(cases2b4.LMs[-1])
+    list_p3.append(cases2b2.LMs[-1])
+    list_p3.append(cases2b4.LMs[-1])
     expected2 = set(list_p3)
     nt.assert_set_equal(actual, expected1)
     nt.assert_set_equal(actual, expected2)
@@ -1216,8 +1265,8 @@ def test_Cases_prop_select_crossselect5():
     actual1 = cases2a.select(nplies=[2, 4], ps=[3, 4])
     actual2 = cases2a.select(nplies=[2, 4], ps=[3, 4], how='union')
     expected = {
-        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs, cases2b4.LMs) if (
-        LM.nplies in (2, 4)) | (LM.p in (3, 4))
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if (LM.nplies in (2, 4)) | (LM.p in (3, 4))
     }
     nt.assert_set_equal(actual1, expected)
     nt.assert_set_equal(actual2, expected)
@@ -1227,8 +1276,8 @@ def test_Cases_prop_select_crossselect6():
     '''Check (intersection) output of select method; multiple nplies and ps.'''
     actual = cases2a.select(nplies=[2, 4], ps=[3, 4], how='intersection')
     expected1 = {
-        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs, cases2b4.LMs) if (
-        LM.nplies in (2, 4)) & (LM.p in (3, 4))
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if (LM.nplies in (2, 4)) & (LM.p in (3, 4))
     }
     nt.assert_set_equal(actual, expected1)
 
@@ -1247,8 +1296,8 @@ def test_Cases_prop_select_crossselect8():
     '''Check (symmetric difference) output of select method; single nplies, multi ps.'''
     actual = cases2a.select(nplies=4, ps=[3, 4], how='symmetric difference')
     expected1 = {
-        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs, cases2b4.LMs) if (
-        LM.nplies == 4) ^ (LM.p in (3, 4))
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if (LM.nplies == 4) ^ (LM.p in (3, 4))
     }
     nt.assert_set_equal(actual, expected1)
 
