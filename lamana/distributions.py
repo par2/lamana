@@ -549,7 +549,7 @@ class Cases(ct.MutableMapping):
     load_params : dict; default None
         Passed-in geometric parameters if specified; else default is used.
     mat_props : dict; default None
-        Passed-in materials parameters if specidfied; else default is used.
+        Passed-in materials parameters if specified; else default is used.
     ps : list of ints
         `p` values to be looped over; `p` sets the number of rows per DataFrame.
     model : str; default None
@@ -560,8 +560,9 @@ class Cases(ct.MutableMapping):
         If True and given a series of intersecting `caselets` (specifically
         geometry strings), return unique geometries per `caselet`.
     combine : bool; default False
-        Combines `caselets` into a single case. Convenience, complementary
-        keyword to Case(separate=True).
+        Combines `caselets` into one case. Convenience, complementary
+        keyword to Case(separate=True) that makes a case for each caselet.
+        combine=False assumes single cases must be made.
     #defaults_path : str
         Custom path from which to import Defaults().
 
@@ -640,6 +641,7 @@ class Cases(ct.MutableMapping):
     - Demonstration notebook for applied API
 
     '''
+    # TODO: rename caselets arg to input? since the input type is unknown at first
     def __init__(
         self, caselets, load_params=None, mat_props=None, ps=None,
         model=None, verbose=False, unique=False, combine=False,
@@ -681,15 +683,16 @@ class Cases(ct.MutableMapping):
         # Setup caselets
         # Logic starts here, for defining the hashable class _dict_caselets.
         # Needs latter model, load_params and mat_props defined first
-        # Combining caselets here is convenient if a pattern us already setup
-        # rather than make a new make separate Case for each manually.
-        '''Try to clean up with multiple exceptions rather than isinstance().'''
+        # Combining caselets here is convenient if a pattern is already setup
+        # rather than manually make a new, separate Case for each.
+        # TODO: Try to clean up with multiple exceptions rather than isinstance().
+        # TODO: post-refactor and implementation in input_, uncomment equality tests for 400-200-800 in test_distributions
         if combine:
-            '''DEV: deprecate post is_valid update for empty apply'''
-            if not caselets:
-                raise TypeError('combine=True: Invalid type detected for '
-                                'caselets. Make list of geometry strings, '
-                                'lists of geometry strings or cases.')
+            # TODO: DEV: deprecate post is_valid update for empty apply
+            if not caselets:                               # if empty arg
+                raise TypeError('combine=True: Invalid type detected for'
+                                ' caselets. Make list of geometry strings,'
+                                ' lists of geometry strings or cases.')
             try:
                 # Assuming a list of geometry strings
                 case_ = la.distributions.Case(self.load_params, self.mat_props)
@@ -720,6 +723,12 @@ class Cases(ct.MutableMapping):
             self.caselets = [self._get_unique(caselet) for caselet in caselets]
             #print(self.caselets)
         else:
+            # TODO: accepts onything for caselets, which can break equality
+            #### BUG: Critial; bypassed all the type handling for input caselet
+            #### Need to handle caselets here too
+            # Add a hack for now; move input handling of Cases to input_
+            # logging.DEBUG('Caselets not using `combine`.')
+            print('Caselets not using `combine`.')
             self.caselets = caselets
 
         # Build a dict of cases; and a separate case for each p.
@@ -791,7 +800,7 @@ class Cases(ct.MutableMapping):
         '''
         if isinstance(caselet_, str):
             print('Single geometry string detected. unique not applied.'
-                  'See combine=True keyword.')
+                  ' See combine=True keyword.')
             return caselet_
         elif isinstance(caselet_, la.distributions.Case):
             # Extract the list of geometry strings from the case
