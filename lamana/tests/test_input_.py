@@ -361,8 +361,9 @@ def test_Geo_ne1():
         nt.assert_not_equal(actual, expected)
 
 
+# TODO: Make global manual standard Geos for these comparisons
 # Instance comparisons
-def test_Geo_compare_instances1():
+def test_Geo_compare_instances1a():
     '''Check __eq__ between hashable Geometry object instances.'''
     G1 = la.input_.Geometry('400-[200]-800')
     G2 = la.input_.Geometry('400-[200]-800')
@@ -376,6 +377,22 @@ def test_Geo_compare_instances1():
     nt.assert_equal(G1, G3)
     nt.assert_equal(G2, G1)
     nt.assert_equal(G3, G1)
+
+
+def test_Geo_compare_instances1b():
+    '''Check __eq__ between hashable Geometry object instances.'''
+    G1 = la.input_.Geometry('400-[200]-800')
+    G2 = la.input_.Geometry('400-[200]-800')
+    G3 = la.input_.Geometry('400-200-800')
+
+    #assert G1 == G2
+    #assert G1 == G3
+    #assert G2 == G1
+    #assert G3 == G1
+    nt.assert_true(G1 == G2)
+    nt.assert_true(G1 == G3)
+    nt.assert_true(G2 == G1)
+    nt.assert_true(G3 == G1)
 
 
 def test_Geo_compare_instances2():
