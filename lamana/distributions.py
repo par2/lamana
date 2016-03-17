@@ -233,8 +233,8 @@ class Case(object):
             raise ValueError("No geometries found.  Please input valid geometry, "
                              "e.g. '400-[200]-800.'")
             ##raise Exception("No geometries found.  Please input valid geometry, e.g. '400-[200-800.'")
-            '''Tried to exclude loop, but f(x) needs to iterate and make a list prior to unique.'''
-            '''Consider checking a unique appended cache iteratively.'''
+            # NOTE: Tried to exclude loop, but f(x) needs to iterate and make a list prior to unique.
+            # NOTE: Consider checking a unique appended cache iteratively.
 #         else:
 #             self._geo_strings = geo_strings
 

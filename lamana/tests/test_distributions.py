@@ -142,6 +142,8 @@ expected4 = [
 #  CASE
 # -----------------------------------------------------------------------------
 
+
+# Case Arguments -------------------------------------------------------------
 #  TODO: Convert, organize tests  to LPEP 001.015
 @nt.raises(TypeError)
 def test_Case_arg_empty1():
@@ -166,6 +168,7 @@ def test_Case_mth_apply_arg_empty1():
     '''Check raise Exception if not passed a geometries.'''
     case0 = la.distributions.Case(dft.load_params, dft.mat_props)
     actual = case0.apply()
+
 
 # Case Attributes -------------------------------------------------------------
 def test_Case_attr_parameters1():
@@ -264,16 +267,20 @@ def test_Case_attr_properties2():
     nt.assert_equal(actual, expected)
 
 
-# Case Properties -------------------------------------------------------------
-# TODO: Move
-def test_Case_prop_size1():
-    '''Check size property gives correct number for length of Case object.'''
-    case_ = la.distributions.Case(dft.load_params, dft.mat_props)
-    case_.apply(['400-[200]-800', '400-[100,100]-800', '400-[400]-400'])
-    actual = case_.size
-    expected = 3
+# Case Special Methods --------------------------------------------------------
+def test_Case_spmthd_eq_4():
+    '''Check returns NotImplemented if classes are not equal in __eq__.'''
+    # See Also original implementation in test_constructs.py
+    actual = case1.__eq__(1)                               # isinstance(1, Cases()) is False
+    expected = NotImplemented
     nt.assert_equal(actual, expected)
-###
+
+
+def test_Case_spmthd_ne1():
+    '''Check returns NotImplemented if classes are not equal in __ne__.'''
+    actual = case1.__ne__(1)                               # isinstance(1, Cases()) is False
+    expected = NotImplemented
+    nt.assert_equal(actual, expected)
 
 
 def test_Case_spmthd__eq_ne_compare1():
@@ -527,6 +534,18 @@ def test_Case_mthd_apply_LaminateModels1():
     ut.assertFrameEqual(actual, expected)
 
 
+# Case Properties -------------------------------------------------------------
+# TODO: Move
+def test_Case_prop_size1():
+    '''Check size property gives correct number for length of Case object.'''
+    case_ = la.distributions.Case(dft.load_params, dft.mat_props)
+    case_.apply(['400-[200]-800', '400-[100,100]-800', '400-[400]-400'])
+    actual = case_.size
+    expected = 3
+    nt.assert_equal(actual, expected)
+###
+
+
 # TODO: Cleanup; move
 # DataFrames ------------------------------------------------------------------
 # Test p
@@ -573,7 +592,6 @@ def replicate_values(dict_, dict_keys=[], multiplier=1):
 
 
 def make_dfs(dicts, dict_keys=None, p=1):
-#def make_dfs(dicts, dict_keys=[], p=1):
     '''Call replicate_values() to return a list of custom DataFrames with p
     number of repeated values.
 
