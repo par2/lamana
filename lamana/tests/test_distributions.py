@@ -1446,7 +1446,7 @@ def test_Cases_caselets_ps4():
     '''Check cases from list caselets raises Exceptions if p is non-integer.'''
     cases = la.distributions.Cases(case_caselets, ps=[2, 3, 'dummy', 5, 7, 9])
 
-.
+
 # Cases default assignments
 ##def test_Cases_import1():
 ##    '''Check passes if Defaults are not present in user-defined model.'''
