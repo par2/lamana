@@ -1301,7 +1301,7 @@ def test_Cases_prop_select_crossselect8():
     }
     nt.assert_set_equal(actual, expected1)
 
-
+# TODO: Move to setup; looks like tests for caselet types; not containers
 # This section is dedicated to Cases() tests primarily from 0.4.4b3
 str_caselets = ['350-400-500', '400-200-800', '400-[200]-800']
 list_caselets = [
@@ -1315,12 +1315,10 @@ case_1.apply(['400-200-800', '400-[200]-800'])
 case_2.apply(['350-400-500', '400-200-800'])
 case_3.apply(['350-400-500', '400-200-800', '400-400-400'])
 case_caselets = [case_1, case_2, case_3]
-
-
+invalid_caselets = [1, 1, 1]
 
 
 ####
-
 # TODO: Rename/Move.  Caselets are an attribute here, no?  test_Cases_attr_caselets#()
 def test_Cases_caselets1():
     '''Check cases from caselets of geometry strings.'''
@@ -1373,6 +1371,12 @@ def test_Cases_caselets3():
         nt.assert_equal(a, e)
 
 
+@nt.raises(TypeError)
+def test_Cases_caselets4():
+    '''Check cases raise error if caselets not a str, list or case. '''
+    cases = la.distributions.Cases(invalid_caselets)
+
+
 def test_Cases_caselets_ps1():
     '''Check strs from caselets form for each ps.'''
     cases = la.distributions.Cases(str_caselets, ps=[4, 5])
@@ -1396,7 +1400,7 @@ def test_Cases_caselets_ps1():
 
 #cases = Cases(list_caselets, ps=[2,3,4,5,7,9])
 def test_Cases_caselets_ps2():
-    '''Check cases from string caselets form for each ps.'''
+    '''Check cases from string caselets for each ps.'''
     cases = la.distributions.Cases(list_caselets, ps=[4, 5])
     #cases = Cases(list_caselets, ps=[4,5])
     ##actual = cases                                         # unused
@@ -1417,7 +1421,7 @@ def test_Cases_caselets_ps2():
 
 
 def test_Cases_caselets_ps3():
-    '''Check cases from list caselets form for each ps.'''
+    '''Check cases from list caselets for each ps.'''
     cases = la.distributions.Cases(case_caselets, ps=[2, 3, 4, 5, 7, 9])
     #cases = Cases(case_caselets, ps=[2,3,4,5,7,9])
     ##actual = cases                                         # unused
@@ -1437,6 +1441,33 @@ def test_Cases_caselets_ps3():
     nt.assert_equal(actual3, expected3)
 
 
+@nt.raises(TypeError)
+def test_Cases_caselets_ps4():
+    '''Check cases from list caselets raises Exceptions if p is non-integer.'''
+    cases = la.distributions.Cases(case_caselets, ps=[2, 3, 'dummy', 5, 7, 9])
+
+.
+# Cases default assignments
+##def test_Cases_import1():
+##    '''Check passes if Defaults are not present in user-defined model.'''
+##    cases = la.distributions.Cases(['400-[200]-800'], model='')
+##    pass
+
+
+# TODO: Unsure how to design elegantly w/o fake models modules lacking Defaults; tabled
+##@nt.raises(ImportError)
+##def test_Cases_import2():
+##    '''Check raises ImportError if load_params can't import from defaults.'''
+##    cases = la.distributions.Cases(case_caselets, load_params=None, model='')
+
+
+##@nt.raises(ImportError)
+##def test_Cases_import3():
+##    '''Check raises ImportError if mat_params can't import from defaults.'''
+##    cases = la.distributions.Cases(case_caselets, load_params=dft.load_params, model='')
+
+
+# Cases keywords
 def test_Cases_keyword_combine1():
     '''Check caselets of geometry strings combine into a single case.'''
     cases = la.distributions.Cases(str_caselets, combine=True)
