@@ -141,10 +141,31 @@ expected4 = [
 # -----------------------------------------------------------------------------
 #  CASE
 # -----------------------------------------------------------------------------
+
+#  TODO: Convert, organize tests  to LPEP 001.015
 @nt.raises(TypeError)
-def test_emptyCase1():
-    '''If no parameters passed to Case(), raise TypeError'''
+def test_Case_arg_empty1():
+    '''If no parameters passed to Case(), raise TypeError.'''
     case0 = la.distributions.Case()
+
+
+@nt.raises(TypeError)
+def test_Case_arg_empty2():
+    '''Check raise Exception if not passed load_params; first test.'''
+    case0 = la.distributions.Case(dft.mat_props)
+
+
+@nt.raises(TypeError)
+def test_Case_arg_empty3():
+    '''Check raise Exception if not passed mat_props.'''
+    case0 = la.distributions.Case(dft.load_params)
+
+
+@nt.raises(ValueError)
+def test_Case_mth_apply_arg_empty1():
+    '''Check raise Exception if not passed a geometries.'''
+    case0 = la.distributions.Case(dft.load_params, dft.mat_props)
+    actual = case0.apply()
 
 
 def test_Case_parameters1():
@@ -243,6 +264,15 @@ def test_Case_properties2():
     nt.assert_equal(actual, expected)
 
 
+def test_Case_prop_size1():
+    '''Check size property gives correct number for length of Case object.'''
+    case_ = la.distributions.Case(dft.load_params, dft.mat_props)
+    case_.apply(['400-[200]-800', '400-[100,100]-800', '400-[400]-400'])
+    actual = case_.size
+    expected = 3
+    nt.assert_equal(actual, expected)
+
+
 def test_Case_compare1():
     '''Check __eq__, __ne__ of case.'''
     case1 = la.distributions.Case(dft.load_params, dft.mat_props)
@@ -260,6 +290,8 @@ def test_Case_compare1():
     nt.assert_equal(actual1, expected)
     nt.assert_not_equal(actual2, expected)
 
+
+# TODO: Change; too brittle
 # Test Case().apply() properties
 # The following use the same geos
 case1.apply(geos_full)
