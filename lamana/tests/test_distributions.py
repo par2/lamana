@@ -1006,7 +1006,11 @@ def test_Cases_spmthd_del1():
     nt.assert_equal(actual1, expected)
 
 
-# TODO: test for __iter__ Cases
+##def test_Cases_spmthd_iter1():
+##    '''Check Cases() iterates by values (not keys).'''
+##    actual = [caselet for caselet in cases1a]
+##    expected = [caselet for caselet in cases1a.values()]
+##    nt.assert_equal(actual, expected)
 
 
 def test_Cases_spmthd_len1():
@@ -1141,6 +1145,7 @@ def test_Cases_mthd_tocsv():
             os.remove(filepath)
 
 
+# TODO: Move to prop section; brittle, moving causes failures; not apparent why; suspect load_params namespace collision
 def test_Cases_prop_LMs1():
     '''Check viewing inside cases gives correct list.'''
     actual1 = cases1a.LMs
@@ -1323,7 +1328,7 @@ invalid_caselets = [1, 1, 1]
 
 ####
 # TODO: Rename/Move.  Caselets are an attribute here, no?  test_Cases_attr_caselets#()
-def test_Cases_caselets1():
+def test_Cases_arg_caselets1():
     '''Check cases from caselets of geometry strings.'''
     cases = la.distributions.Cases(str_caselets)
     #cases = Cases(str_caselets)
@@ -1340,7 +1345,7 @@ def test_Cases_caselets1():
         nt.assert_equal(a, e)
 
 
-def test_Cases_caselets2():
+def test_Cases_arg_caselets2():
     '''Check cases from caselets of lists of geometry strings.'''
     cases = la.distributions.Cases(list_caselets)
     #cases = Cases(list_caselets)
@@ -1358,7 +1363,7 @@ def test_Cases_caselets2():
         nt.assert_equal(a, e)
 
 
-def test_Cases_caselets3():
+def test_Cases_arg_caselets3():
     '''Check cases from caselets of cases.'''
     cases = la.distributions.Cases(case_caselets)
     #cases = Cases(case_caselets)
@@ -1375,12 +1380,12 @@ def test_Cases_caselets3():
 
 
 @nt.raises(TypeError)
-def test_Cases_caselets4():
+def test_Cases_arg_caselets4():
     '''Check cases raise error if caselets not a str, list or case. '''
     cases = la.distributions.Cases(invalid_caselets)
 
 
-def test_Cases_caselets_ps1():
+def test_Cases_arg_caselets_ps1():
     '''Check strs from caselets form for each ps.'''
     cases = la.distributions.Cases(str_caselets, ps=[4, 5])
     #cases = Cases(str_caselets, ps=[4,5])
@@ -1402,7 +1407,7 @@ def test_Cases_caselets_ps1():
 
 
 #cases = Cases(list_caselets, ps=[2,3,4,5,7,9])
-def test_Cases_caselets_ps2():
+def test_Cases_arg_caselets_ps2():
     '''Check cases from string caselets for each ps.'''
     cases = la.distributions.Cases(list_caselets, ps=[4, 5])
     #cases = Cases(list_caselets, ps=[4,5])
@@ -1423,7 +1428,7 @@ def test_Cases_caselets_ps2():
     nt.assert_equal(actual3, expected3)
 
 
-def test_Cases_caselets_ps3():
+def test_Cases_arg_caselets_ps3():
     '''Check cases from list caselets for each ps.'''
     cases = la.distributions.Cases(case_caselets, ps=[2, 3, 4, 5, 7, 9])
     #cases = Cases(case_caselets, ps=[2,3,4,5,7,9])
@@ -1445,7 +1450,7 @@ def test_Cases_caselets_ps3():
 
 
 @nt.raises(TypeError)
-def test_Cases_caselets_ps4():
+def test_Cases_arg_caselets_ps4():
     '''Check cases from list caselets raises Exceptions if p is non-integer.'''
     cases = la.distributions.Cases(case_caselets, ps=[2, 3, 'dummy', 5, 7, 9])
 
@@ -1470,8 +1475,8 @@ def test_Cases_caselets_ps4():
 ##    cases = la.distributions.Cases(case_caselets, load_params=dft.load_params, model='')
 
 
-# Cases keywords
-def test_Cases_keyword_combine1():
+# Cases Keywords --------------------------------------------------------------
+def test_Cases_kw_combine1():
     '''Check caselets of geometry strings combine into a single case.'''
     cases = la.distributions.Cases(str_caselets, combine=True)
     #cases = Cases(str_caselets, combine=True)
@@ -1485,7 +1490,7 @@ def test_Cases_keyword_combine1():
         nt.assert_equal(a, e)
 
 
-def test_Cases_keyword_combine2():
+def test_Cases_kw_combine2():
     '''Check caselets of listed geometry strings combine into a single case.'''
     cases = la.distributions.Cases(list_caselets, combine=True)
     #cases = Cases(list_caselets, combine=True)
@@ -1501,7 +1506,7 @@ def test_Cases_keyword_combine2():
     nt.assert_set_equal(set(actual.LMs), set(expected[0].LMs))
 
 
-def test_Cases_keyword_combine3():
+def test_Cases_kw_combine3():
     '''Check caselets of cases combine into a single case.'''
     cases = la.distributions.Cases(case_caselets, combine=True)
     #cases = Cases(case_caselets, combine=True)
@@ -1520,7 +1525,7 @@ def test_Cases_keyword_combine3():
 
 
 @nt.raises(TypeError)
-def test_Cases_keyword_combine4():
+def test_Cases_kw_combine4():
     '''Check empty caselet throw error.'''
     cases = la.distributions.Cases([], combine=True)
     #cases = Cases([], combine=True)
@@ -1539,7 +1544,7 @@ def test_Cases_keyword_combine4():
         nt.assert_equal(a, e)
 
 
-def test_Cases_keyword_unique1():
+def test_Cases_kw_unique1():
     '''Check unique keyword of string caselets; ignores singles since already unique.'''
     cases = la.distributions.Cases(str_caselets, unique=True)
     #cases = Cases(str_caselets, unique=True)
@@ -1551,7 +1556,7 @@ def test_Cases_keyword_unique1():
     nt.assert_set_equal(actual, expected)
 
 
-def test_Cases_keyword_unique2():
+def test_Cases_kw_unique2():
     '''Check unique keyword of string caselets gives unique cases.'''
     cases = la.distributions.Cases(list_caselets, unique=True)
     #cases = Cases(list_caselets, unique=True)
@@ -1564,7 +1569,7 @@ def test_Cases_keyword_unique2():
     nt.assert_set_equal(actual, expected)
 
 
-def test_Cases_keyword_unique3():
+def test_Cases_kw_unique3():
     '''Check unique keyword of string caselets gives unique cases.'''
     cases = la.distributions.Cases(case_caselets, unique=True)
     #cases = Cases(case_caselets, unique=True)
@@ -1576,7 +1581,7 @@ def test_Cases_keyword_unique3():
     nt.assert_set_equal(actual, expected)
 
 
-def test_Cases_keyword_unique4():
+def test_Cases_kw_unique4():
     '''Check unique/combine keyword of string caselets gives unique cases; unifies singles.'''
     cases = la.distributions.Cases(str_caselets, combine=True, unique=True)
     #cases = Cases(str_caselets, combine=True, unique=True)
