@@ -1141,16 +1141,6 @@ def test_Cases_mthd_tocsv():
             os.remove(filepath)
 
 
-def test_Cases_mthd_frames():
-    '''Check frames method outputs DataFrames.  See other detailed Case().frames tests.'''
-    dfs = cases1a.frames
-
-    for df in dfs:
-        actual = isinstance(df, pd.DataFrame)
-        nt.assert_true(actual)
-
-
-# Cases Properties ------------------------------------------------------------
 def test_Cases_prop_LMs1():
     '''Check viewing inside cases gives correct list.'''
     actual1 = cases1a.LMs
@@ -1172,7 +1162,7 @@ def test_Cases_prop_LMs1():
     nt.assert_equal(actual1, expected)
 
 
-def test_Cases_prop_select1():
+def test_Cases_mthd_select1():
     '''Check output of select method; single nplies only.'''
     actual = cases2a.select(nplies=4)
     expected = {LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
@@ -1180,7 +1170,7 @@ def test_Cases_prop_select1():
     nt.assert_set_equal(actual, expected)
 
 
-def test_Cases_prop_select2():
+def test_Cases_mthd_select2():
     '''Check output of select method; single ps only.'''
     actual = cases2a.select(ps=3)
     # Using a set expression to filter normal Case objects
@@ -1191,7 +1181,7 @@ def test_Cases_prop_select2():
     nt.assert_set_equal(actual, expected)
 
 
-def test_Cases_prop_select3():
+def test_Cases_mthd_select3():
     '''Check output of select method; nplies only.'''
     actual = cases2a.select(nplies=[2, 4])
     expected = {
@@ -1201,7 +1191,7 @@ def test_Cases_prop_select3():
     nt.assert_set_equal(actual, expected)
 
 
-def test_Cases_prop_select4():
+def test_Cases_mthd_select4():
     '''Check output of select method; ps only.'''
     actual = cases2a.select(ps=[2, 4])
     expected = {
@@ -1212,7 +1202,7 @@ def test_Cases_prop_select4():
 
 
 # Cases `select` Cross-Selections
-def test_Cases_prop_select_crossselect1():
+def test_Cases_mthd_select_crossselect1():
     '''Check (union) output of select method; single nplies and ps.'''
     actual1 = cases2a.select(nplies=4, ps=3)
     actual2 = cases2a.select(nplies=4, ps=3, how='union')
@@ -1224,7 +1214,7 @@ def test_Cases_prop_select_crossselect1():
     nt.assert_set_equal(actual2, expected)
 
 
-def test_Cases_prop_select_crossselect2():
+def test_Cases_mthd_select_crossselect2():
     '''Check (intersection) output of select method; single nplies and ps.'''
     actual = cases2a.select(nplies=4, ps=3, how='intersection')
     expected1 = {
@@ -1236,7 +1226,7 @@ def test_Cases_prop_select_crossselect2():
     nt.assert_set_equal(actual, expected2)
 
 
-def test_Cases_prop_select_crossselect3():
+def test_Cases_mthd_select_crossselect3():
     '''Check (difference) output of select method; single nplies and ps.'''
     actual = cases2a.select(nplies=4, ps=3, how='difference')
     expected1 = cases2a.select(ps=3) - cases2a.select(nplies=4)
@@ -1245,7 +1235,7 @@ def test_Cases_prop_select_crossselect3():
     nt.assert_set_equal(actual, expected2)
 
 
-def test_Cases_prop_select_crossselect4():
+def test_Cases_mthd_select_crossselect4():
     '''Check (symmetric difference) output of select method; single nplies and ps.'''
     actual = cases2a.select(nplies=4, ps=3, how='symmetric difference')
     expected1 = {
@@ -1260,7 +1250,7 @@ def test_Cases_prop_select_crossselect4():
     nt.assert_set_equal(actual, expected2)
 
 
-def test_Cases_prop_select_crossselect5():
+def test_Cases_mthd_select_crossselect5():
     '''Check (union) output of select method; multiple nplies and ps.'''
     actual1 = cases2a.select(nplies=[2, 4], ps=[3, 4])
     actual2 = cases2a.select(nplies=[2, 4], ps=[3, 4], how='union')
@@ -1272,7 +1262,7 @@ def test_Cases_prop_select_crossselect5():
     nt.assert_set_equal(actual2, expected)
 
 
-def test_Cases_prop_select_crossselect6():
+def test_Cases_mthd_select_crossselect6():
     '''Check (intersection) output of select method; multiple nplies and ps.'''
     actual = cases2a.select(nplies=[2, 4], ps=[3, 4], how='intersection')
     expected1 = {
@@ -1282,7 +1272,7 @@ def test_Cases_prop_select_crossselect6():
     nt.assert_set_equal(actual, expected1)
 
 
-def test_Cases_prop_select_crossselect7():
+def test_Cases_mthd_select_crossselect7():
     '''Check (difference) output of select method; multiple nplies and single ps.'''
     # Subtracts nplies from ps.
     actual = cases2a.select(nplies=[2, 4], ps=3, how='difference')
@@ -1292,7 +1282,7 @@ def test_Cases_prop_select_crossselect7():
     nt.assert_set_equal(actual, expected2)
 
 
-def test_Cases_prop_select_crossselect8():
+def test_Cases_mthd_select_crossselect8():
     '''Check (symmetric difference) output of select method; single nplies, multi ps.'''
     actual = cases2a.select(nplies=4, ps=[3, 4], how='symmetric difference')
     expected1 = {
@@ -1301,6 +1291,19 @@ def test_Cases_prop_select_crossselect8():
     }
     nt.assert_set_equal(actual, expected1)
 
+
+# Cases Properties ------------------------------------------------------------
+
+def test_Cases_prop_frames():
+    '''Check frames method outputs DataFrames.  See other detailed Case().frames tests.'''
+    dfs = cases1a.frames
+
+    for df in dfs:
+        actual = isinstance(df, pd.DataFrame)
+        nt.assert_true(actual)
+
+
+# Cases Caselets --------------------------------------------------------------
 # TODO: Move to setup; looks like tests for caselet types; not containers
 # This section is dedicated to Cases() tests primarily from 0.4.4b3
 str_caselets = ['350-400-500', '400-200-800', '400-[200]-800']
