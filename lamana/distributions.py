@@ -665,13 +665,17 @@ class Cases(ct.MutableMapping):
             modified_name = ''.join(['.', self.model])     # '.Wilson_LT'
             module = importlib.import_module(modified_name, package='lamana.models')
             dft = module.Defaults()                        # triggers handling parameters
+            # TODO: Add logging.INFO('Using model {}'.format(self.model))
         except (ImportError):
             print('User-defined Defaults not found.')
+            # TODO: Add logging.INFO('User-defined Defaults not found.')
+            pass
 
         # Try to set defaults from auto imports, else set whats passed in.
         if load_params is None:
             try:
                 self.load_params = dft.load_params
+                # TODO: Add logging.INFO('Using defaults loading parameters from {}'.format(self.model))
             except (AssertionError):
                 raise ImportError('models.Defaults() not found.  Assign load_params.')
         else:
@@ -679,6 +683,7 @@ class Cases(ct.MutableMapping):
         if mat_props is None:
             try:
                 self.mat_props = dft.mat_props
+                # TODO: Add logging.INFO('Using defaults material parameters from {}'.format(self.model))
             except (AssertionError):
                 raise ImportError('models.Defaults() not found.  Assign mat_props.')
         else:
@@ -774,7 +779,7 @@ class Cases(ct.MutableMapping):
                     list_cases = [case for i, case in iterable]
                 else:
                     raise TypeError('Non-integer detected.  p must be an integer.')
-                    '''Test raise exception if p is not int.'''
+                '''Test raise exception if p is not int.'''
                 list_.extend(list_cases)
             # Reorder dict
             self._dict_caselets = {i: case for i, case in enumerate(list_)}
@@ -800,6 +805,7 @@ class Cases(ct.MutableMapping):
                 case_ = caselet_
             elif isinstance(caselet_, la.distributions.Case) and self.ps:
                 # TODO: clarify
+                # TODO: should be covered by test_Cases_caselets_ps3(); ?
                 # case1 --> <case>; redo case
                 geo_strings = [LM.Geometry.string for LM in caselet_.LMs]
                 case_ = self._get_case(geo_strings)
