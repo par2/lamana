@@ -727,12 +727,35 @@ class Cases(ct.MutableMapping):
             self.caselets = [self._get_unique(caselet) for caselet in caselets]
             #print(self.caselets)
         else:
+            # TODO: Redo redundancy; unify caselet handling
             # TODO: accepts onything for caselets, which can break equality
-            #### BUG: Critial; bypassed all the type handling for input caselet
+            #### BUG: Critical; bypassed all the type handling for input caselet
             #### Need to handle caselets here too
             # Add a hack for now; move input handling of Cases to input_
             # logging.DEBUG('Caselets not using `combine`.')
             print('Caselets not using `combine`.')
+            # Try to convert all strings
+            if isinstance(caselets, list):
+                try:
+                    # Assume list of geometry strings
+                    caselets = [
+                        la.input_.Geometry._to_gen_convention(caselet)
+                        for caselet in caselets
+                    ]
+                except(TypeError):
+                    # Assume list of lists of strings
+                    try:
+                        caselet_lsts = []
+                        for caselet in caselets:
+                            caselet_lst = []
+                            for geo_string in caselet:
+                                conv = la.input_.Geometry._to_gen_convention(geo_string)
+                                caselet_lst.append(conv)
+                            caselet_lsts.append(caselet_lst)
+                        caselets = caselet_lsts
+                    except(TypeError):
+                        pass
+
             self.caselets = caselets
 
         # Build a dict of cases; and a separate case for each p.
@@ -741,6 +764,7 @@ class Cases(ct.MutableMapping):
             iterable = self._convert_caselets(self.caselets)
             self._dict_caselets = dict((i, case) for i, case in iterable)
         else:                                              # Iterate ps
+            # TODO: Rename list_; what kind of list?
             list_ = []
             for p in ps:
                 if isinstance(p, int):
@@ -774,6 +798,7 @@ class Cases(ct.MutableMapping):
                 # case1 --> <case>
                 case_ = caselet_
             elif isinstance(caselet_, la.distributions.Case) and self.ps:
+                # TODO: clarify
                 # case1 --> <case>; redo case
                 geo_strings = [LM.Geometry.string for LM in caselet_.LMs]
                 case_ = self._get_case(geo_strings)
