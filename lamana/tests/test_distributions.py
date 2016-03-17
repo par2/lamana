@@ -167,18 +167,18 @@ def test_Case_mth_apply_arg_empty1():
     case0 = la.distributions.Case(dft.load_params, dft.mat_props)
     actual = case0.apply()
 
-
-def test_Case_parameters1():
+# Case Attributes -------------------------------------------------------------
+def test_Case_attr_parameters1():
     '''Confirm dict inputs (static data).'''
     actual = case1.load_params
     expected = {'P_a': 1, 'R': 0.012, 'a': 0.0075, 'p': 4, 'r': 2e-4}
     nt.assert_equal(actual, expected)
 
+# TODO: Test Series equality of load_params
 
-'''Test load parameters Series equality'''
-# Case attributes
+
 # Using a sample of geometries
-def test_Case_material_order0():
+def test_Case_attr_material_order0():
     '''Check property setter; materials changes the _material attribute.'''
     case2.materials = ['PSu', 'HA']
     actual = case2._materials
@@ -186,7 +186,7 @@ def test_Case_material_order0():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_materials_order1():
+def test_Case_attr_materials_order1():
     '''Check homogenous laminate gives same material.'''
     case2.materials = ['HA']                               # set order
     case2.apply(bdft.geos_sample)
@@ -196,7 +196,7 @@ def test_Case_materials_order1():
         nt.assert_equal(actual, e)
 
 
-def test_Case_materials_order2():
+def test_Case_attr_materials_order2():
     '''Check material setting of biphasic laminate in snapshots.'''
     case2.materials = ['PSu', 'HA']                        # set order
     case2.apply(bdft.geos_sample)
@@ -209,7 +209,7 @@ def test_Case_materials_order2():
         nt.assert_equal(actual2, e)
 
 
-def test_Case_materials_order3():
+def test_Case_attr_materials_order3():
     '''Check order for repeated materials.'''
     case2.materials = ['PSu', 'HA', 'HA']                  # set order
     case2.apply(bdft.geos_sample)
@@ -223,7 +223,7 @@ def test_Case_materials_order3():
     #print(case2.snapshots[-1])
 
 
-def test_Case_materials_order4():
+def test_Case_attr_materials_order4():
     '''Check multi-phase laminate, matl > 2, cycles through list.'''
     case3.materials = ['PSu', 'HA', 'dummy']               # set order
     case3.apply(bdft.geos_sample)
@@ -234,7 +234,7 @@ def test_Case_materials_order4():
 
 
 @nt.raises(NameError)
-def test_Case_materials_order5():
+def test_Case_attr_materials_order5():
     '''Check error is thrown if materials are not found inmat_props.'''
     case2.materials = ['PSu', 'HA', 'dummy']               # set order
     case2.apply(bdft.geos_sample)
@@ -243,7 +243,7 @@ def test_Case_materials_order5():
         nt.assert_equal(actual, e)
 
 
-def test_Case_properties1():
+def test_Case_attr_properties1():
     '''Confirm dict conversion to Dataframe (static data) and values.'''
     d = {
         'Modulus': pd.Series([52e9, 2.7e9], index=['HA', 'PSu']),
@@ -254,7 +254,7 @@ def test_Case_properties1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_properties2():
+def test_Case_attr_properties2():
     '''Check the order of the properties DataFrame when materials is reset.'''
     expected = ['PSu', 'HA']
     case2.materials = expected                             # set order
@@ -264,6 +264,8 @@ def test_Case_properties2():
     nt.assert_equal(actual, expected)
 
 
+# Case Properties -------------------------------------------------------------
+# TODO: Move
 def test_Case_prop_size1():
     '''Check size property gives correct number for length of Case object.'''
     case_ = la.distributions.Case(dft.load_params, dft.mat_props)
@@ -271,9 +273,10 @@ def test_Case_prop_size1():
     actual = case_.size
     expected = 3
     nt.assert_equal(actual, expected)
+###
 
 
-def test_Case_compare1():
+def test_Case_spmthd__eq_ne_compare1():
     '''Check __eq__, __ne__ of case.'''
     case1 = la.distributions.Case(dft.load_params, dft.mat_props)
     case2 = la.distributions.Case(dft.load_params, dft.mat_props)
@@ -291,13 +294,14 @@ def test_Case_compare1():
     nt.assert_not_equal(actual2, expected)
 
 
+# Case Methods ----------------------------------------------------------------
 # TODO: Change; too brittle
 # Test Case().apply() properties
 # The following use the same geos
 case1.apply(geos_full)
 
 
-def test_Case_apply_middle1():
+def test_Case_mthd_apply_middle1():
     '''Check output for middle layer.'''
     #case1.apply(geos_full)
     actual = case1.middle
@@ -305,7 +309,7 @@ def test_Case_apply_middle1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_inner1():
+def test_Case_mthd_apply_inner1():
     '''Check output for inner layer.'''
     #case1.apply(geos_full)
     actual = case1.inner
@@ -316,7 +320,7 @@ def test_Case_apply_inner1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_outer1():
+def test_Case_mthd_apply_outer1():
     '''Check output for inner layer.'''
     #case1.apply(geos_full)
     actual = case1.outer
@@ -324,7 +328,7 @@ def test_Case_apply_outer1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_index1():
+def test_Case_mthd_apply_index1():
     '''Check list indexing of the last index.'''
     #case1.apply(geos_full)
     actual = case1.inner[-1]
@@ -332,7 +336,7 @@ def test_Case_apply_index1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_index2():
+def test_Case_mthd_apply_index2():
     '''Check list indexing of the last element.'''
     #case1.apply(geos_full)
     actual = case1.inner[-1][-1]
@@ -340,7 +344,7 @@ def test_Case_apply_index2():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_iterate1():
+def test_Case_mthd_apply_iterate1():
     '''Check iterating indexed list; first element of every inner_i.'''
     #case1.apply(geos_full)
     actual = [first[0] for first in case1.inner]
@@ -348,7 +352,7 @@ def test_Case_apply_iterate1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_iterate2():
+def test_Case_mthd_apply_iterate2():
     '''Check iterating indexed list; operate on last element of every inner_i.'''
     #case1.apply(geos_full)
     actual = [inner_i[-1] / 2.0 for inner_i in case1.total_inner_i]
@@ -356,7 +360,7 @@ def test_Case_apply_iterate2():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_total1():
+def test_Case_mthd_apply_total1():
     '''Calculate total thicknesses (all).'''
     actual = case1.total
     expected = [2000.0, 2000.0, 2000.0, 2000.0, 2000.0,
@@ -364,21 +368,21 @@ def test_Case_apply_total1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_total2():
+def test_Case_mthd_apply_total2():
     '''Calculate total middle layer thicknesses; all.'''
     actual = case1.total_middle
     expected = [2000.0, 0.0, 800.0, 0.0, 800.0, 800.0, 800.0, 800.0, 800.0]
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_total3():
+def test_Case_mthd_apply_total3():
     '''Calculate total inner layer thicknesses; all.'''
     actual = case1.total_inner
     expected = [0.0, 0.0, 0.0, 1000.0, 400.0, 400.0, 400.0, 400.0, 400.0]
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_total4():
+def test_Case_mthd_apply_total4():
     '''Calculate total of each inner_i layer thicknesses; all.'''
     actual = case1.total_inner_i
     expected = [[0.0], [0.0], [0.0], [1000.0], [400.0],
@@ -386,14 +390,14 @@ def test_Case_apply_total4():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_total5():
+def test_Case_mthd_apply_total5():
     '''Calculate total outer layer thicknesses; all.'''
     actual = case1.total_outer
     expected = [0.0, 2000.0, 1200.0, 1000.0, 800.0, 800.0, 800.0, 800.0, 800.0]
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_slice1():
+def test_Case_mthd_apply_slice1():
     '''Check list slicing of total thicknesses.'''
     #case1.apply(geos_full)
     actual = case1.total_outer[4:-1]
@@ -401,7 +405,7 @@ def test_Case_apply_slice1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_unique1():
+def test_Case_mthd_apply_unique1():
     '''Check getting a unique set of LaminateModels when unique=True.'''
     actual = la.distributions.Case(dft.load_params, dft.mat_props)
     actual.apply(['400-[200]-800'])
@@ -410,7 +414,7 @@ def test_Case_apply_unique1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_unique2():
+def test_Case_mthd_apply_unique2():
     '''Check getting a unique set of LaminateModels when unique=False.'''
     actual = la.distributions.Case(dft.load_params, dft.mat_props)
     actual.apply(['400-[200]-800', '400-[200]-800'])
@@ -420,7 +424,7 @@ def test_Case_apply_unique2():
 
 
 @nt.raises(AssertionError)
-def test_Case_apply_unique3():
+def test_Case_mthd_apply_unique3():
     '''Check exception if comparing inaccurately LaminateModels when unique is False.'''
     actual = la.distributions.Case(dft.load_params, dft.mat_props)
     actual.apply(['400-[200]-800'])                   # wrong actual
@@ -429,7 +433,7 @@ def test_Case_apply_unique3():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_unique4():
+def test_Case_mthd_apply_unique4():
     '''Check unique word skips iterating same geo strings; gives only one.'''
     standards = ['400-200-800', '400-[200]-800',
                  '400-200-800', '400-[200]-800',
@@ -443,7 +447,7 @@ def test_Case_apply_unique4():
 
 
 # Case refactor 0.4.5a1
-def test_Case_apply_reapply():
+def test_Case_mthd_apply_reapply():
     '''Check same result is returned by calling apply more than once.'''
     case1 = la.distributions.Case(dft.load_params, dft.mat_props)
     case1.apply(['400-[200]-800', '400-[200]-800', '100-200-1400'])
@@ -456,9 +460,9 @@ def test_Case_apply_reapply():
     nt.assert_equal(actual, expected)
 
 
-# Laminate Structure ----------------------------------------------------------
-#Test LaminateModels
-def test_Case_apply_Snapshots1():
+# Laminate Structure
+# Test LaminateModels
+def test_Case_prop_snapshots1():
     '''Test the native DataFrame elements and dtypes. Resorts columns.  Uses pandas equals test.'''
     case1.apply(geos_full)
     cols = ['layer', 'matl', 'type', 't(um)']
@@ -477,7 +481,7 @@ def test_Case_apply_Snapshots1():
     ut.assertFrameEqual(actual[cols], expected[cols])
 
 
-def test_Case_apply_LaminateModels1():
+def test_Case_mthd_apply_LaminateModels1():
     '''Test the native DataFrame elements and dtypes. Resorts columns.
     Uses pandas equals() test.  p is even.'''
     case1.apply(geos_full)
@@ -522,6 +526,8 @@ def test_Case_apply_LaminateModels1():
 #     nt.assert_true(bool_test)
     ut.assertFrameEqual(actual, expected)
 
+
+# TODO: Cleanup; move
 # DataFrames ------------------------------------------------------------------
 # Test p
 '''Building expected DataFrames for tests can be tedious.  The following
@@ -683,7 +689,7 @@ d8 = {
 
 
 #------------------------------------------------------------------------------
-def test_apply_LaminateModels_frames_p1():
+def test_Case_mthd_apply_LaminateModels_frames_p1():
     '''Check built DataFrames have correct p for each Lamina.
 
     Using two functions to build DataFrames: make_dfs() and replicate_values().
@@ -747,7 +753,7 @@ def test_apply_LaminateModels_frames_p1():
 
 
 # Test stress sides
-def test_apply_LaminateModels_side_p1():
+def test_Case_mthd_apply_LaminateModels_side_p1():
     '''Check None is assigned in the middle for LaminateModels with odd rows.'''
     load_params = {
         'R': 12e-3,                                        # specimen radius
@@ -778,7 +784,7 @@ def test_apply_LaminateModels_side_p1():
     nt.assert_equal(actual, expected)
 
 
-def test_apply_LaminateModels_side_p2():
+def test_Case_mthd_apply_LaminateModels_side_p2():
     '''Check None is not in the DataFrame having even rows.'''
     load_params = {
         'R': 12e-3,                                        # specimen radius
@@ -804,7 +810,7 @@ def test_apply_LaminateModels_side_p2():
     nt.assert_equal(actual, expected)
 
 
-def test_apply_LaminateModels_INDET1():
+def test_Case_mthd_apply_LaminateModels_INDET1():
     '''Test INDET in the middle row for p = 1, odd laminates.'''
     load_params = {
         'R': 12e-3,                                        # specimen radius
@@ -835,7 +841,7 @@ def test_apply_LaminateModels_INDET1():
     nt.assert_equal(actual, expected)
 
 
-def test_apply_LaminateModels_INDET2():
+def test_Case_mthd_apply_LaminateModels_INDET2():
     '''Test INDET in the middle rows for p = 1, odd laminates.'''
     load_params = {
         'R': 12e-3,                                        # specimen radius
@@ -866,7 +872,7 @@ def test_apply_LaminateModels_INDET2():
     nt.assert_equal(actual, expected)
 
 
-def test_apply_LaminateModels_None1():
+def test_Case_mthd_apply_LaminateModels_None1():
     '''Check None is assigned in the middle for LaminateModels with odd rows.'''
     load_params = {
         'R': 12e-3,                                        # specimen radius
