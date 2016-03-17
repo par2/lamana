@@ -731,7 +731,8 @@ class Cases(ct.MutableMapping):
             # TODO: accepts onything for caselets, which can break equality
             #### BUG: Critical; bypassed all the type handling for input caselet
             #### Need to handle caselets here too
-            # Add a hack for now; move input handling of Cases to input_
+            # Hack for now for converting any geo_string in caselets to gen_conven.
+            # Move input handling of Cases to input_
             # logging.DEBUG('Caselets not using `combine`.')
             print('Caselets not using `combine`.')
             # Try to convert all strings

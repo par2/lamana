@@ -1025,18 +1025,18 @@ def test_Cases_spmthd_eq_1():
     '''Check __eq__ between hashable Cases object instances.'''
     # Compare Cases with single standards
     nt.assert_equal(cases4a, cases4b)
-    #nt.assert_equal(cases4a, cases4c)
+    nt.assert_equal(cases4a, cases4c)
     nt.assert_equal(cases4b, cases4a)
-    #nt.assert_equal(cases4c, cases4a)
+    nt.assert_equal(cases4c, cases4a)
 
 
 def test_Cases_spmthd_eq_2():
     '''Check __eq__ between hashable Cases object instances.'''
     # Compare Cases with single standards
     nt.assert_true(cases4a == cases4b)
-    #nt.assert_true(cases4a == cases4c)
+    nt.assert_true(cases4a == cases4c)
     nt.assert_true(cases4b == cases4a)
-    #nt.assert_true(cases4c == cases4a)
+    nt.assert_true(cases4c == cases4a)
 
 
 def test_Cases_spmthd_eq_3():
@@ -1058,9 +1058,9 @@ def test_Cases_spmthd_eq_4():
 def test_Cases_spmthd_ne_1():
     '''Check __ne__ between hashable Geometry object instances.'''
     nt.assert_false(cases4a != cases4b)
-    #nt.assert_false(cases4a != cases4c)
+    nt.assert_false(cases4a != cases4c)
     nt.assert_false(cases4b != cases4a)
-    #nt.assert_false(cases4c != cases4a)
+    nt.assert_false(cases4c != cases4a)
 
 
 def test_Cases_spmthd_ne_2():
