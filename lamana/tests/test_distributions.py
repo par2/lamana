@@ -268,37 +268,75 @@ def test_Case_attr_properties2():
 
 
 # Case Special Methods --------------------------------------------------------
-def test_Case_spmthd_eq_4():
-    '''Check returns NotImplemented if classes are not equal in __eq__.'''
-    # See Also original implementation in test_constructs.py
-    actual = case1.__eq__(1)                               # isinstance(1, Cases()) is False
-    expected = NotImplemented
-    nt.assert_equal(actual, expected)
+# NOTE: Shift in paradigms, first use of test class to contain variables.
+class TestCaseComparisons():
+    '''Check __eq__ and __ne__ of Case objects. BETA.'''
 
+    # Instantiate cases for comparison
+    # NOTE: Keep pertinent instantiations contained in a single scope
+    # NOTE: Modifications - add instantiations, simply add self to variable calls.
+    dft = wlt.Defaults()
 
-def test_Case_spmthd_ne1():
-    '''Check returns NotImplemented if classes are not equal in __ne__.'''
-    actual = case1.__ne__(1)                               # isinstance(1, Cases()) is False
-    expected = NotImplemented
-    nt.assert_equal(actual, expected)
+    case1a = la.distributions.Case(dft.load_params, dft.mat_props)
+    case1b = la.distributions.Case(dft.load_params, dft.mat_props)
+    case1c = la.distributions.Case(dft.load_params, dft.mat_props)
+    case1d = la.distributions.Case(dft.load_params, dft.mat_props)
+    case1e = la.distributions.Case(dft.load_params, dft.mat_props)
+    case1a.apply(dft.geos_all)
+    case1b.apply(dft.geos_all)
+    case1c.apply(dft.geo_inputs['all'])
+    case1d.apply(dft.geos_most)
+    case1e.apply(dft.geos_special)
 
+    def test_Case_spmthd_eq_1(self):
+        '''Check __eq__ between hashable Cases object instances.'''
+        # Compare Cases with single standards
+        nt.assert_equal(self.case1a, self.case1b)
+        nt.assert_equal(self.case1a, self.case1c)
+        nt.assert_equal(self.case1b, self.case1a)
+        nt.assert_equal(self.case1c, self.case1a)
 
-def test_Case_spmthd__eq_ne_compare1():
-    '''Check __eq__, __ne__ of case.'''
-    case1 = la.distributions.Case(dft.load_params, dft.mat_props)
-    case2 = la.distributions.Case(dft.load_params, dft.mat_props)
-    case3 = la.distributions.Case(dft.load_params, dft.mat_props)
-    case1.apply(dft.geos_most)
-    case2.apply(dft.geos_most)
-    case3.apply(dft.geos_standard)
+    def test_Case_spmthd_eq_2(self):
+        '''Check __eq__ between hashable Cases object instances.'''
+        # Compare Cases with single standards
+        nt.assert_true(self.case1a == self.case1b)
+        nt.assert_true(self.case1a == self.case1c)
+        nt.assert_true(self.case1b == self.case1a)
+        nt.assert_true(self.case1c == self.case1a)
 
-    expected = case1
-    actual1 = case2
-    actual2 = case3
-    #print(actual1)
-    #print(actual2)
-    nt.assert_equal(actual1, expected)
-    nt.assert_not_equal(actual2, expected)
+    def test_Case_spmthd_eq_3(self):
+        '''Check __eq__ between unequal hashable Geometry object instances.'''
+        nt.assert_false(self.case1a == self.case1d)
+        nt.assert_false(self.case1a == self.case1e)
+        nt.assert_false(self.case1d == self.case1a)
+        nt.assert_false(self.case1e == self.case1a)
+
+    def test_Case_spmthd_eq_4(self):
+        '''Check returns NotImplemented if classes are not equal in __eq__.'''
+        # See Also original implementation in test_constructs.py
+        actual = self.case1a.__eq__(1)                     # isinstance(1, Cases()) is False
+        expected = NotImplemented
+        nt.assert_equal(actual, expected)
+
+    def test_Case_spmthd_ne_1(self):
+        '''Check __ne__ between hashable Geometry object instances.'''
+        nt.assert_false(self.case1a != self.case1b)
+        nt.assert_false(self.case1a != self.case1c)
+        nt.assert_false(self.case1b != self.case1a)
+        nt.assert_false(self.case1c != self.case1a)
+
+    def test_Case_spmthd_ne_2(self):
+        '''Check __ne__ between unequal hashable Geometry object instances.'''
+        nt.assert_true(self.case1a != self.case1d)
+        nt.assert_true(self.case1a != self.case1e)
+        nt.assert_true(self.case1d != self.case1a)
+        nt.assert_true(self.case1e != self.case1a)
+
+    def test_Case_spmthd_ne3(self):
+        '''Check returns NotImplemented if classes are not equal in __ne__.'''
+        actual = self.case1a.__ne__(1)                     # isinstance(1, Cases()) is False
+        expected = NotImplemented
+        nt.assert_equal(actual, expected)
 
 
 # Case Methods ----------------------------------------------------------------
