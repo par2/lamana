@@ -634,6 +634,11 @@ def assertSeriesEqual(s1, s2, **kwds):
     **kwds : dict-like
         Keywords for `pandas.util.testing.assert_series_equal()`.
 
+    Returns
+    -------
+    None
+        Uses tools.pandas.testing; raises exceptions if not equal.
+
     '''
     from pandas.util.testing import assert_series_equal
     return assert_series_equal(s1, s2, **kwds)
@@ -650,12 +655,18 @@ def assertFrameEqual(df1, df2, **kwds):
     **kwds : dict-like
         Keywords for `pandas.util.testing.assert_frame_equal()`.
 
+    Returns
+    -------
+    None
+        Uses tools.pandas.testing; raises exceptions if not equal.
+
     '''
     from pandas.util.testing import assert_frame_equal
     # `sort` is deprecated; works in pandas 0.16.2; last worked in lamana 0.4.9
     # replaced `sort` with `sort_index` for pandas 0.17.1; backwards compatible
-    return assert_frame_equal(df1.sort_index(axis=1), df2.sort_index(axis=1),
-                              check_names=True, **kwds)
+    return assert_frame_equal(
+        df1.sort_index(axis=1), df2.sort_index(axis=1), check_names=True, **kwds
+    )
     ##return assert_frame_equal(df1.sort(axis=1), df2.sort(axis=1),
     ##                          check_names=True, **kwds)
 
