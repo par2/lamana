@@ -365,6 +365,79 @@ def test_compare_iterables():
     nt.assert_equal(actual2, expected)
 
 
+# Pandas Object Comparisons ---------------------------------------------------
+class TestPandasComparisions():
+    '''Check basic assertions for helper functions comparings Series and DataFrames.'''
+    # Build DataFrames
+    df_data1 = {'apple': 4, 'orange': 3, 'banana': 2, 'blueberry': 3}
+    df_data2 = {'apple': 4, 'orange': 3, 'banana': 2, 'blueberry': 3}
+    df_data3 = {'apple': 4, 'strawberry': 3, 'orange': 3, 'banana': 2}
+
+    df1 = pd.DataFrame(df_data1, index=['amount'])
+    df2 = pd.DataFrame(df_data2, index=['amount'])
+    df3 = pd.DataFrame(df_data3, index=['amount'])
+
+    # Build Series
+    s_data1 = {'apple': 4, 'orange': 3, 'banana': 2, 'blueberry': 3}
+    s_data2 = {'apple': 4, 'orange': 3, 'banana': 2, 'blueberry': 3}
+    s_data3 = {'apple': 4, 'strawberry': 3, 'orange': 3, 'banana': 2}
+
+    s1 = pd.Series(s_data1)
+    s2 = pd.Series(s_data2)
+    s3 = pd.Series(s_data3)
+
+    # Test assertFrameEqual
+    def test_assertframeeq1(self):
+        '''Check helper function compares DataFrames, None.'''
+        # See https://github.com/pydata/pandas/blob/master/pandas/util/testing.py
+        actual = ut.assertFrameEqual(self.df1, self.df2)
+        expected = None
+        nt.assert_equal(actual, expected)
+
+    @nt.raises(AssertionError)
+    def test_assertframeeq2(self):
+        '''Check helper function compares DataFrames, raises error is not equal.'''
+        actual = ut.assertFrameEqual(self.df1, self.df3)
+
+    # Test assertSeriesEqual
+    def test_assertserieseq1(self):
+        '''Check helper function compares Series, None.'''
+        # See https://github.com/pydata/pandas/blob/master/pandas/util/testing.py
+        actual = ut.assertSeriesEqual(self.s1, self.s2)
+        expected = None
+        nt.assert_equal(actual, expected)
+
+    @nt.raises(AssertionError)
+    def test_assertserieseq2(self):
+        '''Check helper function compares Series, raises error is not equal.'''
+        actual = ut.assertSeriesEqual(self.s1, self.s3)
+
+    # Test ndframe_equal
+    def test_ndframeeq_DataFrame1(self):
+        '''Check helper function compares DataFrames, True.'''
+        actual = ut.ndframe_equal(self.df1, self.df2)
+        expected = True
+        nt.assert_equal(actual, expected)
+
+    def test_ndframeeq_DataFrame2(self):
+        '''Check helper function compares DataFrames, False.'''
+        actual = ut.ndframe_equal(self.df1, self.df3)
+        expected = False
+        nt.assert_equal(actual, expected)
+
+    def test_ndframeeq_Series1(self):
+        '''Check helper function compares Series, True.'''
+        actual = ut.ndframe_equal(self.s1, self.s2)
+        expected = True
+        nt.assert_equal(actual, expected)
+
+    def test_ndframeeq_Series2(self):
+        '''Check helper function compares Series, False.'''
+        actual = ut.ndframe_equal(self.s1, self.s3)
+        expected = False
+        nt.assert_equal(actual, expected)
+
+
 # Matching Brackets -----------------------------------------------------------
 def test_ismatched1():
     '''Check matching pair of brackets or parentheses returns True.'''
@@ -400,7 +473,25 @@ def test_ismatched3():
     nt.assert_equal(actual2, expected)
 
 
+# TODO: How to access the counting branches in ismatched()?
+#def test_ismatched_count1():
+#    '''Check parens and brakets are counted.'''
+#    s1 = '[[][]]]'
+#    s2 = '()))()))'
+#    actual1 = ut.is_matched(s1)
+#    actual2 = ut.ismatched(s2)
+#    actual3 = ut.ismatched(''.join(s1, s2))
+#    # (bra, ket, par, ren)
+#    expected1 = (3, 4, 0, 0)
+#    expected1 = (0, 0, 2, 6)
+#    expected3 = (3, 4, 2, 6)
+#    nt.assert_equal(actual1, expected1)
+#    nt.assert_equal(actual2, expected2)
+#    nt.assert_equal(actual3, expected3)
+
+
 # Sort DataFrame Columns ------------------------------------------------------
+# TODO: Make a test class to combine DataFrame builds; see TestPandasComparisions
 def test_set_columns_seq1():
     '''Check reorders columns to existing sequence.'''
     # Pandas orders DataFrame columns alphabetically
