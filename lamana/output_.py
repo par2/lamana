@@ -242,8 +242,26 @@ def _distribplot(
 
     Raises
     ------
-        Exception
-            If no stress column is found.
+    Exception
+        If no stress column is found.
+
+    Notes
+    -----
+    Since this function pulls from existing axes with `gca`, it is currently up
+    to the coder to manage axes cleanup, particularly when making consecutive plot
+    instances.  The following example uses the clear axes f(x) to remedy this issue:
+
+    >>> # Plot consecutive instances
+    >>> case = ut.laminator(['400-200-800'])[0]
+    >>> LMs = case.LMs
+    >>> plot1 = la.output_._distribplot(LMs, normalized=True)
+    >>> plot1.cla()                                        # clear last plot, otherwise prevents infinite loop of gca from old plot
+    >>> plot2 = la.output_._distribplot(LMs, normalized=False)
+
+    If you want to keep your old axes, consider passing in a new axes.
+
+    >>> fig, new_ax = plt.subplots()
+    >>> plot3 = la.output_._distribplot(LMs, normalized=False, ax=new_ax)
 
     Examples
     --------
@@ -482,6 +500,7 @@ def _distribplot(
     return ax
 
 
+# TODO: Needs to return an axes or figure plot
 def _multiplot(
     caselets, x=None, y=None, title=None, normalized=True, halfplot='tensile',
     colorblind=False, grayscale=False, annotate=False, labels_off=False,
@@ -656,3 +675,42 @@ def _multiplot(
     fig.suptitle(**suptitle_kw)
     plt.rcParams.update({'font.size': 18})
     plt.show()
+
+
+# -----------------------------------------------------------------------------
+# AXES-LEVEL ------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+class AxesPlot():
+    '''Return a matplotblib axes.
+
+    See Also
+    --------
+    - _distribplot()
+    - singleplot()
+    - halfplot()
+    - quarterplt()
+    - predictplot()
+
+    '''
+    pass
+
+
+# -----------------------------------------------------------------------------
+# FIGURE-LEVEL ----------------------------------------------------------------
+# -----------------------------------------------------------------------------
+class FigurePlot():
+    '''Return a matplotlib figure.
+
+    This class sets up a figure to accept data for multiple plots.
+
+    Notes
+    -----
+    Each subplot is a separate axes.
+
+    See Also
+    --------
+    - _multiplot()
+    - ratioplot()
+
+    '''
+    pass
