@@ -1,5 +1,5 @@
 import numpy as np
-from matplotlib.pyplot import close
+import matplotlib.pyplot as plt
 
 
 class PlotTestCase(object):
@@ -8,4 +8,4 @@ class PlotTestCase(object):
         np.random.seed(33)
 
     def tearDown(self):
-        close('all')
+        plt.close('all')
