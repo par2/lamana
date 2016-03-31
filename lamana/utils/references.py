@@ -56,6 +56,7 @@ class Reference(object):
     # (047) Force create directory              https://stackoverflow.com/questions/273192/in-python-check-if-a-directory-exists-and-create-it-if-necessary
     # (048) Deprecation of __getslice__         https://docs.python.org/2/reference/datamodel.html#additional-methods-for-emulation-of-sequence-types
     # (049) Axes and Figure plots in seaborn    http://stackoverflow.com/questions/23969619/plotting-with-seaborn-using-the-matplotlib-object-oriented-interface
+    # (050) DISPLAY variable error              https://stackoverflow.com/questions/2801882/generating-a-png-with-matplotlib-when-display-is-undefined
 
     pass
 #------------------------------------------------------------------------------

@@ -1,5 +1,8 @@
-import numpy as np
+
+import matplotlib as mpl
+mpl.use('Agg')                                             # required to prevent DISPLAY error; must be before pyplot (REF 050)
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class PlotTestCase(object):

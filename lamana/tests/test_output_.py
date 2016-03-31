@@ -3,6 +3,8 @@
 
 import logging
 
+import matplotlib as mpl
+mpl.use('Agg')                                             # required to prevent DISPLAY error; must be before pyplot (REF 050)
 import matplotlib.pyplot as plt
 import nose.tools as nt
 
