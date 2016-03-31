@@ -11,6 +11,8 @@ import collections as ct
 import itertools as it
 
 import pandas as pd
+import matplotlib as mpl
+mpl.use('Agg')                                             # required to prevent DISPLAY error; must be before pyplot (REF 050)
 import matplotlib.pyplot as plt
 
 import lamana as la
