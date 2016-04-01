@@ -10,6 +10,7 @@ import nose.tools as nt
 
 import lamana as la
 from lamana.utils import tools as ut
+from lamana.utils import plottools as upt
 from lamana.models import Wilson_LT as wlt
 
 # Setup -----------------------------------------------------------------------
