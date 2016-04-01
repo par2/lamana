@@ -277,7 +277,6 @@ def _distribplot(
     <matplotlib.axes._subplots.AxesSubplot>
 
     '''
-
     # -------------------------------------------------------------------------
     '''Make cyclers colorblind and grayscale friendly'''
     if ax is None:
@@ -512,10 +511,10 @@ def _distribplot(
 # TODO: caselets are defined as containers of str, lists of str or cases, in LPEP 003.
 # Here caseslets are an LM, LMs or cases; list of cases(?) or cases object.
 def _multiplot(
-    caselets, x=None, y=None, title=None, normalized=True, halfplot='tensile',
-    colorblind=False, grayscale=False, annotate=False, labels_off=False,
-    suptitle_kw=None, subplots_kw=None, patch_kw=None, plot_kw=None,
-    legend_kw=None, labels_kw=None, **kwargs
+    caselets, x=None, y=None, title=None, normalized=True, extrema=False,
+    halfplot='tensile', colorblind=False, grayscale=False, annotate=False,
+    labels_off=False, suptitle_kw=None, subplots_kw=None, patch_kw=None,
+    plot_kw=None, legend_kw=None, labels_kw=None, **kwargs
 ):
     '''Return figure of axes containing several plots.
 
@@ -537,6 +536,9 @@ def _multiplot(
         Figure title.
     normalized : bool
         If true, plots y = k_; else plots y = d_ unless specified otherwise.
+    extrema : bool, default: False
+        Plot minima and maxima only; equivalent to p=2.
+        Forced off for clarity in separate plots.
     halfplot : str
         Trim the DataFrame to read either |'tensile'|'compressive'|None|.
     colorblind : bool
@@ -684,7 +686,7 @@ def _multiplot(
                 #print('Exception was caught; not a case')
 
             _distribplot(
-                LMs, x=x, y=y, halfplot=halfplot, annotate=annotate,
+                LMs, x=x, y=y, halfplot=halfplot, extrema=extrema, annotate=annotate,
                 normalized=normalized, ax=ax, colorblind=colorblind,
                 grayscale=grayscale, plot_kw=plot_kw, patch_kw=patch_kw,
                 legend_kw=legend_kw, sublabel_kw=sublabel_kw, **kwargs
