@@ -706,10 +706,10 @@ def _multiplot(
     # Common Figure Labels
     fig.suptitle(**suptitle_kw)
     plt.rcParams.update({'font.size': 18})
-    plt.show()
 
-    # NOTE: does not return axes.  Fix?  Remove plt.show?
-
+    # NOTE: Add a figure return and show deprecation in 0.4.11.dev0
+    return fig
+    #plt.show()
 
 # -----------------------------------------------------------------------------
 # AXES-LEVEL ------------------------------------------------------------------
