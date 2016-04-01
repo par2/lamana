@@ -437,9 +437,9 @@ def _distribplot(
             ypos = incrementer
         else:
             raise PlottingError(
-                'Unnormalized plots (i.e. y=d(m)) are cumbersome for'
-                ' geometries > 1. Consider using the normalized=True keyword'
-                ' for multi-geometry plots.'
+                'Unnormalized plots (i.e. y=d(m)) are visually cumbersome for'
+                ' geometries > 1. Consider using the `normalized=True` keyword'
+                ' for displaying simultaneous multi-geometry data.'
             )
             # NOTE: Replaced with raise in 0.4.11.dev0
             #'''Add this to warning.'''
