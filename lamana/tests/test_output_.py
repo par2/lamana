@@ -18,7 +18,7 @@ dft = wlt.Defaults()
 
 # TESTS -----------------------------------------------------------------------
 # TODO: need to add kw in distribplot to turn off plot window; shut down plt.show()
-def test_distribplot_plot_axes():
+def test_distribplot_plot_instance1():
     '''Check distribplot returns an axes.'''
     case = ut.laminator(['400-200-800'])[0]
     plot = la.output_._distribplot(case.LMs, normalized=True, extrema=True)
@@ -29,7 +29,7 @@ def test_distribplot_plot_axes():
 
 
 # TODO: Consider sublclassing from PlotTestCase to close plots
-class TestPlotDimensions():
+class TestDistribplotDimensions():
     '''Check plots dimensions of rectangle patches correctly.
 
     `_distribplot` is the source of distribution plots; backbone to `distributions`.
@@ -246,7 +246,7 @@ class TestPlotDimensions():
 
 # TODO: case randomizer here
 # TODO: since similar methods, consider abstracting plot_df_data_extractor into plottools
-class TestPlotLines():
+class TestDistribplotLines():
     '''Check accuracy of plot lines.'''
 
     # Various cases
@@ -388,4 +388,19 @@ class TestPlotLines():
 
         plt.close()                                     # in jupyter, cuts out last plot
 
+
 # TODO: Cover tests for _multiplot and _cycle_depth
+def test_multiplot_plot_instance1():
+    '''Check distribplot returns a figure.'''
+    const_total = ['350-400-500', '400-200-800']
+    cases = la.distributions.Cases(
+         const_total, load_params=dft.load_params, mat_props=dft.mat_props,
+         model='Wilson_LT', ps=[2, 3]
+    )
+    plot = la.output_._multiplot(cases)
+
+    nt.assert_is_instance(plot, mpl.figure.Figure)
+
+    plt.close()
+
+# TODO: Test multiplot caselet types
