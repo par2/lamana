@@ -73,11 +73,11 @@ class TestPlotDimensions():
     case3 = ut.laminator(dft.geo_inputs['7-ply'])
 
     # Sample plots
-    plot1 = la.output_._distribplot(case1.LMs, normalized=True)
+    plot1 = la.output_._distribplot(case1.LMs, normalized=True, extrema=True)
     fig2, ax2 = plt.subplots()                          # make new, separate axes; prevent inifinite loop of plt.gca()
-    plot2 = la.output_._distribplot(case1.LMs, normalized=False, ax=ax2)
+    plot2 = la.output_._distribplot(case1.LMs, normalized=False, extrema=True, ax=ax2)
 
-    def test_distribplot_normalized_patches_dimensions1(self):
+    def test_distribplot_patches_normalized_dimensions1(self):
         '''Check position and dimensions of normalized patches, statically.'''
 
         # Static implies the plot is supplied with fixed, pre-determined values
@@ -112,17 +112,18 @@ class TestPlotDimensions():
     # case = ut.laminator(dft.geo_inputs['5-ply'])
     # case = ut.laminator(dft.geo_inputs['4-ply'])
     # case = ut.laminator(dft.geo_inputs['7-ply'])
-    def test_distribplot_normalized_patches_dimensions2(self):
+    def test_distribplot_patches_normalized_dimensions2(self):
         '''Check position and dimensions of normalized patches, dynamically.
 
         Notes
         -----
         Iterating cases, artists and LaminateModels.  The LMs must have the a same nplies.
+        Extrema forced True.
 
         '''
         for case_ in self.case3.values():
             fig, ax = plt.subplots()
-            plot = la.output_._distribplot(case_.LMs, normalized=True)
+            plot = la.output_._distribplot(case_.LMs, normalized=True, extrema=True)
 
             # Calculations on all LMs in a case
             x_max = max(LM.max_stress.max() for LM in case_.LMs)
@@ -159,7 +160,7 @@ class TestPlotDimensions():
 
             plt.close()
 
-    def test_distribplot_unnormalized_patches_dimensions1(self):
+    def test_distribplot_unpatches_unnormalized_dimensions1(self):
         '''Check position and dimensions of unnormalized patches, statically.'''
         # Static implies the plot is supplied with fixed, pre-determined values
         #case = ut.laminator(['400-200-800'])[0]
@@ -202,17 +203,20 @@ class TestPlotDimensions():
             nt.assert_almost_equal(actual[2], expected[2])
             nt.assert_almost_equal(actual[3], expected[3])
 
-    def test_distribplot_unnormalized_patches_dimensions2(self):
+    def test_distribplot_patches_unnormalized_dimensions2(self):
         '''Check position and dimensions of unnormalized patches, dynamically.
 
         Notes
         -----
         Iterating cases, artists and LaminateModels.  Can only handle single geometries.
+        Extrema are forced True.
 
         '''
         for case_ in self.case2.values():
             fig, ax = plt.subplots()
-            plot = la.output_._distribplot(case_.LMs, normalized=False, ax=ax)
+            plot = la.output_._distribplot(
+                case_.LMs, normalized=False, extrema=True, ax=ax
+            )
 
             # Calculations on all LMs in a case
             x_max = max(LM.max_stress.max() for LM in case_.LMs)
@@ -237,7 +241,8 @@ class TestPlotDimensions():
                 # Extract from DataFrames (assume normalized have equal patch dimensions)
                 df = case_.LMs[0].LMFrame
                 y_i = df[df['label'] == 'interface']['d(m)'].reset_index(drop=True)[i]
-                h_i = case_.snapshots[0]['t(um)'][i] / 1e6
+                ##h_i = case_.snapshots[0]['t(um)'][i]/1e6
+                h_i = case_.LMs[0].stack_order[i + 1][1] / 1e6 # access stack layer thickness
                 logging.debug('x_i: {}, y_i: {}, w_i: {}, h_i: {}'.format(x_min, y_i, w_i, h_i))
 
                 # x postions and widths are fixed; y positions and height change.
