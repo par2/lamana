@@ -351,6 +351,6 @@ def extract_plot_LM_xy(cases, normalized=True, extrema=False):
             df_cases.append((df_xs.tolist(), df_ys.tolist()))
         logging.debug('Case {}, LaminateModel data | df_xs, df_ys: {}'.format(i, df_cases))
 
-    plt.close()
+        plt.close()
 
     return line_cases, df_cases
