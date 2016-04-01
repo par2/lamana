@@ -971,6 +971,7 @@ class Cases(ct.MutableMapping):
 
         cases = self
 
+        # NOTE: ? we should set a default int to ps
         # Set defaults
         ##selected = []
         if nplies is None:
