@@ -15,51 +15,24 @@ from lamana.models import Wilson_LT as wlt
 # Setup -----------------------------------------------------------------------
 dft = wlt.Defaults()
 
-load_params = {
-    'R': 12e-3,                                            # specimen radius
-    'a': 7.5e-3,                                           # support ring radius
-    'r': 2e-4,                                             # radial distance from center loading
-    'P_a': 1,                                              # applied load
-    'p': 2,                                                # points/layer
-}
-
-# Quick Form: a dict of lists
-mat_props = {
-    'HA': [5.2e10, 0.25],
-    'PSu': [2.7e9, 0.33],
-}
-
 
 # TESTS -----------------------------------------------------------------------
-# These tests are primitive.  They check that plots are made without errors.
-# Details of the plotting fidelity must be checked by other means.
+# TODO: need to add kw in distribplot to turn off plot window; shut down plt.show()
+def test_distribplot_plot_axes():
+    '''Check distribplot returns an axes.'''
+    case = ut.laminator(['400-200-800'])[0]
+    plot = la.output_._distribplot(case.LMs, normalized=True, extrema=True)
 
+    nt.assert_is_instance(plot, mpl.axes.Axes)
 
-def test_plot_nobreak():
-    '''Check that basic plotting API works without errors.'''
-    # Build dicts of loading parameters and and material properties
-    # Select geometries
-    single_geo = ['400-200-800']
-
-    case = la.distributions.Case(load_params, mat_props)   # instantiate a User Input Case Object through distributions
-    case.apply(single_geo)
-    ##actual = case.plot
-    ##actual = case.plot()
-    # plt.close()                                          # hangs
-
-    # TODO: need to add kw in distrplot to turn off plot window
-    # Shut down plt.show()
-
-    #nt.assertTrue(isinstance(actual, mpl.axes))
-    pass
-
-
-# TODO: Cover tests for _multiplot and _cycle_depth
+    plt.close()
 
 
 # TODO: Consider sublclassing from PlotTestCase to close plots
 class TestPlotDimensions():
     '''Check plots dimensions of rectangle patches correctly.
+
+    `_distribplot` is the source of distribution plots; backbone to `distributions`.
 
     Notes
     -----
@@ -76,6 +49,20 @@ class TestPlotDimensions():
     plot1 = la.output_._distribplot(case1.LMs, normalized=True, extrema=True)
     fig2, ax2 = plt.subplots()                          # make new, separate axes; prevent inifinite loop of plt.gca()
     plot2 = la.output_._distribplot(case1.LMs, normalized=False, extrema=True, ax=ax2)
+
+    # TODO: randomize cases for this test
+    def test_distribplot_patches_count1(self):
+        '''Check number of rectangle patches equals number of plies.'''
+        case = self.case1
+        LM = case.LMs[0]
+
+        npatches = len(self.plot1.artists)
+        nplies = LM.nplies
+
+        actual = npatches
+        expected = nplies
+
+        nt.assert_equal(actual, expected)
 
     def test_distribplot_patches_normalized_dimensions1(self):
         '''Check position and dimensions of normalized patches, statically.'''
@@ -160,7 +147,7 @@ class TestPlotDimensions():
 
             plt.close()
 
-    def test_distribplot_unpatches_unnormalized_dimensions1(self):
+    def test_distribplot_patches_unnormalized_dimensions1(self):
         '''Check position and dimensions of unnormalized patches, statically.'''
         # Static implies the plot is supplied with fixed, pre-determined values
         #case = ut.laminator(['400-200-800'])[0]
@@ -269,6 +256,27 @@ class TestPlotLines():
     case2 = ut.laminator(['400-200-800'], ps=[3, 4])
     case3 = ut.laminator(['400-200-800', '400-400-400', '100-100-100'], ps=[3, 4])
 
+    def test_distribplot_lines_count1(self):
+        '''Check number of lines equals number of case size (# geo_strings).'''
+        case = self.case3
+
+        for case_ in case.values():
+            fig, ax = plt.subplots()
+            plot = la.output_._distribplot(case_.LMs, ax=ax)
+
+            nlines = len(plot.lines)
+            ngeo_strings = len(case_.LMs)
+            ncases = case_.size
+
+            actual1 = nlines
+            expected1 = ngeo_strings
+            expected2 = ncases
+
+            nt.assert_equal(actual1, expected1)
+            nt.assert_equal(actual1, expected2)
+
+            plt.close()
+
     def test_distribplot_lines_normalized_data1(self):
         '''Check plot data agrees with LaminateModel data; normalized=True.
 
@@ -288,6 +296,7 @@ class TestPlotLines():
         #case = self.case2
         case = self.case3
 
+        ### FUNCTIONALIZE
         for i, case_ in enumerate(case.values()):
             fig, ax = plt.subplots()
             plot = la.output_._distribplot(case_.LMs, normalized=normalized, extrema=extrema, ax=ax)
@@ -315,6 +324,7 @@ class TestPlotLines():
                     if not extrema: df_ys = df['d(m)']
                 df_cases.append(zip(df_xs.tolist(), df_ys.tolist()))
             logging.debug('Case {}, LaminateModel data | df_xs, df_ys: {}'.format(i, df_cases))
+        ###
 
         # Compare plot data with LaminateModel data
         #actual = zip(xs.tolist(), ys.tolist())
@@ -377,3 +387,5 @@ class TestPlotLines():
         nt.assert_equal(actual, expected)
 
         plt.close()                                     # in jupyter, cuts out last plot
+
+# TODO: Cover tests for _multiplot and _cycle_depth
