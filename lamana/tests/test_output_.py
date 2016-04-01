@@ -256,4 +256,124 @@ class TestPlotDimensions():
 
             plt.close()
 
-        # TODO: add line detection tests here
+
+# TODO: case randomizer here
+# TODO: since similar methods, consider abstracting plot_df_data_extractor into plottools
+class TestPlotLines():
+    '''Check accuracy of plot lines.'''
+
+    # Various cases
+    #case1 = ut.laminator(['400-200-800',], ps=[3,])
+    #case2 = ut.laminator(['400-200-800',], ps=[3, 3])
+    #case2 = ut.laminator(['400-200-800',], ps=[4, 4])
+    case2 = ut.laminator(['400-200-800'], ps=[3, 4])
+    case3 = ut.laminator(['400-200-800', '400-400-400', '100-100-100'], ps=[3, 4])
+
+    def test_distribplot_lines_normalized_data1(self):
+        '''Check plot data agrees with LaminateModel data; normalized=True.
+
+        Compares lists of zipped (x,y) datapoints.
+
+        Notes
+        -----
+        - Supports normalize triggering; normalized=True|False
+        - Supports non-fixed extrema, i.e p>=2; extrema=False.
+        - Supports multiple ps, cases, geo_strings
+
+        '''
+        # DEV: change parameters
+        normalized = True
+        extrema = False
+        #case = self.case1
+        #case = self.case2
+        case = self.case3
+
+        for i, case_ in enumerate(case.values()):
+            fig, ax = plt.subplots()
+            plot = la.output_._distribplot(case_.LMs, normalized=normalized, extrema=extrema, ax=ax)
+            #print(plot)
+
+            # Extract plot data from lines; contain lines per case
+            line_cases = []
+            for line in plot.lines:
+                xs, ys = line.get_data()
+                line_cases.append(zip(xs.tolist(), ys.tolist()))
+            logging.debug('Case: {}, Plot points per line | xs, ys: {}'.format(i, line_cases))
+
+            # Extract data from LaminateModel; only
+            df_cases = []
+            for LM in case_.LMs:
+                df = LM.LMFrame
+                condition = (df['label'] == 'interface') | (df['label'] == 'discont.')
+                df_xs = df[condition].ix[:, -1]
+                if not extrema: df_xs = df.ix[:, -1]
+                if normalized:
+                    df_ys = df[condition]['k']
+                    if not extrema: df_ys = df['k']
+                elif not normalized:
+                    df_ys = df[condition]['d(m)']
+                    if not extrema: df_ys = df['d(m)']
+                df_cases.append(zip(df_xs.tolist(), df_ys.tolist()))
+            logging.debug('Case {}, LaminateModel data | df_xs, df_ys: {}'.format(i, df_cases))
+
+        # Compare plot data with LaminateModel data
+        #actual = zip(xs.tolist(), ys.tolist())
+        actual = line_cases
+        expected = df_cases                             # as lists
+        nt.assert_equal(actual, expected)
+
+        plt.close()                                     # in jupyter, cuts out last plot
+
+    def test_distribplot_lines_unnormalized_data1(self):
+        '''Check plot data agrees with LaminateModel data; normalized=False.
+
+        Compares lists of zipped (x,y) datapoints.
+
+        Notes
+        -----
+        - Supports normalize triggering; normalized=True|False
+        - Supports non-fixed extrema, i.e p>=2; extrema=False.
+        - Supports multiple ps, cases; does NOT support mutliple geo_strings
+
+        '''
+        # DEV: change parameters
+        normalized = False
+        extrema = False
+        #case = self.case1
+        case = self.case2
+
+        for i, case_ in enumerate(case.values()):
+            fig, ax = plt.subplots()
+            plot = la.output_._distribplot(case_.LMs, normalized=normalized, extrema=extrema, ax=ax)
+            #print(plot)
+
+            # Extract plot data from lines; contain lines per case
+            line_cases = []
+            for line in plot.lines:
+                xs, ys = line.get_data()
+                line_cases.append(zip(xs.tolist(), ys.tolist()))
+            logging.debug('Case: {}, Plot points per line | xs, ys: {}'.format(i, line_cases))
+
+            # Extract data from LaminateModel; only
+            df_cases = []
+            for LM in case_.LMs:
+                df = LM.LMFrame
+                condition = (df['label'] == 'interface') | (df['label'] == 'discont.')
+                df_xs = df[condition].ix[:, -1]
+                if not extrema: df_xs = df.ix[:, -1]
+                if normalized:
+                    df_ys = df[condition]['k']
+                    if not extrema: df_ys = df['k']
+                elif not normalized:
+                    df_ys = df[condition]['d(m)']
+                    if not extrema: df_ys = df['d(m)']
+                df_cases.append(zip(df_xs.tolist(), df_ys.tolist()))
+            logging.debug('Case {}, LaminateModel data | df_xs, df_ys: {}'.format(i, df_cases))
+
+        # Compare plot data with LaminateModel data
+        #actual = zip(xs.tolist(), ys.tolist())
+        actual = line_cases
+        expected = df_cases                             # as lists
+        nt.assert_equal(actual, expected)
+
+        plt.close()                                     # in jupyter, cuts out last plot
