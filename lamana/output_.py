@@ -206,11 +206,11 @@ def _distribplot(
     halfplot : str
         Trim the DataFrame to read either |'tensile'|'compressive'|None|.
     extrema : bool
-        Plot minima and maxima only; equivalent to p=2. Default: True.
+        Plot minima and maxima only; equivalent to p=2.
     legend_on : bool
         Turn on/off plot. Default: True.
     colorblind : bool
-        Set line and marker colors as colorblind-safe. Default: False.
+        Set line and marker colors as colorblind-safe.
     grayscale : bool
         Set everything to grayscale.  Overrides colorblind.
     annotate : bool
@@ -518,9 +518,37 @@ def _multiplot(
 
     Parameters
     ----------
+    caselets : list-like
+        Container of str, lists of str or cases.
+    x, y : str
+        DataFrame column names.  Users can pass in other columns names.
+    title : str
+        Figure title.
+    normalized : bool
+        If true, plots y = k_; else plots y = d_ unless specified otherwise.
+    halfplot : str
+        Trim the DataFrame to read either |'tensile'|'compressive'|None|.
+    colorblind : bool
+        Set line and marker colors as colorblind-safe.
+    grayscale : bool
+        Set everything to grayscale.  Overrides colorblind.
+    annotate : bool
+        Annotate names of layer types.
+    labels_off : bool
+        Toggle labels.
     labels_kw : dict
         One stop for custom labels and annotated text passed in from user.
         axestitle, sublabels, legendtitles are lists of labels for each caselet.
+
+
+    These keywords control general plotting aesthetics.
+    {subplot, patch, plot, legend, suptitle}_kw : dict
+        Default keywords are initialized to set up the distribution plots.
+        - subplots: |ncols=4|
+        - patch: None
+        - plot: |clip_on=True|
+        - legend: |loc=1|fontsize='small'|
+        - suptitle: |t=''|fontsize=22|fontweight='bold'|
 
     Returns
     -------
@@ -688,7 +716,7 @@ class AxesPlot():
     - _distribplot()
     - singleplot()
     - halfplot()
-    - quarterplt()
+    - quarterplot()
     - predictplot()
 
     '''
