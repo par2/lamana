@@ -6,6 +6,10 @@
 import re
 import logging
 
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
+
 import lamana as la
 #import collections as ct
 #import itertools as it
@@ -277,3 +281,76 @@ def analyze_matprops():
 def extract_patches():
     '''Return dict of layered patch from a plot with coordinates for each patch.'''
     pass
+
+
+def extract_plot_LM_xy(cases, normalized=True, extrema=False):
+    '''Return tuples of xy data from case plots and LaminateModel DataFrames.
+
+    Parameters
+    ----------
+    cases : Cases-like object
+        One or more cases contained in an iterable, e.g. laminator or Cases
+        objects.  Cases contain the critical LamainateModels from which to plot
+        lines and later pull DataFrame data.
+    normalized : bool, default: True
+        Passed to _distriplot to pull df data from `k` column; else uses `d(m)` column.
+    extrema : bool, default: False
+        Passed to _distribplot.  If True, uses only two datapoints/layer, i.e.
+        "interface" and "discont."
+
+    Returns
+    -------
+    tuple
+        A tuple of two lists: line plot and df data.  These lists represent extracted
+        xy-data for all cases.  Inside the lists are tuples of listed x, y data.
+
+    See Also
+    --------
+    - TestDistribplotLines: uses 1st and 2nd tuples as actual, expected data
+
+    Examples
+    --------
+    >>> # 2 cases of size 3; assumes default loading parameters and material properties
+    >>> cases = ut.laminator(['400-200-800', '400-400-400', '100-100-100'], ps=[3, 4])
+    >>> extract_plot_LM_xy(cases)
+    # [<(lists of x plot data, list of y plot data), (lists of x df data, list of y df data)>]
+
+    '''
+    for i, case in enumerate(cases.values()):
+        fig, ax = plt.subplots()
+        plot = la.output_._distribplot(
+            case.LMs, normalized=normalized, extrema=extrema, ax=ax
+        )
+        #print(plot)
+
+        # Extract plot data from lines; contain lines per case
+        line_cases = []
+        for line in plot.lines:
+            xs, ys = line.get_data()
+            #line_cases.append(zip(xs.tolist(), ys.tolist()))
+            line_cases.append((xs.tolist(), ys.tolist()))
+        logging.debug('Case: {}, Plot points per line | xs, ys: {}'.format(i, line_cases))
+
+        # Extract data from LaminateModel; only
+        df_cases = []
+        for LM in case.LMs:
+            df = LM.LMFrame
+            condition = (df['label'] == 'interface') | (df['label'] == 'discont.')
+            df_xs = df[condition].ix[:, -1]
+            if not extrema:
+                df_xs = df.ix[:, -1]
+            if normalized:
+                df_ys = df[condition]['k']
+                if not extrema:
+                    df_ys = df['k']
+            elif not normalized:
+                df_ys = df[condition]['d(m)']
+                if not extrema:
+                    df_ys = df['d(m)']
+            #df_cases.append(zip(df_xs.tolist(), df_ys.tolist()))
+            df_cases.append((df_xs.tolist(), df_ys.tolist()))
+        logging.debug('Case {}, LaminateModel data | df_xs, df_ys: {}'.format(i, df_cases))
+
+    plt.close()
+
+    return line_cases, df_cases
