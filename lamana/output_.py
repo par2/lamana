@@ -501,6 +501,8 @@ def _distribplot(
 
 
 # TODO: Needs to return an axes or figure plot
+# TODO: caselets are defined as containers of str, lists of str or cases, in LPEP 015.
+# Here caseslets are an LM, LMs or cases; list of cases(?) or cases object.
 def _multiplot(
     caselets, x=None, y=None, title=None, normalized=True, halfplot='tensile',
     colorblind=False, grayscale=False, annotate=False, labels_off=False,
@@ -518,8 +520,9 @@ def _multiplot(
 
     Parameters
     ----------
-    caselets : list-like
-        Container of str, lists of str or cases.
+    caselets : LM, LMs or cases
+        Should be a container of str, lists of str or cases; however, accepting
+        LM, LMs or cases.  Refactoring required.
     x, y : str
         DataFrame column names.  Users can pass in other columns names.
     title : str
@@ -644,6 +647,7 @@ def _multiplot(
     #print('kwargs:{} '.format(kwargs))
     #print('nrows: {}, ncols: {}'.format(nrows, ncols_dft))
 
+    # NOTE: does not return ax.  Fix?
     def plot_caselets(i, ax):
         '''Iterate axes of the subplots; apply a small plot ("caselet").
 
@@ -663,7 +667,7 @@ def _multiplot(
             legend_kw.update(title=ltitle)
             sublabel_kw = dict(s=sublabel)
 
-            # Caselet could be a case or LM, but distribplot needs LMs
+            # Caselet could be a case or LM, but distribplot needs a list of LMs
             try:
                 LMs = caselet.LMs
             except (AttributeError):
@@ -703,6 +707,8 @@ def _multiplot(
     fig.suptitle(**suptitle_kw)
     plt.rcParams.update({'font.size': 18})
     plt.show()
+
+    # NOTE: does not return axes.  Fix?  Remove plt.show?
 
 
 # -----------------------------------------------------------------------------
