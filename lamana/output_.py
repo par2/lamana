@@ -501,7 +501,7 @@ def _distribplot(
 
 
 # TODO: Needs to return an axes or figure plot
-# TODO: caselets are defined as containers of str, lists of str or cases, in LPEP 015.
+# TODO: caselets are defined as containers of str, lists of str or cases, in LPEP 003.
 # Here caseslets are an LM, LMs or cases; list of cases(?) or cases object.
 def _multiplot(
     caselets, x=None, y=None, title=None, normalized=True, halfplot='tensile',
