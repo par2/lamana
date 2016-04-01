@@ -33,3 +33,8 @@ class IndeterminateError(Error):
 
     '''
     pass
+
+
+class PlottingError(Error):
+    '''Associated with plotting errors.'''
+    pass
