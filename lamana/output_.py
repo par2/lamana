@@ -154,6 +154,8 @@ import itertools as it
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+from lamana.lt_exceptions import PlottingError
+
 
 
 # colorblind palette from seaborn; grayscale is web-safe
@@ -434,11 +436,17 @@ def _distribplot(
             thick = t_ / 1e6
             ypos = incrementer
         else:
-            '''Add this to warning.'''
-            print('CAUTION: Unnormalized plots (y=d(m)) is cumbersome for '
-                  'geometries>1. Consider normalized=True for multi-geometry '
-                  'plots.')
-            return None
+            raise PlottingError(
+                'Unnormalized plots (i.e. y=d(m)) are cumbersome for'
+                ' geometries > 1. Consider using the normalized=True keyword'
+                ' for multi-geometry plots.'
+            )
+            # NOTE: Replaced with raise in 0.4.11.dev0
+            #'''Add this to warning.'''
+            #print('CAUTION: Unnormalized plots (y=d(m)) are cumbersome for '
+            #      'geometries > 1. Consider normalized=True for multi-geometry '
+            #      'plots.')
+            #return None
 
         patch_kw.update({'facecolor': next(layer_cycle)})          # adv. cyclers
         rect = mpl.patches.Rectangle((minX, ypos), width, thick, **patch_kw)
@@ -710,6 +718,7 @@ def _multiplot(
     # NOTE: Add a figure return and show deprecation in 0.4.11.dev0
     return fig
     #plt.show()
+
 
 # -----------------------------------------------------------------------------
 # AXES-LEVEL ------------------------------------------------------------------
