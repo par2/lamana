@@ -12,14 +12,12 @@ import lamana as la
 from lamana.utils import tools as ut
 from lamana.utils import plottools as upt
 from lamana.models import Wilson_LT as wlt
-from lamana.lt_exceptions import PlottingError
 
 # Setup -----------------------------------------------------------------------
 dft = wlt.Defaults()
 
 
 # TESTS -----------------------------------------------------------------------
-# Single Plots ----------------------------------------------------------------
 # TODO: need to add kw in distribplot to turn off plot window; shut down plt.show()
 def test_distribplot_plot_instance1():
     '''Check distribplot returns an axes.'''
@@ -333,30 +331,19 @@ class TestDistribplotLines():
         plt.close()                                     # in jupyter, cuts out last plot
 
 
-# Multiple Plots --------------------------------------------------------------
-# TODO: release after figuring what to feed _multiplot
-#@nt.raises(PlottingError)
-#def test_multiplot_unnormalized_error1():
-#    '''Check raises PlottingError if geometry > 1 for unnormalized plot.'''
-#
-#    case = ut.laminator(['400-[200]-800', '400-[400]-400'])
-#    plot = la.output_._multiplot(case, normalized=False)
-#
-#    plt.close()
-
 
 # TODO: Cover tests for _multiplot and _cycle_depth
-# TODO: Refactor test
-#def test_multiplot_plot_instance1():
-#    '''Check distribplot returns a figure.'''
-#    const_total = ['350-400-500', '400-200-800']
-#    cases = la.distributions.Cases(
-#         const_total, load_params=dft.load_params, mat_props=dft.mat_props,
-#         model='Wilson_LT', ps=[2, 3]
-#    )
-#    plot = la.output_._multiplot(cases)
-#    nt.assert_is_instance(plot, mpl.figure.Figure)
-#
-#    plt.close()
+def test_multiplot_plot_instance1():
+    '''Check distribplot returns a figure.'''
+    const_total = ['350-400-500', '400-200-800']
+    cases = la.distributions.Cases(
+         const_total, load_params=dft.load_params, mat_props=dft.mat_props,
+         model='Wilson_LT', ps=[2, 3]
+    )
+    plot = la.output_._multiplot(cases)
+
+    nt.assert_is_instance(plot, mpl.figure.Figure)
+
+    plt.close()
 
 # TODO: Test multiplot caselet types
