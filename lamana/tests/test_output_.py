@@ -19,6 +19,9 @@ dft = wlt.Defaults()
 
 
 # TESTS -----------------------------------------------------------------------
+# TODO:  _cycle_depth
+
+
 # Single Plots ----------------------------------------------------------------
 # TODO: need to add kw in distribplot to turn off plot window; shut down plt.show()
 def test_distribplot_plot_instance1():
@@ -334,6 +337,7 @@ class TestDistribplotLines():
 
 
 # Multiple Plots --------------------------------------------------------------
+# DEV: a series of bugs were discovered during testing; refactoring is required.
 # TODO: release after figuring what to feed _multiplot
 #@nt.raises(PlottingError)
 #def test_multiplot_unnormalized_error1():
@@ -345,18 +349,61 @@ class TestDistribplotLines():
 #    plt.close()
 
 
-# TODO: Cover tests for _multiplot and _cycle_depth
-# TODO: Refactor test
-#def test_multiplot_plot_instance1():
-#    '''Check distribplot returns a figure.'''
-#    const_total = ['350-400-500', '400-200-800']
-#    cases = la.distributions.Cases(
-#         const_total, load_params=dft.load_params, mat_props=dft.mat_props,
-#         model='Wilson_LT', ps=[2, 3]
-#    )
-#    plot = la.output_._multiplot(cases)
-#    nt.assert_is_instance(plot, mpl.figure.Figure)
-#
-#    plt.close()
+def test_multiplot_plot_instance1():
+    '''Check distribplot returns a figure.'''
+    str_caselets = ['350-400-500', '400-200-800']
+    cases = la.distributions.Cases(str_caselets, ps=[2, 3])
+    plot = la.output_._multiplot(cases)
+    nt.assert_is_instance(plot, mpl.figure.Figure)
+
+    plt.close()
+
+
+def test_multiplot_axes_count1():
+    '''Check total axes equals number of cases.'''
+    str_caselets = ['400-200-800', '400-400-400']
+    ps = [2, 3, 4, 5]
+
+    cases = la.distributions.Cases(str_caselets, ps=ps)
+    plot = la.output_._multiplot(cases)
+
+    naxes = len(plot.axes)
+    ncases1 = len(str_caselets) * len(ps)
+    ncases2 = len(cases)
+
+    actual = naxes
+    expected1 = ncases1
+    expected2 = ncases2
+
+    nt.assert_equal(actual, expected1)
+    nt.assert_equal(actual, expected2)
+
+    plt.close()
+
+
+# TODO: release after fix; need to plot beyond default rows
+# def test_multiplot_axes_count2():
+#     '''Check total axes in figure for random number of ps equals number of cases.'''
+#     random_choice = random.randint(2,10)
+#     population = range(2, 12)
+#     # Generate list of random integers, e.g [2, 5, 4, 7] or [5, 3]
+#     random_ps = random.sample(population, random_choice)
+#     assert len(random_ps) < population
+
+#     cases = la.distributions.Cases(['400-200-800', '400-400-400'], ps=random_ps)
+#     plot = la.output_._multiplot(cases)
+
+#     naxes = len(plot.axes)
+#     ncases = len(cases)
+#     actual = naxes
+#     expected = ncases
+
+#     logging.debug('# axes: {}, # cases: {}, # ps: {} --> ps: {}'.format(
+#             naxes, ncases, random_choice, random_ps)
+#     )
+#     nt.assert_equal(actual, expected)
+
+#     plt.close()
+
 
 # TODO: Test multiplot caselet types
