@@ -2,6 +2,7 @@
 '''Confirm output of general models.'''
 
 import logging
+import itertools as it
 
 import matplotlib as mpl
 mpl.use('Agg')                                             # required to prevent DISPLAY error; must be before pyplot (REF 050)
@@ -20,6 +21,29 @@ dft = wlt.Defaults()
 
 # TESTS -----------------------------------------------------------------------
 # TODO:  _cycle_depth
+def test_cycler_depth1():
+    '''Check cycler repeats for a given depth.
+
+    Notes
+    -----
+    Testing an infinite generator is not straight-forward.  It must be consumed.
+    We will use itertools.islice() to consume up to an arbitrary index, e.g. 10.
+
+    '''
+    # Depth:  1    2    3    4    5    6
+    iter_ = ['A', 'B', 'C', 'D', 'E', 'F']
+    cycler1 = la.output_._cycle_depth(iter_, depth=2)
+    cycler2 = la.output_._cycle_depth(iter_, depth=3)
+
+    # Consume the infinite generator with islice.
+    actual1 = list(it.islice(cycler1, 10))
+    actual2 = list(it.islice(cycler2, 10))
+
+    expected1 = ['A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B']
+    expected2 = ['A', 'B', 'C', 'A', 'B', 'C', 'A', 'B', 'C', 'A']
+
+    nt.assert_almost_equals(actual1, expected1)
+    nt.assert_almost_equals(actual2, expected2)
 
 
 # Single Plots ----------------------------------------------------------------
