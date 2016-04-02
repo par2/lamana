@@ -24,7 +24,37 @@ dft = wlt.Defaults()
 
 # Single Plots ----------------------------------------------------------------
 # TODO: need to add kw in distribplot to turn off plot window; shut down plt.show()
-def test_distribplot_plot_instance1():
+@nt.raises(PlottingError)
+def test_distribplot_unnormalized_error1():
+    '''Check raises PlottingError if geometry > 1 for unnormalized plot.'''
+    case = ut.laminator(['400-200-800', '400-400-400'])[0]
+    plot = la.output_._distribplot(case.LMs, normalized=False)
+
+    plt.close()
+
+
+# TODO: release after moking mock model with no stress columns; needed for LM
+#@nt.raises(InputError)
+#def test_distribplot_input_error1():
+#    '''Check raises InputError if x override does not have 'stress' in the name.'''
+#    x_col = 'sterss'
+#    case = ut.laminator(['400-200-800', '400-400-400'])[0]
+#    plot = la.output_._distribplot(case.LMs, x=x_col)
+#
+#    plt.close()
+
+
+def test_distribplot_input_error2():
+    '''Check still looks for stress column, even if bad x column name given.'''
+    x_col = 'bad_column_name'
+    case = ut.laminator(['400-200-800'])[0]
+    plot = la.output_._distribplot(case.LMs, x=x_col)
+    nt.assert_is_instance(plot, mpl.axes.Axes)
+
+    plt.close()
+
+
+def test_distribplot_instance1():
     '''Check distribplot returns an axes.'''
     case = ut.laminator(['400-200-800'])[0]
     plot = la.output_._distribplot(case.LMs, normalized=True, extrema=True)
@@ -43,7 +73,8 @@ class TestDistribplotDimensions():
     Notes
     -----
     - Required creating new axes to prevent plot clobbering
-    - Some methods use class level plots; some use internal plots.  Internals that make axes need closing.
+    - Some methods use class level plots; some use internal plots.
+      Internals that make axes need closing.
 
     '''
     # Set up cases
@@ -338,17 +369,7 @@ class TestDistribplotLines():
 
 # Multiple Plots --------------------------------------------------------------
 # DEV: a series of bugs were discovered during testing; refactoring is required.
-# TODO: release after figuring what to feed _multiplot
-#@nt.raises(PlottingError)
-#def test_multiplot_unnormalized_error1():
-#    '''Check raises PlottingError if geometry > 1 for unnormalized plot.'''
-#
-#    case = ut.laminator(['400-[200]-800', '400-[400]-400'])
-#    plot = la.output_._multiplot(case, normalized=False)
-#
-#    plt.close()
-
-
+# TODO: Look into close plots by encasing following functions with a class
 def test_multiplot_plot_instance1():
     '''Check distribplot returns a figure.'''
     str_caselets = ['350-400-500', '400-200-800']
