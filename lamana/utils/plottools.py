@@ -354,3 +354,23 @@ def extract_plot_LM_xy(cases, normalized=True, extrema=False):
         plt.close()
 
     return line_cases, df_cases
+
+
+def _has_annotations(texts):
+    '''Return True if at least annotation is found.
+
+    Parameters
+    ----------
+    texts : list
+        Contains matplolib plotting objects.
+
+    See Also
+    --------
+    - test_distribplot_annotate#: used to verify annotations on text.
+
+    '''
+    for text in texts:
+        # Relies on annotations to be Annotation objects
+        if isinstance(text, mpl.text.Annotation):
+            return True
+    return False
