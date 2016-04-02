@@ -149,12 +149,13 @@ lamana.distributions.Cases.plot : makes call to `_multiplot()`.
 
 
 import math
+import logging
 import itertools as it
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from lamana.lt_exceptions import PlottingError
+from lamana.lt_exceptions import InputError, PlottingError
 
 
 
@@ -244,8 +245,10 @@ def _distribplot(
 
     Raises
     ------
-    Exception
+    InputError
         If no stress column is found.
+    PlottingError
+        If multiple geometries try an unnormalized plot; cannot superimpose.
 
     Notes
     -----
@@ -292,9 +295,9 @@ def _distribplot(
         y = 'k'
     elif not normalized and y is None:
         y = 'd(m)'
-    '''Will have trouble standardizing the name of the stress column.'''
-    '''Need to de-hard-code x label since changes with model'''
-    '''Try looking for stress columns, and select last one, else look for strain.'''
+    # NOTE: Will have trouble standardizing the name of the stress column.
+    # NOTE: Need to de-hard-code x label since changes with model
+    # TODO: Try looking for stress columns, and select last one, else look for strain.
 
     # see loop on handling stress column
 
@@ -374,22 +377,31 @@ def _distribplot(
         # Handle arbitrary name of x column by
         # selecting last 'stress' column; assumes 'stress_f (MPa)' for Wilson_LT
         # if none found, exception is raised. user should input x value
+        #logging.debug('x: {}'.format(x))
+        x_col = x
+        y_col = y
         try:
-            df[x]
+            df[x_col]
         except KeyError:
-            stress_names = df.columns.str.startswith('stress')
-            stress_cols = df.loc[:, stress_names]
-            ##stress_cols = df.loc[stress_names]
-            x_series = stress_cols.iloc[:, -1]
-            x = x_series.name
-            #print ('stress_cols ', stress_cols)
-            #print(x)
-        except KeyError:
-            # TODO: make a custom exception
-            raise Exception("Stress column '{}' not found. "
-                            'Specify y column in plot() method.'.format(x))
+            try:
+                # Try to discern if input wants a stress column.
+                stress_names = df.columns.str.startswith('stress')
+                stress_cols = df.loc[:, stress_names]
+                ##stress_cols = df.loc[stress_names]
+                x_series = stress_cols.iloc[:, -1]
+                x_col = x_series.name
+                logging.info(
+                    "Stress column '{}' not found."
+                    " Using '{}' column.".format(x, x_col)
+                )
+            # TODO: unable to test without configuring model.  Make mock model for test.
+            except KeyError:
+                raise InputError(
+                    "Stress column '{}' not found."
+                    ' Specify `y` column in plot() method.'.format(x_col)
+                )
 
-        x_series, y_series = df[x], df[y]
+        x_series, y_series = df[x_col], df[y_col]
         xs, ys = x_series.tolist(), y_series.tolist()
 
         # Update plot boundaries
@@ -748,6 +760,12 @@ class FigurePlot():
 
     This class sets up a figure to accept data for multiple plots.
 
+
+    Attributes
+    -----------
+    nrows, ncols = int, int
+        Figure rows and columns.
+
     Notes
     -----
     Each subplot is a separate axes.
@@ -758,4 +776,5 @@ class FigurePlot():
     - ratioplot()
 
     '''
+    #figsize = (ncols * size * aspect, nrows * size)
     pass
