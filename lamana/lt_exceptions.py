@@ -7,16 +7,21 @@ class Error(Exception):
 
 
 class FormatError(Error):
-    '''Associate with geo_string formatting.'''
+    '''Associated with geo_string formatting.'''
     pass
 
 
-class InvalidError(Error):
-    '''Associate with invalid, impossible geo_strings.'''
-    pass
+#class ValidationError(Error):
+#    '''Associate with invalid, impossible geo_strings.'''
+#    pass
 
 
-class KeyError(Error):
+#class KeyError(Error):
+#    pass
+
+
+class InputError(Error):
+    '''Associated with invalid user inputs.'''
     pass
 
 
@@ -25,7 +30,7 @@ class NotImplementedError(Error):
 
 
 class IndeterminateError(Error):
-    '''Associate with INDET exceptions.
+    '''Associated with INDET exceptions.
 
     See Also
     --------
