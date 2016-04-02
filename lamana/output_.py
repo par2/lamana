@@ -175,11 +175,44 @@ LAMANA_PALETTES = dict(
 # Process plotting figures of single and multiple subplots
 
 
-def _cycle_depth(iterable, n=None):
-    '''Return a cycler that iterates n items into an iterable.'''
-    if n is None:
-        n = len(iterable)
-    return it.cycle(it.islice(iterable, n))
+#def _cycle_depth(iterable, n=None):
+#    '''Return a cycler that iterates n items into an iterable.'''
+#    if n is None:
+#        n = len(iterable)
+#    return it.cycle(it.islice(iterable, n))
+
+
+def _cycle_depth(iterable, depth=None):
+    '''Return an itertools.cycle that slices the iterable by a given depth.
+
+    Parameters
+    ----------
+    iterable : iterable
+        A container of infinite length.
+    depth : int
+        A index value; if None, cycle the entire iterable.
+
+    Examples
+    --------
+    >>> # Depth:  1    2    3    4    5    6
+    >>> iter_ = ['A', 'B', 'C', 'D', 'E', 'F']
+    >>> _cycle_depth(iter_, depth=2)
+    itertools.cycle                      # ['A', 'B', 'A', 'B', 'A' ...]
+
+    >>> # Depth:  1    2    3    4    5    6
+    >>> iter_ = ['A', 'B', 'C', 'D', 'E', 'F']
+    >>> _cycle_depth(iter_, depth=3)
+    itertools.cycle                      # ['A', 'B', 'C', 'A', 'B', 'C' ...]
+
+    Returns
+    -------
+    itertools.cycle
+        An infinite generator.
+
+    '''
+    if depth is None:
+        depth = len(iterable)
+    return it.cycle(it.islice(iterable, depth))
 
 
 # TODO: Abstract to Distribplot and PanelPlot classes
@@ -435,7 +468,7 @@ def _distribplot(
 
     # Smart-cycle layer colors list; slice iterable the length of materials
     # Draw layers only for # y = {k_ and d_(if nplies=1)}
-    layer_cycle = _cycle_depth(layercolors, n=len(materials))      # assumes all Cases materials equiv.
+    layer_cycle = _cycle_depth(layercolors, depth=len(materials))  # assumes all Cases materials equiv.
 
     # -------------------------------------------------------------------------
     # Annotations anchored to layers instead of plot; iterates layers
