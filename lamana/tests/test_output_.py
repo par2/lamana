@@ -32,18 +32,22 @@ def test_cycler_depth1():
     '''
     # Depth:  1    2    3    4    5    6
     iter_ = ['A', 'B', 'C', 'D', 'E', 'F']
-    cycler1 = la.output_._cycle_depth(iter_, depth=2)
-    cycler2 = la.output_._cycle_depth(iter_, depth=3)
+    cycler1 = la.output_._cycle_depth(iter_, depth=None)
+    cycler2 = la.output_._cycle_depth(iter_, depth=2)
+    cycler3 = la.output_._cycle_depth(iter_, depth=3)
 
     # Consume the infinite generator with islice.
     actual1 = list(it.islice(cycler1, 10))
     actual2 = list(it.islice(cycler2, 10))
+    actual3 = list(it.islice(cycler3, 10))
 
-    expected1 = ['A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B']
-    expected2 = ['A', 'B', 'C', 'A', 'B', 'C', 'A', 'B', 'C', 'A']
+    expected1 = ['A', 'B', 'C', 'D', 'E', 'F', 'A', 'B', 'C', 'D']
+    expected2 = ['A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B']
+    expected3 = ['A', 'B', 'C', 'A', 'B', 'C', 'A', 'B', 'C', 'A']
 
     nt.assert_almost_equals(actual1, expected1)
     nt.assert_almost_equals(actual2, expected2)
+    nt.assert_almost_equals(actual3, expected3)
 
 
 # Single Plots ----------------------------------------------------------------
@@ -84,6 +88,28 @@ def test_distribplot_instance1():
     plot = la.output_._distribplot(case.LMs, normalized=True, extrema=True)
 
     nt.assert_is_instance(plot, mpl.axes.Axes)
+
+    plt.close()
+
+
+def test_distribplot_annotate1():
+    '''Check iif text exists on the plot when annotate=True.'''
+    case = ut.laminator(['400-200-800'])[0]
+    plot = la.output_._distribplot(case.LMs, annotate=True)
+
+    actual = upt._has_annotations(plot.texts)
+    nt.assert_true(actual)
+
+    plt.close()
+
+
+def test_distribplot_annotate2():
+    '''Check ift text exists; return False when annotate=False'''
+    case = ut.laminator(['400-200-800'])[0]
+    plot = la.output_._distribplot(case.LMs, annotate=False)
+
+    actual = upt._has_annotations(plot.texts)
+    nt.assert_false(actual)
 
     plt.close()
 
