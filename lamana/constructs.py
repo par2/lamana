@@ -992,7 +992,7 @@ class Laminate(Stack):
         ...
 
         '''
-        pass
+        pass                                               # pragma: no cover
 
     # Checks ------------------------------------------------------------------
     # Read from DataFrames

@@ -416,11 +416,11 @@ def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
         ##path = path + r'\lamana\tests\controls_LT'         # for Main Script. Comment out in tests
         ##path = ''.join([path, r'\lamana\output'])
         dirpath = ''.join([path, r'\export'])              # \export in root dir
-    else:
+    else:                                                  # pragma: no cover
         dirpath = path
 
     # Filename
-    if prefix is None:
+    if prefix is None:                                      # pragma: no cover
         prefix = r'w'                                       # for written by lamana
 
     prefix = ''.join([prefix, '_'])

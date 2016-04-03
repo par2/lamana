@@ -205,3 +205,5 @@ def test_extract_equivalence4():
     actual = line_data
     expected = df_data
     nt.assert_equal(actual, expected)
+
+# TODO: Add tests for colors

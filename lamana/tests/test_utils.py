@@ -356,7 +356,7 @@ def test_compare_symmetric():
 
 
 def test_compare_iterables():
-    '''Check set comparision works if given non-iterables e.g. int.'''
+    '''Check set comparison works if given non-iterables e.g. int.'''
     # Symmetric Difference: [1,2,3] ^ [3,4] -> {1,2,4}
     actual1 = ut.compare_set(1, [2, 3], how='union')       # it is int
     actual2 = ut.compare_set([1, 2], 3, how='union')       # other is int
