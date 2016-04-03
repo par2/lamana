@@ -11,42 +11,62 @@ mpl.use('Agg')
 import matplotlib.pyplot as plt
 
 import lamana as la
-#import collections as ct
-#import itertools as it
+from lamana.lt_exceptions import InputError
 
 
 # Analyze Geometries ----------------------------------------------------------
-def _get_duples(geo_string):
+# Token processing
+def _get_duples(token):
     '''Return list of tuples given an outer or inner_i; (position, duple).
 
     If none found, return empty list.
 
     Parameters
     ----------
-    geo_string: str
-        Pure geo_string of General Convention, e.g. '400.0-[100.0,100.0]-800.0'.
-
-    Examples
-    --------
-    >>> _get_duples('[100,(200.0,200),300]')
-    [(5, '(200.0,200)')]
-    >>> _get_non_duples('[100,300]'')                       # if non-duple, empty list
-    []
+    token: str
+        A string representation of a geometry token (outer, inner_i or middle);
+        this is NOT a full geometry string.
 
     Returns
     -------
     list of tuples
-        [(string position, duple), ...]
+        The duple location and string representation of all duples are contained
+        in a list.  [(string position, duple), ...]
+
+    Examples
+    --------
+    >>> _get_duples('(300,100)')                            # outer token
+    [(0, '(300.0, 100.0)']
+    >>> _get_duples('[100,(200.0,200),300]')                # inner_i token
+    [(5, '(200.0,200)')]
+    >>> _get_non_duples('[100,300]')                        # if non-duple, empty list
+    []
+
+    Raises
+    ------
+    InputError
+        If full geometry string is passed in e.g. '400.0-[100.0,100.0]-800.0'.
+
+    Notes
+    -----
+    Assumes tokens are valid.
 
     '''
+    # TODO: Replace with an is_valid_token() method to improve robostness
+    if '-' in token:
+        raise InputError(
+            "'-' found.  Please input a geometry token only, e.g."
+            "outer, inner_i or middle string."
+        )
+
     pattern = r'(\( *\d+\.*\d*\, *\d+\.*\d* *\))'          # duple; includes whitespace
 
     list_of_duples = []
-    for match in re.finditer(pattern, geo_string):
+    for match in re.finditer(pattern, token):
         pos = match.start()
         end = match.end()
         #print(pos, end)
-        duple = geo_string[pos:end]
+        duple = token[pos:end]
 
         # Convert to float
         duple = duple.strip('()')
@@ -55,23 +75,27 @@ def _get_duples(geo_string):
 
         list_of_duples.append((pos, duple))
         logging.debug('Using _get_duple. position: {},'
-                      ' duple: {} for string {}'.format(pos, duple, geo_string))
+                      ' duple: {} for string {}'.format(pos, duple, token))
     return list_of_duples
+    # TODO: should probably return None if list is empty, or none found
 
 
-def _get_non_duples(geo_string):
+def _get_non_duples(token):
     '''Return list of pure inner numbers (non-duples) given an inner_i or outer geo_string.
 
     If none found, return empty list.
 
     Parameters
     ----------
-    geo_string: str
-        Pure geo_string of General Convention, e.g. '400.0-[100.0,100.0]-800.0'.
+    token: str
+        A string representation of a geometry token (outer, inner_i or middle);
+        this is NOT a full geometry string.
 
     Examples
     --------
-    >>> _get_non_duples('[100,(200.0,200),300]')
+    >>> _get_non_duples('400')                             # outer token
+    [(0, '400.0')]
+    >>> _get_non_duples('[100,(200.0,200),300]')           # inner_i token
     [(1, '100.0'), (17, '300.0')]
     >>> _get_non_duples('[(200.0,200)]')                   # if duple, empty list
     []
@@ -79,24 +103,42 @@ def _get_non_duples(geo_string):
     Returns
     -------
     list of tuples
-        [(string position, duple), ...]
+        The duple location and string representation of all duples are contained
+        in a list.  [(string position, duple), ...]
+
+    Raises
+    ------
+    InputError
+        If full geometry string is passed in e.g. '400.0-[100.0,100.0]-800.0'.
+
+    Notes
+    -----
+    Assumes tokens are valid.
 
     '''
+    # TODO: Replace with an is_valid_token() method to improve robostness
+    if '-' in token:
+        raise InputError(
+            "'-' found.  Please input a geometry token only, e.g."
+            "outer, inner_i or middle string."
+        )
+
     # NOTE: adding tests may require refining the regex pattern
     # Assume only duples and inners in the inner_i string
     pattern = r'(?<![(\d+])(\d+\.*\d+ *\,*?)(?![\d\.)])'   # inners only; exlude duples
     # Test string: '[100.0, (200.0, 200.0), 300, (100.0,300),(100,300.0)]'
 
     list_of_non_duples = []
-    for match in re.finditer(pattern, geo_string):
+    for match in re.finditer(pattern, token):
         pos = match.start()
         end = match.end()
         #print(pos, end)
-        layer = float(geo_string[pos:end])                 # convert to float
+        layer = float(token[pos:end])                     # convert to float
         list_of_non_duples.append((pos, layer))
         logging.debug('Using _get_nonduples. position: {},'
-                      ' layer: {} for string {}'.format(pos, layer, geo_string))
+                      ' layer: {} for string {}'.format(pos, layer, token))
     return list_of_non_duples
+    # TODO: should probably return None if list is empty, or none found
 
 
 def _get_outer(token):
@@ -105,14 +147,21 @@ def _get_outer(token):
     Parameters
     ----------
     token : str
-        String representations of ints, floats and duples
+        String representations of outer layer_ ints, floats and duples
         e.g '400', '400.0', '(300.0, 100)'
 
     Notes
     -----
-    Parse the outer.  Get either:
+    Parse the outer token; NOT a full geometry string.  Get either:
     1. a float (position, outer) or
     2. tuple (position, outer)
+
+    Examples
+    --------
+    >>> _get_outer('400-[200]-800')
+    400.0
+    >>> _get_outer('(300,100)-[200]-800')
+    (300.0, 100.0)
 
     Checks if duple. If not, is ignored.  Float conversions occur internally.
 
@@ -134,7 +183,7 @@ def _get_inner_i(token):
     Parameters
     ----------
     token : str
-        String representations of inner_i ints, floats and duples
+        String representation of inner_i layer_ ints, floats and duples
         e.g. '[100,(200.0,200),300]'
 
     Examples
@@ -167,8 +216,15 @@ def _get_middle(token):
     Parameters
     ----------
     token : str
-        String representations of middle ints, floats symmetric
+        String representation of middle layer_ ints, floats symmetric
         e.g. '800', '800.0', '400S'
+
+    Examples
+    --------
+    >>> _get_middle('800.0')
+    800.0
+    >>> _get_middle('400S')
+    800.0
 
     Notes
     -----
@@ -182,6 +238,7 @@ def _get_middle(token):
 
 
 # TODO: Performance comparison of this function with Stack.decode_geometry().
+# Stack assembly
 def _unfold_geometry(outer, inner_i, middle):
     '''Return an list of unfolded, stacking sequence given converted geo_string tokens.
 
@@ -203,7 +260,7 @@ def _unfold_geometry(outer, inner_i, middle):
     decodes geometry strings. This approach may have performance benefits.
 
     The workflow for creating an ordered stack sequence is manual, contained in a list:
-       outer1 + inner_i1 + middle + inner_i (reversed) + outer2
+       outer1 + inner_i + middle + inner_i(reversed) + outer2
 
     The outer is checked for a duple.  If one is found, the tensile entry is parsed.
     The inner_i is forward iterated, parsing only tensile inners if duples found.
@@ -256,33 +313,29 @@ def _unfold_geometry(outer, inner_i, middle):
     return stack_seq
 
 
+# Main function
 def analyze_geostring(geo_string):
     '''Return a tuple of nplies, thickness and order given a geo_string.'''
     # TODO: _to_gen_convention() needs to handle duples
+    # Pre-process geo_string
     conv_geostring = la.input_.Geometry._to_gen_convention(geo_string)
     tokens = conv_geostring.split('-')
     #tokens = geo_string.split('-')                         # beta; allow unconventional
+
+    # Token processing
     outer = _get_outer(tokens[0])
     inner_i = _get_inner_i(tokens[1])
     middle = _get_middle(tokens[2])
 
-    order = _unfold_geometry(outer, inner_i, middle)
+    # Attributes
+    order = _unfold_geometry(outer, inner_i, middle)       # stack assembly
     nplies = len(order)
     t_total = sum(order) / 1000.0
 
     return nplies, t_total, order
 
 
-def analyze_matprops():
-    ''''Return int of number of materials.'''
-    pass
-
-
-def extract_patches():
-    '''Return dict of layered patch from a plot with coordinates for each patch.'''
-    pass
-
-
+# Analyze Plots --------------------------------------------------------------
 def extract_plot_LM_xy(cases, normalized=True, extrema=False):
     '''Return tuples of xy data from case plots and LaminateModel DataFrames.
 
@@ -356,7 +409,17 @@ def extract_plot_LM_xy(cases, normalized=True, extrema=False):
     return line_cases, df_cases
 
 
-def _has_annotations(texts):
+#def analyze_matprops():
+#    ''''Return int of number of materials.'''
+#    pass
+
+
+#def analyze_colors():
+#    ''''Return int of number of materials.'''
+#    pass
+
+
+def has_annotations(texts):
     '''Return True if at least annotation is found.
 
     Parameters
