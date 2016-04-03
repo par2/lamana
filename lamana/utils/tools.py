@@ -448,10 +448,10 @@ def is_matched(pattern, string):
     '''
     # TODO: all default pattern for 'all' (.) if none supplied; make pattern optional
     search = re.findall(pattern, string)                   # quick, non-iterative extraction
-    if '[' or ']' in search:
+    if '[' in search or ']' in search:
         bra = search.count('[')
         ket = search.count(']')
-    if '(' or ')' in search:
+    if '(' in search or ')' in search:
         par = search.count('(')
         ren = search.count(')')
     #print(bra, ket, par, ren)
