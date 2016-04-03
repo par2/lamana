@@ -97,7 +97,7 @@ def test_distribplot_annotate1():
     case = ut.laminator(['400-200-800'])[0]
     plot = la.output_._distribplot(case.LMs, annotate=True)
 
-    actual = upt._has_annotations(plot.texts)
+    actual = upt.has_annotations(plot.texts)
     nt.assert_true(actual)
 
     plt.close()
@@ -108,7 +108,7 @@ def test_distribplot_annotate2():
     case = ut.laminator(['400-200-800'])[0]
     plot = la.output_._distribplot(case.LMs, annotate=False)
 
-    actual = upt._has_annotations(plot.texts)
+    actual = upt.has_annotations(plot.texts)
     nt.assert_false(actual)
 
     plt.close()
