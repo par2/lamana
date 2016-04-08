@@ -318,6 +318,8 @@ def analyze_geostring(geo_string):
     '''Return a tuple of nplies, thickness and order given a geo_string.'''
     # TODO: _to_gen_convention() needs to handle duples
     # Pre-process geo_string
+    # TODO: add is_valid conditional; else continue
+    # TODO: add is_gen_convention
     conv_geostring = la.input_.Geometry._to_gen_convention(geo_string)
     tokens = conv_geostring.split('-')
     #tokens = geo_string.split('-')                         # beta; allow unconventional

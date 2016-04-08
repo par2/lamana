@@ -722,13 +722,17 @@ def _multiplot(
             legend_kw.update(title=ltitle)
             sublabel_kw = dict(s=sublabel)
 
+
+            # TODO: Refactor
             # Caselet could be a case or LM, but distribplot needs a list of LMs
             try:
+                # Case
                 LMs = caselet.LMs
             except (AttributeError):
-                # Case is actually a LaminateModel; see distributions.Case.plot().
+                # Single LaminateModel
                 LMs = [caselet]
                 #print('Exception was caught; not a case')
+                # NOTE: what about LMs?
 
             _distribplot(
                 LMs, x=x, y=y, halfplot=halfplot, extrema=extrema, annotate=annotate,

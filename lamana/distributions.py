@@ -227,6 +227,9 @@ class Case(object):
         self.Geometries = []
         self.model = model
 
+        # TODO: pre-process the geo_strings as caselets for consistency with Cases
+        # Replace geo_strings with caselet
+        #caselet = la.input_.to_caselet(geo_strings)
         '''Find way to convert unique geos and add to cache.'''
 
         # Defaults
@@ -263,6 +266,7 @@ class Case(object):
             _geo_cache = set()
 
             for geometry in geometries:
+                # TODO: Move conversion to Caselet()
                 conv_geometry = la.input_.Geometry._to_gen_convention(geometry)
 
                 # Check a cache
@@ -698,12 +702,17 @@ class Cases(ct.MutableMapping):
         # rather than manually make a new, separate Case for each.
         # TODO: Try to clean up with multiple exceptions rather than isinstance().
         # TODO: post-refactor and implementation in input_, uncomment equality tests for 400-200-800 in test_distributions
+
         if combine:
             # TODO: DEV: deprecate post is_valid update for empty apply
             if not caselets:                               # if empty arg
                 raise TypeError('combine=True: Invalid type detected for'
                                 ' caselets. Make list of geometry strings,'
                                 ' lists of geometry strings or cases.')
+
+        # TODO: pre-process the caselets into Caselets;
+        # Simply build cases based on the caselet_input dict
+###
             try:
                 # Assuming a list of geometry strings
                 case_ = la.distributions.Case(self.load_params, self.mat_props)
@@ -765,7 +774,7 @@ class Cases(ct.MutableMapping):
                         pass
 
             self.caselets = caselets
-
+###
         # Build a dict of cases; and a separate case for each p.
         if self.ps is None:                                # ignore ps
             #
