@@ -389,6 +389,9 @@ class Case(object):
         if separate and len(LMs) > 1:                   # one plot is not multiplot
             caselets = LMs                              # will trigger exception handling
 
+###
+            # TODO: Replace with Cases.  Any figure with more the one subplot
+            # should be handled by Cases.
             # Defaults for processing unnormalized single geometries
             normalized = False if normalized is None else normalized
             subplots_kw.update(dict(ncols=2))
@@ -402,7 +405,7 @@ class Case(object):
                 grayscale=grayscale, annotate=annotate, subplots_kw=subplots_kw,
                 suptitle_kw=suptitle_kw, **kwargs
             )
-
+###
         # Single/Multiple Geometries ----------------------------------------------
         else:
             fig, ax = plt.subplots(**subplots_kw)           # Set fig dimensions and dpi
