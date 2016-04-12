@@ -75,6 +75,30 @@ mat_props = {
 
 
 # Test String Conversion and Types
+def test_tokenize_geostring1():
+    '''Check result is converted outer, inner_i, middle tokens.'''
+    # Parse geometry string by dashes
+    geo_strings = {
+        0: '400-[150,50]-800',                             # regular geometry string
+        1: '(300,100)-[150,50]-800',                       # irregualar geometry string; outer duple
+        2: '400-[(150,50)]-800',                           # irregualar geometry string; inner_i duple
+        3: '400-[150,(75,50),25]-800',                     # irregualar geometry string; inner_i duple and regular inners
+        4: '(300,100)-[150,(75,50),25]-800',               # irregualar geometry string; outer and inner_i duple + reg. inners
+    }
+
+    # TODO: Change post general convention fix
+    expected_lists = {
+        0: ['400', '[150,50]', '800'],
+        1: ['(300,100)', '[150,50]', '800'],
+        2: ['400', '[(150,50)]', '800'],
+        3: ['400', '[150,(75,50),25]', '800'],
+        4: ['(300,100)', '[150,(75,50),25]', '800'],
+    }
+    for geo_string, expected in zip(geo_strings.values(), expected_lists.values()):
+        actual = la.input_.tokenize_geostring(geo_string)
+        nt.assert_equals(actual, expected)
+
+
 def test_geo_inner1():
     '''Check non-decimal inner converts to decimal.'''
     # Convert inside string '200' to 200.0 if brackets aren't found
