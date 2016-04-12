@@ -25,17 +25,21 @@ def test_get_duples1():
     inner_i1 = '[100.0, (200.0, 200.0), 300.0]'
     inner_i2 = '[100.0, (200.0, 200.0), 300.0, (100,300.0)]'
     inner_i3 = '[100.0, (200.0, 200.0), 300, (100.0,300),(100,300.0)]'
+    inner_i4 = '[100.0, (150.0, 50.0), 300.0]'
     invalid = '800.0'                                    # invalid arg
     actual1 = upt._get_duples(outer)
     actual2 = upt._get_duples(inner_i1)
     actual3 = upt._get_duples(inner_i2)
     actual4 = upt._get_duples(inner_i3)
     actual5 = upt._get_duples(invalid)
+    actual6 = upt._get_duples(inner_i1, swap=True)
     expected1 = [(0, (300.0, 100.0))]
     expected2 = [(8, (200.0, 200.0))]
     expected3 = [(8, (200.0, 200.0)), (31, (100.0, 300.0))]
     expected4 = [(8, (200.0, 200.0)), (29, (100.0, 300.0)), (41, (100.0, 300.0))]
     expected5 = []
+    expected6 = [(8, (50.0, 150.0))]
+
 
     nt.assert_equal(actual1, expected1)
     nt.assert_equal(actual2, expected2)
@@ -85,9 +89,17 @@ def test_get_outer1():
 
 def test_get_inner_i1():
     '''Check a list of inner_i components is returned.'''
-    inner_i1 = '[100,(200.0,200),300]'
-    expected = [100.0, (200.0, 200.0), 300.0]
+    inner_i1 = '[100,(150.0,50),300]'
     actual = upt._get_inner_i(inner_i1)
+    expected = [100.0, (150.0, 50.0), 300.0]
+    nt.assert_equal(actual, expected)
+
+
+def test_get_inner_i2():
+    '''Check a list of revered inner_i components is returned; reverse=True.'''
+    inner_i1 = '[100,(150.0,50),300]'
+    actual = upt._get_inner_i(inner_i1, reverse=True)
+    expected = [300.0, (50.0, 150.0), 100.0]
     nt.assert_equal(actual, expected)
 
 
@@ -103,24 +115,27 @@ def test_get_middle1():
     nt.assert_equal(actual3, expected)
 
 
-def test_unfold_geometry1():
-    '''Check returns list of ordered stack sequence.'''
-    expected = [400.0, 100.0, 200.0, 300.0, 800.0, 300.0, 200.0, 100.0, 400.0]
-    outer = 400.0
-    inner_i = [100.0, (200.0, 200.0), 300.0]
-    middle = 800.0
-    actual = upt._unfold_geometry(outer, inner_i, middle)
-    nt.assert_equal(actual, expected)
+# def test_unfold_geometry1():
+#     '''Check returns list of ordered stack sequence.'''
+#     expected = [400.0, 100.0, 200.0, 300.0, 800.0, 300.0, 200.0, 100.0, 400.0]
+#     outer = 400.0
+#     inner_i = [100.0, (200.0, 200.0), 300.0]
+#     middle = 800.0
+#     actual = upt._unfold_geometry(outer, inner_i, middle)
+#     nt.assert_equal(actual, expected)
+#
+# # TODO: DEPRECATE
+# def test_unfold_geometry2():
+#     '''Check returns list of ordered stack sequence; using outer duples.'''
+#     expected = [300.0, 100.0, 200.0, 300.0, 800.0, 300.0, 200.0, 100.0, 100.0]
+#     outer = (300.0, 100.0)
+#     inner_i = [100.0, (200.0, 200.0), 300.0]
+#     middle = 800.0
+#     actual = upt._unfold_geometry(outer, inner_i, middle)
+#     nt.assert_equal(actual, expected)
 
 
-def test_unfold_geometry2():
-    '''Check returns list of ordered stack sequence; using outer duples.'''
-    expected = [300.0, 100.0, 200.0, 300.0, 800.0, 300.0, 200.0, 100.0, 100.0]
-    outer = (300.0, 100.0)
-    inner_i = [100.0, (200.0, 200.0), 300.0]
-    middle = 800.0
-    actual = upt._unfold_geometry(outer, inner_i, middle)
-    nt.assert_equal(actual, expected)
+
 
 
 def test_analyze_geostring1():
