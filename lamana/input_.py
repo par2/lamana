@@ -21,6 +21,18 @@ from lamana.utils import tools as ut
 # Parses informations and generates User Input objects, i.e. Geometry()
 
 
+def tokenize_geostring(geo_string):
+    '''Return a tuple of tokens; outer, inner_i, middle tokens.'''
+    # Convert to General Convention
+    # TODO: Add handling of duples into _to_gen_convention first
+    # For now, assume strings are formated correctly
+    #g_conv = la.input_.Geometry._to_gen_convention(geo_string)
+
+    # Return tokens
+    tokens = geo_string.split('-')
+    return tokens
+
+
 class Geometry(object):
     '''Parse input geometry string into floats.
 
