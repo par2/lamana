@@ -15,8 +15,62 @@ from lamana.lt_exceptions import InputError
 
 
 # Analyze Geometries ----------------------------------------------------------
+
+# TODO: return indexed dicts.
 # Token processing
-def _get_duples(token):
+
+# DEPRECATE
+# def reverse_duples(duples):
+#     '''Return list of swapped duples; string potiions included.'''
+#     return [(duple[0], tuple(reversed(duple[1]))) for duple in upt._get_duples(token)]
+
+
+def process_inner_i(inner_i, left=True, reverse=False):
+    '''Yield either left (tensile) or right (compressive) inners.
+
+    Parameters
+    ----------
+    inner_i : list
+        Converted inners; use _get_inner_i.
+    left : bool
+        Yields tensile layers; else yield compressive layers.
+    reverse : bool
+        Yield values in reverse order; useful for deque.extend.
+
+    '''
+    if reverse:
+        if left:
+            # Tensile inners
+            for inner in reversed(inner_i):
+                if isinstance(inner, tuple):
+                    yield inner[0]
+                else:
+                    yield inner
+        elif not left:
+            # Compressive inners
+            for inner in inner_i:
+                if isinstance(inner, tuple):
+                    yield inner[1]
+                else:
+                    yield inner
+    else:
+        if left:
+            # Tensile inners
+            for inner in inner_i:
+                if isinstance(inner, tuple):
+                    yield inner[0]
+                else:
+                    yield inner
+        elif not left:
+            # Compressive inners
+            for inner in reversed(inner_i):
+                if isinstance(inner, tuple):
+                    yield inner[1]
+                else:
+                    yield inner
+
+
+def _get_duples(token, swap=False):
     '''Return list of tuples given an outer or inner_i; (position, duple).
 
     If none found, return empty list.
@@ -26,6 +80,8 @@ def _get_duples(token):
     token: str
         A string representation of a geometry token (outer, inner_i or middle);
         this is NOT a full geometry string.
+    swap: bool
+        Swap the duple indices
 
     Returns
     -------
@@ -37,10 +93,12 @@ def _get_duples(token):
     --------
     >>> _get_duples('(300,100)')                            # outer token
     [(0, '(300.0, 100.0)']
-    >>> _get_duples('[100,(200.0,200),300]')                # inner_i token
-    [(5, '(200.0,200)')]
-    >>> _get_non_duples('[100,300]')                        # if non-duple, empty list
+    >>> _get_duples('[100,(150.0,50),300]')                 # inner_i token
+    [(5, '(150.0, 50.0)')]
+    >>> _get_duples('[100,300]')                            # if non-duple, empty list
     []
+    >>> _get_duples('(150.0,50)', swap=True)                # inner_i token
+    [(5, '(50.0, 150.0)')]
 
     Raises
     ------
@@ -71,6 +129,8 @@ def _get_duples(token):
         # Convert to float
         duple = duple.strip('()')
         duple = tuple(float(inner) for inner in duple.split(','))
+        if swap:
+            duple = (duple[1], duple[0])
         #print(duple)
 
         list_of_duples.append((pos, duple))
@@ -177,7 +237,7 @@ def _get_outer(token):
         return duples[0][1]
 
 
-def _get_inner_i(token):
+def _get_inner_i(token, reverse=False):
     '''Return a list of converted inners including duples.
 
     Parameters
@@ -185,11 +245,15 @@ def _get_inner_i(token):
     token : str
         String representation of inner_i layer_ ints, floats and duples
         e.g. '[100,(200.0,200),300]'
+    reversed : bool
+        Trigger reversal of the list and inner duples.
 
     Examples
     --------
-    >>> _get_inner_i('[100,(200.0,200),300]')
-    [100.0, (200.0, 200.0), 300.0]
+    >>> _get_inner_i('[100,(200.0,100),300]')
+    [100.0, (200.0, 100.0), 300.0]
+    >>> _get_inner_i('[100,(200.0,100),300]', reverse=True)
+    [300.0, (100.0, 200.0), 100.0]
 
     Notes
     -----
@@ -201,12 +265,17 @@ def _get_inner_i(token):
     Float conversions occur internally.
 
     '''
-    duples = _get_duples(token)
+    if reverse:
+        duples = _get_duples(token, swap=True)
+    else:
+        duples = _get_duples(token)
     non_duples = _get_non_duples(token)
 
     ordered_inner_i = sorted(duples + non_duples)
     inner_i = [inner for i, inner in ordered_inner_i]
 
+    if reverse:
+        return list(reversed(inner_i))
     return inner_i
 
 
@@ -239,18 +308,20 @@ def _get_middle(token):
 
 # TODO: Performance comparison of this function with Stack.decode_geometry().
 # Stack assembly
+
+# TODO: Replace with version 2; gives in accurate result for '(300,100)-[150,(75,50),25]-800'
 def _unfold_geometry(outer, inner_i, middle):
     '''Return an list of unfolded, stacking sequence given converted geo_string tokens.
 
     Parameters
     ----------
-    outer : str
+    outer : tuple
         The outer token of a parsed geometry string, split by '-'.  May contain
         a string representation of an int, float or duple.
-    inner_i : str
+    inner_i : list
         The inner_i token of a parsed geometry string, split by '-'.  May contain
         string representations of an ints, floats and/or duples.
-    middle: str
+    middle: float or int
         The middle token of a parsed geometry string, split by '-'.  Must contain
         a string representation of an float.  Use _get_middle().
 
@@ -313,7 +384,98 @@ def _unfold_geometry(outer, inner_i, middle):
     return stack_seq
 
 
+def _unfold_geometry2(geo_string):
+    '''Return an deque of the unfolded, stack sequence given a geo_string.
+
+    Parameters
+    ----------
+    geo_string : str
+        Unconverted geometry string.
+
+    Examples
+    --------
+    >>> g = '(300,100)-[150,(75,50),25]-800'               # outer and inner_i duples
+    >>> _unfold_geometry2(g)
+    [300.0, 100.0, 150.0, (75.0, 50.0), 25.0, 800.0,
+     25.0, (50.0, 75.0), 150.0, 100.0, 300.0]
+
+    Notes
+    -----
+    Unlike the Stack() parsing functions that decode Geometry objects, this function
+    decodes raw geometry strings. This approach may have even better performance benefits.
+    In this second version, deques build the stack from both ends instead of lists.
+    - Fewer conditionals and type checks (needed to parse inner_i)
+    - Bi-terminal stacking (further improved with possible multi-threading)
+
+    This function compensates for 1) the native, in-place reversal done by
+    `extend`and `extendleft`.  2) Swaps duple positions and final list positions
+    using the `reverse` keyword in `_get_inner_i()`. These internal reversal may
+    reduce performance.
+
+    Regular strings only need to reverse the inner_i sequence post middle.
+    Irregular strings must reverse inner_is, but parse indices of duples for all inner_i.
+    Thefore, special logic is applied to accomodate "duple switching" - parsing
+    tensile or compressive layers from duples at the right time.  The only option
+    known so far is to iterate forward and backward over inner_i (not ideal).
+
+    Performance:
+    >>> o = '(300,100)'
+    >>> i = ('78,4,65,6'* 10000) + ('(75,50,100,150,200,30,10)'* 10000)
+    >>> m = '800'
+    >>> geo_string = '-'.join([o,i,m])
+    >>> result = _unfold_geometry2(geo_string)
+    >>> %timeit result
+    The slowest run took 42.05 times longer than the fastest. This could mean
+    that an intermediate result is being cached 10000000 loops,
+    best of 3: 44.4 ns per loop
+
+    See Also
+    --------
+    - constructs.Stack.decode_geometry(): similar methodology applied to Geometry objects.
+    - _get_outer(), _get_inner_i(), _get_middle(): helper functions for preparing tokens.
+    - _unfold_geometry(): builds stacks with lists
+
+    '''
+    outer, inner_i, middle = la.input_.tokenize_geostring(geo_string)
+
+    # Middle ------------------------------------------------------------------
+    s = ct.deque([upt._get_middle(middle)])
+
+    logging.debug('Extending {}.  Running stack: {} '.format(middle, s))
+
+    # Inner_i -----------------------------------------------------------------
+    # Tensile
+#     rev_inner_i = list(reversed(upt._get_inner_i(inner_i)))
+#     s.extendleft(rev_inner_i)                              # handle nonduples
+    inners = upt._get_inner_i(inner_i)
+    inners_lt = process_inner_i(inners, left=True, reverse=True)
+    s.extendleft(inners_lt)
+    logging.debug('Rev. extending_lt.  Running stack: {} '.format(s))
+
+    # Compressive
+#     s.extend(upt._get_inner_i(inner_i, reverse=True))      # handle nonduples
+    inners_rt = process_inner_i(inners, left=False, reverse=False)
+    s.extend(inners_rt)
+    logging.debug('Rev. extending_rt.  Running stack: {} '.format(s))
+
+    # Outer -------------------------------------------------------------------
+    try:
+        outer_conv = (upt._get_outer(outer))
+        s.appendleft(outer_conv[0])                             # tensile
+        s.append(outer_conv[1])                                 # compressive
+        logging.debug('Appending duple indices {}.  Running stack: {} '.format(outer_conv, s))
+    except TypeError:
+        # If outer is an integer; no reversals required
+        s.appendleft(upt._get_outer(outer))
+        s.append(upt._get_outer(outer))
+        #logging.debug('Exception caught in outer parsing: {}'.format(e))
+        logging.debug('Appending {}.  Running stack: {} '.format(outer, s))
+
+    return s
+
+
 # Main function
+# TODO: REPLACE with newer _unfold_geometry2
 def analyze_geostring(geo_string):
     '''Return a tuple of nplies, thickness and order given a geo_string.'''
     # TODO: _to_gen_convention() needs to handle duples
