@@ -16,6 +16,7 @@
 
 import os
 import re
+import logging
 
 import pandas as pd
 import pandas.util.testing as pdt
@@ -366,7 +367,7 @@ def get_special_geometry(Frame):
 #         print('\n')
 #         print('Finished getting DataFrames.')
 
-
+# DEPRECATE: verbose; use logging instead
 def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
     '''Convert DataFrame to csv files and write them to a specified directory.
 
@@ -405,6 +406,7 @@ def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
     # Parse Laminate Properties
     nplies = LM.nplies
     p = LM.p
+    # TODO: Fix units
     t_total = LM.total * 1e3                               # (in mm)
     geometry = LM.Geometry.string
     df = LM.LMFrame
@@ -449,7 +451,8 @@ def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
 
     # Write DataFrame to csv file
     if verbose:
-        print('Writing DataFrame to csv in:', fullpath)
+        #print('Writing DataFrame to csv in:', fullpath)
+        logging.info('Writing DataFrame to csv in: {}'.format(fullpath))
 
     df.to_csv(fullpath)
     return fullpath
@@ -565,9 +568,9 @@ def is_matched(string, pattern=None):
 
     search = re.findall(pattern, string)                   # quick, non-iterative extraction
     for item in search:
-        if '[' or ']' in item:
+        if ('[' in item) or (']' in item):
             bra, ket = item.count('['), item.count(']')
-        if '(' or ')' in item:
+        if ('(' in item) or (')' in item):
             par, ren = item.count('('), item.count(')')
     #print(search, len(search))
     #print('l_bracket: {0}, r_bracket: {1}, '
