@@ -28,6 +28,8 @@ def tokenize_geostring(geo_string):
     # For now, assume strings are formated correctly
     #g_conv = la.input_.Geometry._to_gen_convention(geo_string)
 
+    # Check is_valid(); if not attempt to_gen_convention
+
     # Return tokens
     tokens = geo_string.split('-')
     return tokens

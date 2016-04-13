@@ -707,7 +707,7 @@ class Cases(ct.MutableMapping):
         # TODO: post-refactor and implementation in input_, uncomment equality tests for 400-200-800 in test_distributions
 
         if combine:
-            # TODO: DEV: deprecate post is_valid update for empty apply
+            # DEV: deprecate post is_valid update for empty apply
             if not caselets:                               # if empty arg
                 raise TypeError('combine=True: Invalid type detected for'
                                 ' caselets. Make list of geometry strings,'
