@@ -30,6 +30,10 @@ def tokenize_geostring(geo_string):
 
     # Check is_valid(); if not attempt to_gen_convention
 
+    # Prepare string
+    geo_string = geo_string.upper()                        # auto uppercase
+    geo_string = geo_string.replace(' ','')                # auto whitespace strip
+    
     # Return tokens
     tokens = geo_string.split('-')
     return tokens
