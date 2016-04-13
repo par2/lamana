@@ -70,6 +70,7 @@ def process_inner_i(inner_i, left=True, reverse=False):
                     yield inner
 
 
+# TODO: Need to handle ('400'); consider returning None instead of []
 def _get_duples(token, swap=False):
     '''Return list of tuples given an outer or inner_i; (position, duple).
 
@@ -99,6 +100,8 @@ def _get_duples(token, swap=False):
     []
     >>> _get_duples('(150.0,50)', swap=True)                # inner_i token
     [(5, '(50.0, 150.0)')]
+    # >>> _get_duples('(400)')                                # non_duple, give None
+    # None
 
     Raises
     ------
@@ -136,6 +139,9 @@ def _get_duples(token, swap=False):
         list_of_duples.append((pos, duple))
         logging.debug('Using _get_duple. position: {},'
                       ' duple: {} for string {}'.format(pos, duple, token))
+
+    # if not list_of_duples:                                 # if list is empty
+    #     return None
     return list_of_duples
     # TODO: should probably return None if list is empty, or none found
 
@@ -157,8 +163,10 @@ def _get_non_duples(token):
     [(0, '400.0')]
     >>> _get_non_duples('[100,(200.0,200),300]')           # inner_i token
     [(1, '100.0'), (17, '300.0')]
-    >>> _get_non_duples('[(200.0,200)]')                   # if duple, empty list
-    []
+    >>> _get_non_duples('[0]')                             # zero inner
+    [(1, '0.0')]
+    # >>> _get_non_duples('[(200.0,200)]')                   # if duple, empty list
+    # []
 
     Returns
     -------
@@ -185,18 +193,30 @@ def _get_non_duples(token):
 
     # NOTE: adding tests may require refining the regex pattern
     # Assume only duples and inners in the inner_i string
-    pattern = r'(?<![(\d+])(\d+\.*\d+ *\,*?)(?![\d\.)])'   # inners only; exlude duples
-    # Test string: '[100.0, (200.0, 200.0), 300, (100.0,300),(100,300.0)]'
+    # TODO: make a dictionary of regex patterns
+    # BUG: need to support single digits and decimal points (9 & 9.)
+    pattern = r'(?<![(\d+])(\d+\.*\d+ *\,*?)(?![\d\.)])'   # inners only; exclude duples
+    # TODO: Regex needs to exclude matching empty strings
+
+    #pattern = r'(?<![(\d+])(\d*\.*\d* *\,*?)(?![\d\.)])'   # inners only; exclude duples REG 001; breaking existing tests.  FIX
+    # Test string: '[100.0, (200.0, 200.0), 300, (100.0,300),(100,300.0),1, 1.]'
 
     list_of_non_duples = []
-    for match in re.finditer(pattern, token):
-        pos = match.start()
-        end = match.end()
-        #print(pos, end)
-        layer = float(token[pos:end])                     # convert to float
-        list_of_non_duples.append((pos, layer))
-        logging.debug('Using _get_nonduples. position: {},'
-                      ' layer: {} for string {}'.format(pos, layer, token))
+    for i, match in enumerate(re.finditer(pattern, token)):
+        if match.group() != '':                            # TODO: HACK remove post better pattern to reduce iterations
+            pos = match.start()
+            end = match.end()
+            #print('token {}, match {}, pos {}, end {}, loop {}'.format(token, match.group(), pos, end, i))
+            layer = float(token[pos:end])                  # convert to float
+            #print('layer: ', layer)
+            list_of_non_duples.append((pos, layer))
+            logging.debug(
+                'Using _get_nonduples. position: {},'
+                ' layer: {} for string {}, loop {}'.format(pos, layer, token, i)
+            )
+
+    # if not list_of_non_duples:                             # if list is empty
+    #     return None
     return list_of_non_duples
     # TODO: should probably return None if list is empty, or none found
 
@@ -233,6 +253,7 @@ def _get_outer(token):
         # Assumes if isinstance(non_duples[0][1], float)
         return non_duples[0][1]
     except(IndexError):
+    # except(IndexError, TypeError):                         # TypeError for None
         # Assumes if isinstance(duples[0][1], tuple)
         return duples[0][1]
 
@@ -272,6 +293,18 @@ def _get_inner_i(token, reverse=False):
     non_duples = _get_non_duples(token)
 
     ordered_inner_i = sorted(duples + non_duples)
+    ###
+    # Handle if either duples or non_duples is None
+    # try:
+    #     # None can't extend or be iterated
+    #     ordered_inner_i = sorted(duples.extend(non_duples))
+    # except (AttributeError, TypeError):
+    #     # Return the non-None variable; both can't be None, or invalid geo_string
+    #     if not duples:
+    #         ordered_inner_i = non_duples
+    #     else:
+    #         ordered_inner_i = duples
+    ###
     inner_i = [inner for i, inner in ordered_inner_i]
 
     if reverse:
