@@ -135,7 +135,78 @@ def test_get_middle1():
 #     nt.assert_equal(actual, expected)
 
 
+# Newly added 04-21-16
+def test_unfold_geometry2_1():
+    '''Check deque output is correct for various geometry strings.
 
+    - regular inner_i reverses
+    - irregular inner_i uses duple switching
+
+    '''
+    geo_strings = {
+        1: '400-[150,50]-800',                             # regular geometry string
+        2: '(300,100)-[150,50]-800',                       # irregualar geometry string; outer duple
+        3: '400-[(150,50)]-800',                           # irregualar geometry string; inner_i duple
+        4: '400-[150,(75,50),25]-800',                     # irregualar geometry string; inner_i duple and regular inners
+        5: '(300,100)-[150,(75,50),25]-800',               # irregualar geometry string; outer and inner_i duple + reg. inners
+    }
+
+    expected_stacks = {
+        1: [400.0, 150.0, 50.0, 800.0, 50.0, 150.0, 400.0],
+        2: [300.0, 150.0, 50.0, 800.0, 50.0, 150.0, 100.0],
+        3: [400.0, 150.0, 800.0, 50.0, 400.0],
+        4: [400.0, 150.0, 75.0, 25, 800.0, 25.0, 50.0, 150.0, 400.0],
+        5: [300.0, 150.0, 75.0, 25.0, 800.0, 25.0, 50.0, 150.0, 100.0],
+    }
+
+    for geo_string, expected in zip(geo_strings.values(), expected_stacks.values()):
+        #print(geo_string)
+        stack_deque = _unfold_geometry2(geo_string)
+        actual = list(stack_deque)
+        nt.assert_equals(actual, expected)
+
+
+def test_process_inner_i1():
+    '''Check extraction of tensile and compressive layers.'''
+    geo_strings = {
+        0: '[150,(75,50),25]',
+    }
+
+    expected_lists = {
+            # left             , right
+        0: [[150.0, 75.0, 25.0], [25.0, 50.0, 150.0]],
+    }
+
+    for g, expected in zip(geo_strings.values(), expected_lists.values()):
+        inner_i = upt._get_inner_i(g)
+
+        actual = [
+            list(process_inner_i(inner_i, left=True, reverse=False)),
+            list(process_inner_i(inner_i, left=False, reverse=False))
+        ]
+        nt.assert_equals(actual, expected)
+
+
+def test_process_inner_i2():
+    '''Check extraction of tensile and compressive layers.'''
+    geo_strings = {
+        0: '[150,(75,50),25]',
+    }
+
+    expected_lists = {
+            # left             , right
+        0: [[25.0, 75.0, 150.0], [150.0, 50.0, 25.0]],
+    }
+
+    for g, expected in zip(geo_strings.values(), expected_lists.values()):
+        inner_i = upt._get_inner_i(g)
+
+        left = list(process_inner_i(inner_i, left=True, reverse=True))
+        right = list(process_inner_i(inner_i, left=False, reverse=True))
+
+        actual = [left, right]
+        nt.assert_equals(actual, expected)
+# End of new
 
 
 def test_analyze_geostring1():
