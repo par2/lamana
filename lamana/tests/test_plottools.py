@@ -161,7 +161,7 @@ def test_unfold_geometry2_1():
 
     for geo_string, expected in zip(geo_strings.values(), expected_stacks.values()):
         #print(geo_string)
-        stack_deque = _unfold_geometry2(geo_string)
+        stack_deque = upt._unfold_geometry2(geo_string)
         actual = list(stack_deque)
         nt.assert_equals(actual, expected)
 
@@ -181,8 +181,8 @@ def test_process_inner_i1():
         inner_i = upt._get_inner_i(g)
 
         actual = [
-            list(process_inner_i(inner_i, left=True, reverse=False)),
-            list(process_inner_i(inner_i, left=False, reverse=False))
+            list(upt.process_inner_i(inner_i, left=True, reverse=False)),
+            list(upt.process_inner_i(inner_i, left=False, reverse=False))
         ]
         nt.assert_equals(actual, expected)
 
@@ -201,8 +201,8 @@ def test_process_inner_i2():
     for g, expected in zip(geo_strings.values(), expected_lists.values()):
         inner_i = upt._get_inner_i(g)
 
-        left = list(process_inner_i(inner_i, left=True, reverse=True))
-        right = list(process_inner_i(inner_i, left=False, reverse=True))
+        left = list(upt.process_inner_i(inner_i, left=True, reverse=True))
+        right = list(upt.process_inner_i(inner_i, left=False, reverse=True))
 
         actual = [left, right]
         nt.assert_equals(actual, expected)
