@@ -5,6 +5,7 @@
 
 import re
 import logging
+import collections as ct
 
 import matplotlib as mpl
 mpl.use('Agg')
@@ -472,7 +473,7 @@ def _unfold_geometry2(geo_string):
     outer, inner_i, middle = la.input_.tokenize_geostring(geo_string)
 
     # Middle ------------------------------------------------------------------
-    s = ct.deque([upt._get_middle(middle)])
+    s = ct.deque([_get_middle(middle)])
 
     logging.debug('Extending {}.  Running stack: {} '.format(middle, s))
 
@@ -480,7 +481,7 @@ def _unfold_geometry2(geo_string):
     # Tensile
 #     rev_inner_i = list(reversed(upt._get_inner_i(inner_i)))
 #     s.extendleft(rev_inner_i)                              # handle nonduples
-    inners = upt._get_inner_i(inner_i)
+    inners = _get_inner_i(inner_i)
     inners_lt = process_inner_i(inners, left=True, reverse=True)
     s.extendleft(inners_lt)
     logging.debug('Rev. extending_lt.  Running stack: {} '.format(s))
@@ -493,14 +494,14 @@ def _unfold_geometry2(geo_string):
 
     # Outer -------------------------------------------------------------------
     try:
-        outer_conv = (upt._get_outer(outer))
+        outer_conv = (_get_outer(outer))
         s.appendleft(outer_conv[0])                             # tensile
         s.append(outer_conv[1])                                 # compressive
         logging.debug('Appending duple indices {}.  Running stack: {} '.format(outer_conv, s))
     except TypeError:
         # If outer is an integer; no reversals required
-        s.appendleft(upt._get_outer(outer))
-        s.append(upt._get_outer(outer))
+        s.appendleft(_get_outer(outer))
+        s.append(_get_outer(outer))
         #logging.debug('Exception caught in outer parsing: {}'.format(e))
         logging.debug('Appending {}.  Running stack: {} '.format(outer, s))
 
