@@ -6,10 +6,13 @@
 
 import os
 import importlib
+#import logging
 import collections as ct
 import itertools as it
 
 import pandas as pd
+import matplotlib as mpl
+mpl.use('Agg')                                             # required to prevent DISPLAY error; must be before pyplot (REF 050)
 import matplotlib.pyplot as plt
 
 import lamana as la
@@ -167,6 +170,7 @@ class Case(object):
             df_properties.reindex(self._materials)    # set index order in view
         return df_properties
 
+    # TODO: accept kwargs
     def apply(self, geo_strings=None, model='Wilson_LT', unique=False):
         '''Apply geometries and laminate theory model to a `LaminateModel`.
 
@@ -223,6 +227,9 @@ class Case(object):
         self.Geometries = []
         self.model = model
 
+        # TODO: pre-process the geo_strings as caselets for consistency with Cases
+        # Replace geo_strings with caselet
+        #caselet = la.input_.to_caselet(geo_strings)
         '''Find way to convert unique geos and add to cache.'''
 
         # Defaults
@@ -231,8 +238,8 @@ class Case(object):
             raise ValueError("No geometries found.  Please input valid geometry, "
                              "e.g. '400-[200]-800.'")
             ##raise Exception("No geometries found.  Please input valid geometry, e.g. '400-[200-800.'")
-            '''Tried to exclude loop, but f(x) needs to iterate and make a list prior to unique.'''
-            '''Consider checking a unique appended cache iteratively.'''
+            # NOTE: Tried to exclude loop, but f(x) needs to iterate and make a list prior to unique.
+            # NOTE: Consider checking a unique appended cache iteratively.
 #         else:
 #             self._geo_strings = geo_strings
 
@@ -259,6 +266,7 @@ class Case(object):
             _geo_cache = set()
 
             for geometry in geometries:
+                # TODO: Move conversion to Caselet()
                 conv_geometry = la.input_.Geometry._to_gen_convention(geometry)
 
                 # Check a cache
@@ -284,6 +292,7 @@ class Case(object):
                     #print(_geo_cache)
                     #print(FeatureInput)
                     '''Is there a way to save a general FI for the Case?'''
+                    # TODO: accept kwargs
                     yield la.constructs.Laminate(FeatureInput)
 
             # DEPRECATED AttributeError exception.
@@ -380,6 +389,9 @@ class Case(object):
         if separate and len(LMs) > 1:                   # one plot is not multiplot
             caselets = LMs                              # will trigger exception handling
 
+###
+            # TODO: Replace with Cases.  Any figure with more the one subplot
+            # should be handled by Cases.
             # Defaults for processing unnormalized single geometries
             normalized = False if normalized is None else normalized
             subplots_kw.update(dict(ncols=2))
@@ -393,7 +405,7 @@ class Case(object):
                 grayscale=grayscale, annotate=annotate, subplots_kw=subplots_kw,
                 suptitle_kw=suptitle_kw, **kwargs
             )
-
+###
         # Single/Multiple Geometries ----------------------------------------------
         else:
             fig, ax = plt.subplots(**subplots_kw)           # Set fig dimensions and dpi
@@ -493,20 +505,16 @@ class Case(object):
     def snapshots(self):
         '''Return a list of DataFrames of laminate snapshots without theory
         applied.  Gives a quick view of the stack (as if p = 1).
+
         '''
         print('Accessing snapshot method.')
         return list(LM.Snapshot for LM in self.LaminateModels)
 
     @property
     def frames(self):
-        '''Return a list of DataFrames of the LaminateModel object from the
-        Laminate class.
-
-        Examples
-        --------
-        >>> case1.frames
-        [<LaminateModel object>]
-        '''
+        '''Return a list of LaminateModel DataFrames (LMFrames) `Laminate()` class.'''
+        # TODO Convert to logging
+        #logging.INFO('Accessing frames method in self.__class__.__name__ ...')
         print('Accessing frames method.')
         return list(LM.LMFrame for LM in self.LaminateModels)
 
@@ -520,35 +528,40 @@ class Case(object):
         '''Return number of a Laminates.'''
         return len(self.LaminateModels)
 
+
 # =============================================================================
 # UTILITY ---------------------------------------------------------------------
 # =============================================================================
 # Builds and handles multiple cases simultaneously
-
 class Cases(ct.MutableMapping):
-    '''Return a dict of Case objects.
+    '''Return a dict-like object of enumerated Case objects.
 
     This is useful for situations requiring laminates with different geometries,
-    thicknesses and ps.
+    thicknesses and ps.  This is not a dict.
 
     Characteristics:
 
     - if user-defined, tries to import `Defaults()` to simplify instantiations
     - dict-like storage and access of cases
-    - iterable by values
-    - sliceable; returns a selection of cases
-    - subset selection methods of LaminateModels
-    - set operations for subset selections
+    - list-like ordering of cases
+    - gettable: list-like, get items by index (including negative indicies)
+    - sliceable: slices the dict keys of the Cases object
+    - viewable: contained LaminateModels
+    - iterable: by values (unlike normal dicts, not by keys)
+    - writable: write DataFrames to csv files
+    - selectable: perform set operations and return unique subsets
 
-    Parameters
+    Attributes
     ----------
+    LMs
+    frames
     caselets : list
         Containing geometry strings, lists of geometry strings or cases
         (as of 0.4.4b3).
     load_params : dict; default None
         Passed-in geometric parameters if specified; else default is used.
     mat_props : dict; default None
-        Passed-in materials parameters if specidfied; else default is used.
+        Passed-in materials parameters if specified; else default is used.
     ps : list of ints
         `p` values to be looped over; `p` sets the number of rows per DataFrame.
     model : str; default None
@@ -559,10 +572,20 @@ class Cases(ct.MutableMapping):
         If True and given a series of intersecting `caselets` (specifically
         geometry strings), return unique geometries per `caselet`.
     combine : bool; default False
-        Combines `caselets` into a single case. Convenience, complementary
-        keyword to Case(separate=True).
+        Combines `caselets` into one case. Convenience, complementary
+        keyword to Case(separate=True) that makes a case for each caselet.
+        combine=False assumes single cases must be made.
     #defaults_path : str
         Custom path from which to import Defaults().
+
+    Methods
+    -------
+    select(nplies=None, ps=None, how='union')
+        Return a set (subset) of LaminateModels given keyword conditions.
+    plot(**kwargs)
+        BETA (0.4.4b3): Plot caselets as subplots.
+    to_csv(path=None, verbose=True, **kwargs):
+        Write all collected LaminateModels as csv files to a specified path.
 
     Raises
     ------
@@ -576,11 +599,14 @@ class Cases(ct.MutableMapping):
     Cases of different ps, accepting a list of geometry strings
 
     >>> from lamana.distributions import Cases
-    >>> cases = Cases('dft.geo_inputs['5-ply'], ps=[2,3])
+    >>> cases = Cases(dft.geo_inputs['5-ply'], ps=[2,3])
     >>> cases
     {0: <<class 'lamana.distributions.Case'> p=2, size=3>,
-     1: <<class 'lamana.distributions.Case'> p=3, size=3>}
+     1: <<class 'lamana.distributions.Case'> p=3, size=3>
+     ...
+     }
 
+    # TODO: Fix example
     Accepts a dict of listed geometry strings (precursors for caselets)
 
     >>> dict_caselets = {
@@ -599,16 +625,16 @@ class Cases(ct.MutableMapping):
      1: <<class 'lamana.distributions.Case'> p=5, size=6>}
      2: <<class 'lamana.distributions.Case'> p=5, size=6>,}
 
-    Cases instances are iterable by values (default)
+    `Cases` instances are iterable by values (default)
 
     >>> for case in cases:
     ...    print(case.LMs)
-    [<lamana LaminateModel object (400.0-[200.0]-800.0), p=2>,
+    [[<lamana LaminateModel object (400.0-[200.0]-800.0), p=2>,
      <lamana LaminateModel object (400.0-[200.0]-800.0), p=2>,
-     <lamana LaminateModel object (400.0-[200.0]-400.0S), p=2>]
+     <lamana LaminateModel object (400.0-[200.0]-400.0S), p=2>],
     [<lamana LaminateModel object (400.0-[200.0]-800.0), p=3>,
      <lamana LaminateModel object (400.0-[200.0]-800.0), p=3>,
-     <lamana LaminateModel object (400.0-[200.0]-400.0S), p=3>]
+     <lamana LaminateModel object (400.0-[200.0]-400.0S), p=3>]]
 
     >>> (LM for case in cases for LM in case.LMs)
     <generator object>
@@ -621,8 +647,14 @@ class Cases(ct.MutableMapping):
     - cases: group of cases, particularly with a similar pattern of interest or
       different rows (`p`).
     - caselet: a subset of cases or LMs; geometry string, list or case (See LPEP 003)
+    - DEPRECATED (0.4.11.dev0) __getslice__; affects < Python 2.6
+
+    See Also
+    --------
+    - Demonstration notebook for applied API
 
     '''
+    # TODO: rename caselets arg to input? since the input type is unknown at first
     def __init__(
         self, caselets, load_params=None, mat_props=None, ps=None,
         model=None, verbose=False, unique=False, combine=False,
@@ -642,13 +674,17 @@ class Cases(ct.MutableMapping):
             modified_name = ''.join(['.', self.model])     # '.Wilson_LT'
             module = importlib.import_module(modified_name, package='lamana.models')
             dft = module.Defaults()                        # triggers handling parameters
+            # TODO: Add logging.INFO('Using model {}'.format(self.model))
         except (ImportError):
             print('User-defined Defaults not found.')
+            # TODO: Add logging.INFO('User-defined Defaults not found.')
+            pass
 
         # Try to set defaults from auto imports, else set whats passed in.
         if load_params is None:
             try:
                 self.load_params = dft.load_params
+                # TODO: Add logging.INFO('Using defaults loading parameters from {}'.format(self.model))
             except (AssertionError):
                 raise ImportError('models.Defaults() not found.  Assign load_params.')
         else:
@@ -656,6 +692,7 @@ class Cases(ct.MutableMapping):
         if mat_props is None:
             try:
                 self.mat_props = dft.mat_props
+                # TODO: Add logging.INFO('Using defaults material parameters from {}'.format(self.model))
             except (AssertionError):
                 raise ImportError('models.Defaults() not found.  Assign mat_props.')
         else:
@@ -664,15 +701,21 @@ class Cases(ct.MutableMapping):
         # Setup caselets
         # Logic starts here, for defining the hashable class _dict_caselets.
         # Needs latter model, load_params and mat_props defined first
-        # Combining caselets here is convenient if a pattern us already setup
-        # rather than make a new make separate Case for each manually.
-        '''Try to clean up with multiple exceptions rather than isinstance().'''
+        # Combining caselets here is convenient if a pattern is already setup
+        # rather than manually make a new, separate Case for each.
+        # TODO: Try to clean up with multiple exceptions rather than isinstance().
+        # TODO: post-refactor and implementation in input_, uncomment equality tests for 400-200-800 in test_distributions
+
         if combine:
-            '''DEV: deprecate post is_valid update for empty apply'''
-            if not caselets:
-                raise TypeError('combine=True: Invalid type detected for '
-                                'caselets. Make list of geometry strings, '
-                                'lists of geometry strings or cases.')
+            # DEV: deprecate post is_valid update for empty apply
+            if not caselets:                               # if empty arg
+                raise TypeError('combine=True: Invalid type detected for'
+                                ' caselets. Make list of geometry strings,'
+                                ' lists of geometry strings or cases.')
+
+        # TODO: pre-process the caselets into Caselets;
+        # Simply build cases based on the caselet_input dict
+###
             try:
                 # Assuming a list of geometry strings
                 case_ = la.distributions.Case(self.load_params, self.mat_props)
@@ -682,7 +725,7 @@ class Cases(ct.MutableMapping):
                     case_.apply(caselets)
                 self.caselets = [case_]
                 # TODO: Brittle; need more robust try-except
-            except(AttributeError):
+            except(AttributeError, TypeError):             # raised from Geometry._to_gen_convention()
                 try:
                     # if a list of lists
                     flattened_list = list(it.chain(*caselets))
@@ -703,14 +746,45 @@ class Cases(ct.MutableMapping):
             self.caselets = [self._get_unique(caselet) for caselet in caselets]
             #print(self.caselets)
         else:
-            self.caselets = caselets
+            # TODO: Redo redundancy; unify caselet handling
+            # TODO: accepts onything for caselets, which can break equality
+            #### BUG: Critical; bypassed all the type handling for input caselet
+            #### Need to handle caselets here too
+            # Hack for now for converting any geo_string in caselets to gen_conven.
+            # Move input handling of Cases to input_
+            # logging.DEBUG('Caselets not using `combine`.')
+            print('Caselets not using `combine`.')
+            # Try to convert all strings
+            if isinstance(caselets, list):
+                try:
+                    # Assume list of geometry strings
+                    caselets = [
+                        la.input_.Geometry._to_gen_convention(caselet)
+                        for caselet in caselets
+                    ]
+                except(TypeError):
+                    # Assume list of lists of strings
+                    try:
+                        caselet_lsts = []
+                        for caselet in caselets:
+                            caselet_lst = []
+                            for geo_string in caselet:
+                                conv = la.input_.Geometry._to_gen_convention(geo_string)
+                                caselet_lst.append(conv)
+                            caselet_lsts.append(caselet_lst)
+                        caselets = caselet_lsts
+                    except(TypeError):
+                        pass
 
+            self.caselets = caselets
+###
         # Build a dict of cases; and a separate case for each p.
         if self.ps is None:                                # ignore ps
             #
             iterable = self._convert_caselets(self.caselets)
             self._dict_caselets = dict((i, case) for i, case in iterable)
         else:                                              # Iterate ps
+            # TODO: Rename list_; what kind of list?
             list_ = []
             for p in ps:
                 if isinstance(p, int):
@@ -719,7 +793,7 @@ class Cases(ct.MutableMapping):
                     list_cases = [case for i, case in iterable]
                 else:
                     raise TypeError('Non-integer detected.  p must be an integer.')
-                    '''Test raise exception if p is not int.'''
+                '''Test raise exception if p is not int.'''
                 list_.extend(list_cases)
             # Reorder dict
             self._dict_caselets = {i: case for i, case in enumerate(list_)}
@@ -744,6 +818,8 @@ class Cases(ct.MutableMapping):
                 # case1 --> <case>
                 case_ = caselet_
             elif isinstance(caselet_, la.distributions.Case) and self.ps:
+                # TODO: clarify
+                # TODO: should be covered by test_Cases_caselets_ps3(); ?
                 # case1 --> <case>; redo case
                 geo_strings = [LM.Geometry.string for LM in caselet_.LMs]
                 case_ = self._get_case(geo_strings)
@@ -774,7 +850,7 @@ class Cases(ct.MutableMapping):
         '''
         if isinstance(caselet_, str):
             print('Single geometry string detected. unique not applied.'
-                  'See combine=True keyword.')
+                  ' See combine=True keyword.')
             return caselet_
         elif isinstance(caselet_, la.distributions.Case):
             # Extract the list of geometry strings from the case
@@ -803,19 +879,51 @@ class Cases(ct.MutableMapping):
         #print(self.mat_props)
 
     def __setitem__(self, key, value):
-        raise NotImplementedError('Reinstantiate Cases instead.')
+        # As the dict type is custom, setting to a Cases() object is prohibited.
+        raise NotImplementedError('Setting to a Cases() object is prohibited.'
+                                  ' Please reinstantiate Cases() instead.')
 
     def __getitem__(self, key):
-        if isinstance(key, slice):
+        ##if isinstance(key, int) and key == -1:
+        ##    # Turn key = -1 to key = slice(0, -1, 0)
+        ##    key = slice(key)
+        if isinstance(key, int) and key < 0:
+            # Allow key to act as a negative slice index; case[-1] --> slice(None, -1, None)
+            key = len(self._dict_caselets) + key
+        elif isinstance(key, slice):
+            # Needs to handle None since dict doesn't know
             #print(key.start, key.stop, key.step)
+            if key.start is None:
+                start = 0
+            else:
+                start = key.start
+            if key.stop is None:
+                stop = len(self._dict_caselets)
+            elif key.stop < 0:
+                # Negative stop indicies
+                stop = len(self._dict_caselets) + key.stop
+            else:
+                stop = key.stop
             if key.step is None:
                 step = 1
-            slicedkeys = range(key.start, key.stop, step)
+            # TODO: implement negative steps and reverse index [::-1]
+            else:
+                step = key.step
+            ##slicedkeys = range(key.start, key.stop, step)
+            #print(len(self._dict_caselets), self._dict_caselets)
+            #print(start, stop, step)
+            slicedkeys = range(start, stop, step)
+            #print(slicedkeys)
             return [self._dict_caselets[k] for k in slicedkeys]
         return self._dict_caselets[key]
 
-    def __getslice__(self, i, j):                          # Python 2
-        return self.__getitem__(slice(i, j))
+    ##def __getslice__(self, i, j):                          # Python 2
+    ##    return self.__getitem__(slice(i, j))
+
+    # DEPRECATED 0.4.11.dev0: caused conflict using [:]
+    ##def __getslice__(self, *args):                           # Python < 2.6
+    ##    #print(args)
+    ##    return self.__getitem__(slice(*args))
 
     def __delitem__(self, key):
         del self._dict_caselets[key]
@@ -875,6 +983,7 @@ class Cases(ct.MutableMapping):
 
         cases = self
 
+        # NOTE: ? we should set a default int to ps
         # Set defaults
         ##selected = []
         if nplies is None:
@@ -902,6 +1011,7 @@ class Cases(ct.MutableMapping):
             '''Order of set is important here'''
         elif how.startswith('dif'):
             return set(LMs_by_ps).difference(LMs_by_nplies)
+        # TODO: there is a test for sym diff.  Not sure why this branch is missing.
         elif how.startswith('sym'):
             return set(LMs_by_ps).symmetric_difference(LMs_by_nplies)
 
@@ -956,17 +1066,56 @@ class Cases(ct.MutableMapping):
                               subplots_kw=subplots_kw, suptitle_kw=suptitle_kw,
                               **kwargs)
 
-    def to_csv(self, path=None):
-        '''Write all DataFrames to a path; output directory (default).'''
-        if path is None:
-            path = os.getcwd()                             # use for the test in the correct path
-            path = path + r'\lamana\output'                # default
+    def to_csv(self, path=None, verbose=True, **kwargs):
+        '''Write all collected LaminateModels as csv files to a specified path.
 
-        for LM in self.LMs:
-            ut.write_csv(LM, path=path, verbose=True)
+        Parameters
+        ----------
+        path : str, default: None
+            Send files to this path; "export" directory (default).
+        verbose : bool, default: True
+            Inform on what files have been written and where.
+        kwargs : {overwrite|prefix}, optional
+            Optional keyword arguments for write_csv function.
+
+        See Also
+        --------
+        - utils.tools.write_csv: defaults writing any csv file to to export directory.
+        - test_tools_write1: useful function for writing, testing and removing files.
+
+        Returns
+        -------
+        list
+            List of pathnames of written files.
+
+        '''
+        # DEPRECATED 0.4.11.dev0
+#        if path is None:
+#            path = os.getcwd()                             # use for the test in the correct path
+#            path = path + r'\lamana\output'                # default
+        #for LM in self.LMs:
+            #ut.write_csv(LM, path=path, verbose=verbose, **kwargs)
+
+        return list(ut.write_csv(LM, path=path, verbose=verbose, **kwargs)
+            for LM in self.LMs)
 
     @property
     def LMs(self):
         '''Return a unified list of LaminateModels by processing all cases.'''
         cases = self                                       # since self iters values
         return list(LM for case in cases for LM in case.LMs)
+
+    @property
+    def frames(self):
+        '''Return a list of LaminateModels DataFrames (LMFrames).
+
+        See Also
+        --------
+        - Case().frames: original frames method.
+
+        '''
+        # TODO: Add logging here and in Case()
+        #logging.INFO('Accessing frames method in self.__class__.__name__ ...')
+        print('Accessing frames method.')
+        cases = self
+        return list(LM.LMFrame for case in cases for LM in case.LMs)

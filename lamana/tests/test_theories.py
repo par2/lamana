@@ -14,6 +14,32 @@ cases = ut.laminator(geos=dft.geos_all, ps=[2, 3, 4, 5], verbose=True)
 
 
 # TESTS -----------------------------------------------------------------------
+def test_theories_BaseModel_attr1():
+    '''Check BaseModel attributes are initialized as None.'''
+    BM = la.theories.BaseModel()
+    actual1 = BM.model_name
+    actual2 = BM.LaminateModel
+    actual3 = BM.FeatureInput
+    expected = None
+
+    nt.assert_equal(actual1, expected)
+    nt.assert_equal(actual2, expected)
+    nt.assert_equal(actual3, expected)
+
+
+def test_theories_BaseModel_print1():
+    '''Check BaseModel.__repr__ output.'''
+    BM = la.theories.BaseModel()
+    actual = BM.__repr__()
+    expected = '<BaseModel object>'
+    #print(actual, expected)
+    #assert actual == expected
+    nt.assert_equal(actual, expected)
+
+
+# TODO: add test to cover sub-classing
+
+
 def test_theories_FeatureInput_globals1():
     '''Check globals are correct in updated FeatureInput for 400-[200]-800 post-theories.'''
     case = ut.laminator(geos=dft.geos_standard)

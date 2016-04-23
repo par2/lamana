@@ -4,6 +4,8 @@
 import nose.tools as nt
 
 import lamana as la
+#from lamana.lt_exceptions import FormatError, InvalidError
+from lamana.lt_exceptions import FormatError
 from lamana.input_ import BaseDefaults
 from lamana.models import Wilson_LT as wlt
 from lamana.utils import tools as ut
@@ -70,6 +72,86 @@ mat_props = {
 # Or geometry lists (geo_name) are iterated to test Geometry object creation.
 '''Can the list comparison be sped up.'''
 '''https://pythonhosted.org/testfixtures/comparing.html#generators'''
+
+
+# Test String Conversion and Types
+def test_tokenize_geostring1():
+    '''Check result is converted outer, inner_i, middle tokens.'''
+    # Parse geometry string by dashes
+    geo_strings = {
+        0: '400-[150,50]-800',                             # regular geometry string
+        1: '(300,100)-[150,50]-800',                       # irregualar geometry string; outer duple
+        2: '400-[(150,50)]-800',                           # irregualar geometry string; inner_i duple
+        3: '400-[150,(75,50),25]-800',                     # irregualar geometry string; inner_i duple and regular inners
+        4: '(300,100)-[150,(75,50),25]-800',               # irregualar geometry string; outer and inner_i duple + reg. inners
+    }
+
+    # TODO: Change post general convention fix
+    expected_lists = {
+        0: ['400', '[150,50]', '800'],
+        1: ['(300,100)', '[150,50]', '800'],
+        2: ['400', '[(150,50)]', '800'],
+        3: ['400', '[150,(75,50),25]', '800'],
+        4: ['(300,100)', '[150,(75,50),25]', '800'],
+    }
+    for geo_string, expected in zip(geo_strings.values(), expected_lists.values()):
+        actual = la.input_.tokenize_geostring(geo_string)
+        nt.assert_equals(actual, expected)
+
+
+def test_geo_inner1():
+    '''Check non-decimal inner converts to decimal.'''
+    # Convert inside string '200' to 200.0 if brackets aren't found
+    conv = la.input_.Geometry._to_gen_convention
+    geo1 = '400-200-800'
+    geo2 = '400-200.0-800'
+    expected = '400.0-[200.0]-800.0'
+    nt.assert_equal(conv(geo1), expected)
+    nt.assert_equal(conv(geo2), expected)
+
+# Test Exception Handling in _to_gen_convention()
+@nt.raises(TypeError)
+def test_geo_string1():
+    '''Throw TypeError if geo_input is non-string; list'''
+    err = G(['400-200-800'])                               # list
+
+
+@nt.raises(TypeError)
+def test_geo_string2():
+    '''Throw TypeError if geo_input is non-string; floats'''
+    err = G(400, 200, 800)                                 # floats
+
+
+@nt.raises(FormatError)
+def test_geo_token1():
+    '''Check geo_input throws Exception if less than 3 tokens.'''
+    G('400-200')
+
+
+@nt.raises(FormatError)
+def test_geo_token2():
+    '''Check geo_input throws Exception if more than 3 tokens; 4 splits.'''
+    G('400-200-800-100')
+
+
+@nt.raises(FormatError)
+def test_geo_letters1():
+    '''Check geo_input throws Exception if non-'S' letter found.'''
+    G('400-200-800A')
+
+
+@nt.raises(FormatError)
+def test_geo_letters2():
+    '''Check geo_input throws Exception if more than one letter found.'''
+    G('400-200-800SS')
+
+
+# Test Validations of geo_strings
+
+#@nt.raises(InvalidError)
+#def test_laminator_validation1():
+#    '''Check valid: if inner, must have outer.'''
+#    case = ut.laminator(['0-200-400S'])
 
 
 # Test Geometry() Attributes
@@ -303,8 +385,9 @@ def test_Geo_ne1():
         nt.assert_not_equal(actual, expected)
 
 
+# TODO: Make global manual standard Geos for these comparisons
 # Instance comparisons
-def test_Geo_compare_instances1():
+def test_Geo_compare_instances1a():
     '''Check __eq__ between hashable Geometry object instances.'''
     G1 = la.input_.Geometry('400-[200]-800')
     G2 = la.input_.Geometry('400-[200]-800')
@@ -318,6 +401,22 @@ def test_Geo_compare_instances1():
     nt.assert_equal(G1, G3)
     nt.assert_equal(G2, G1)
     nt.assert_equal(G3, G1)
+
+
+def test_Geo_compare_instances1b():
+    '''Check __eq__ between hashable Geometry object instances.'''
+    G1 = la.input_.Geometry('400-[200]-800')
+    G2 = la.input_.Geometry('400-[200]-800')
+    G3 = la.input_.Geometry('400-200-800')
+
+    #assert G1 == G2
+    #assert G1 == G3
+    #assert G2 == G1
+    #assert G3 == G1
+    nt.assert_true(G1 == G2)
+    nt.assert_true(G1 == G3)
+    nt.assert_true(G2 == G1)
+    nt.assert_true(G3 == G1)
 
 
 def test_Geo_compare_instances2():
@@ -508,8 +607,8 @@ def test_Geo_print1():
     actual = la.input_.Geometry(geo_input).__repr__()
     expected = 'Geometry object (400.0-[200.0]-800.0)'
     #print(actual, expected)
-    assert actual == expected
-    #nt.assert_equal(actual, expected)
+    #assert actual == expected
+    nt.assert_equal(actual, expected)
 
 
 def test_Geo_print2():
@@ -518,8 +617,8 @@ def test_Geo_print2():
     actual = la.input_.Geometry(geo_input).__repr__()
     expected = 'Geometry object (400.0-[200.0]-400.0S)'
     #print(actual, expected)
-    assert actual == expected
-    #nt.assert_equal(actual, expected)
+    #assert actual == expected
+    nt.assert_equal(actual, expected)
 
 
 def test_Geo_print3():
@@ -528,8 +627,8 @@ def test_Geo_print3():
     actual = la.input_.Geometry(geo_input).__str__()
     expected = '400.0-[200.0]-800.0'
     #print(actual, expected)
-    assert actual == expected
-    #nt.assert_equal(actual, expected)
+    #assert actual == expected
+    nt.assert_equal(actual, expected)
 
 
 def test_Geo_print4():
@@ -538,8 +637,9 @@ def test_Geo_print4():
     actual = la.input_.Geometry(geo_input).__str__()
     expected = '400.0-[200.0]-400.0S'
     #print(actual, expected)
-    assert actual == expected
-    #nt.assert_equal(actual, expected)
+    #assert actual == expected
+    nt.assert_equal(actual, expected)
+
 
 # BaseDefaults ----------------------------------------------------------------
 # Defaults can change.  If Defaults are altered, static tests will break.
@@ -803,7 +903,7 @@ def test_BaseDefaults_inner_i1():
 
 
 def test_BaseDefaults_genconvention1():
-    '''Confirm general conventions of are in a 'variable' attribute.'''
+    '''Confirm general conventions are in a 'variable' attribute.'''
     default_dict = bdft.geo_inputs['general conv.']        # dict
     default_attr = bdft.geos_general                       # attribute
     expected = [
@@ -826,7 +926,7 @@ def test_BaseDefaults_genconvention1():
 
 
 def test_BaseDefaults_unconventional1():
-    '''Confirm unconventionals of are in a 'variable' attribute.'''
+    '''Confirm unconventionals are in a 'variable' attribute.'''
     default_dict = bdft.geo_inputs['unconventional']       # dict
     default_attr = bdft.geos_unconventional                # attribute
     expected = [
@@ -839,6 +939,7 @@ def test_BaseDefaults_unconventional1():
         '400-200-800',
         '400-200-400S',
     ]
+    print(default_attr)
     # Allows extension in BaseDefaults().geo_inputs
     actual1 = (set(default_dict) >= set(expected))
     actual2 = (set(default_attr) >= set(expected))
@@ -969,6 +1070,14 @@ def test_BaseDefaults_generate_Geos3():
         nt.assert_true(Geo_object3.is_symmetric)
 
 
+def test_BaseDefaults_generate_Geo4():
+    '''Check TypeError is consumed if invalid None key given to Geo_objects dict.'''
+    gen = bdft.generate(selection=None, geo_inputs=False)
+    actual = list(gen)
+    expected = bdft.Geo_objects['all']
+    nt.assert_equal(actual, expected)
+
+
 def test_BaseDefaults_generate_geo1():
     '''Check .generate yields a consumable generator.'''
     gen = bdft.generate(selection=['5-ply'], geo_inputs=True)
@@ -1009,10 +1118,18 @@ def test_BaseDefaults_generate_geos3():
         nt.assert_equal(geo_input1, geo_input3)
 
 
+def test_BaseDefaults_generate_geo5():
+    '''Check TypeError is consumed if invalid None key given to geos_input dict.'''
+    gen = bdft.generate(selection=None, geo_inputs=True)
+    actual = list(gen)
+    expected = bdft.geo_inputs['all']
+    nt.assert_equal(actual, expected)
+
+
 @nt.raises(KeyError)
-def test_BaseDefaults_generate_geo4():
+def test_BaseDefaults_generate_geo5():
     '''Check KeyError is raised is key is not found in geos_input dict.'''
-    gen = bdft.generate(selection=['non-key'], geo_inputs=True)
+    gen = bdft.generate(selection=['invalid-key'], geo_inputs=True)
     actual = list(gen)
     expected = ['400-200-800', '400-[200]-800', '400-200-400S']
     nt.assert_equal(actual, expected)

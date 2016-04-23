@@ -16,6 +16,7 @@ dft = wlt.Defaults()
 
 
 # SETUP -----------------------------------------------------------------------
+# TODO: Move to utils and test
 def fix_discontinuities(laminate, inner_i):
     '''Replace t_ Nan values at discontinuities with adjacent value for inner_i.
 
@@ -29,13 +30,11 @@ def fix_discontinuities(laminate, inner_i):
 
     # Tensile side
     discTensidx = df.loc[
-        (df['label'] == 'discont.') & (df['type'] == 'inner')
-        & (df['side'] == 'Tens.'), 't(um)'
+        (df['label'] == 'discont.') & (df['type'] == 'inner') & (df['side'] == 'Tens.'), 't(um)'
     ].index.tolist()
     # Compressive side
     discCompidx = df.loc[
-        (df['label'] == 'discont.') & (df['type'] == 'inner')
-        & (df['side'] == 'Comp.'), 't(um)'
+        (df['label'] == 'discont.') & (df['type'] == 'inner') & (df['side'] == 'Comp.'), 't(um)'
     ].index.tolist()
     #print(discTensidx)
     #print(df)
@@ -50,6 +49,7 @@ def fix_discontinuities(laminate, inner_i):
     return df
 
 
+# TODO: Move to utils and test
 def extract_dataframe(df):
     '''Parse corrected DataFrame from a csv file; legacy, automated or custom.'''
     df_expected = df.copy()
@@ -89,6 +89,10 @@ def extract_dataframe(df):
     # Primarily for custom controls
     geo = geometry.split('-')
     #print(geo)
+
+    #### Look closely at affects of this commit 6f5f518fa42099fcbda37c1a15986a88a04e38c5
+    #### Check that files are not influenced; reverting should be commenting _to_gen_convention get_..._geometry
+    # TODO: Refactor; this section is not needed with _to_gen_convention in get_multi_geometry and get_special_geometry
     outer = float(geo[0])
     if '[' in geo[1]:
         inners = geo[1][1:-1].split(',')
@@ -99,6 +103,8 @@ def extract_dataframe(df):
     else:
         inner_i = float(geo[1])
     #print(inner_i)
+    ####
+
     df_expected.loc[
         (df_expected['label'] == 'discont.') & (df_expected['type'] == 'outer'),
         't(um)'] = outer
@@ -125,7 +131,7 @@ def test_apply_LaminateModels_cols_dimensions1():
     #path = path + r'\controls_LT'                          # for test
 
     # Read all files in the path (REF 013)
-    for file in ut.read_csv_dir(path):
+    for file, filepath in ut.read_csv_dir(path):
         #df_expected = file
         df = file
         #print(df_expected)
@@ -140,7 +146,7 @@ def test_apply_LaminateModels_cols_dimensions1():
 
         # Compare the dimensional columns only
         '''Bypassing z(m), z(m)*, intf and k for now'''
-        '''UPDATE: k add back in 0.4.4b'''
+        # UPDATE: `k` added back in 0.4.4b
         ###
         cols = ['layer', 'side', 'type', 'matl',
         #        'label', 't(um)', 'h(m)', 'd(m)', 'intf', 'k', 'Z(m)', 'z(m)']
@@ -189,14 +195,14 @@ def test_apply_LaminateModels_cols_models1():
     # Prepare file path.
     # Depends which directory nosetests is rum
     #path = os.getcwd()                                     # use for the test in the correct path
-    path = os.path.join(os.getcwd(), 'lamana', 'tests', 'controls_LT') # for builds
+    path = os.path.join(os.getcwd(), 'lamana', 'tests', 'controls_LT')  # for builds
     #path = path + r'\lamana\tests\controls_LT'             # for Main Script. Comment out in tests
     #path = path + r'\tests\controls_LT'                    # for test
     #path = os.path.join(os.getcwd(), 'tests', 'controls_LT')          # for test
     #path = path + r'\controls_LT'                          # for test
 
     # Read all files in the path (REF 013)
-    for file in ut.read_csv_dir(path):
+    for file, filepath in ut.read_csv_dir(path):
         #df_expected = file
         df = file
         #print(df_expected)
@@ -252,6 +258,7 @@ def test_apply_LaminateModels_cols_models1():
         #print(expected1.dtypes)
         #print(actual1.dtypes)
         print('\n')
+
         ut.assertFrameEqual(actual1, expected1, check_dtype=False)  # max stress rows
         if p > 1:                                                   # min stress rows
             ut.assertFrameEqual(actual2, expected2, check_dtype=False)

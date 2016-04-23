@@ -149,10 +149,13 @@ lamana.distributions.Cases.plot : makes call to `_multiplot()`.
 
 
 import math
+import logging
 import itertools as it
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+
+from lamana.lt_exceptions import InputError, PlottingError
 
 
 
@@ -172,11 +175,44 @@ LAMANA_PALETTES = dict(
 # Process plotting figures of single and multiple subplots
 
 
-def _cycle_depth(iterable, n=None):
-    '''Return a cycler that iterates n items into an iterable.'''
-    if n is None:
-        n = len(iterable)
-    return it.cycle(it.islice(iterable, n))
+#def _cycle_depth(iterable, n=None):
+#    '''Return a cycler that iterates n items into an iterable.'''
+#    if n is None:
+#        n = len(iterable)
+#    return it.cycle(it.islice(iterable, n))
+
+
+def _cycle_depth(iterable, depth=None):
+    '''Return an itertools.cycle that slices the iterable by a given depth.
+
+    Parameters
+    ----------
+    iterable : iterable
+        A container of infinite length.
+    depth : int
+        A index value; if None, cycle the entire iterable.
+
+    Examples
+    --------
+    >>> # Depth:  1    2    3    4    5    6
+    >>> iter_ = ['A', 'B', 'C', 'D', 'E', 'F']
+    >>> _cycle_depth(iter_, depth=2)
+    itertools.cycle                      # ['A', 'B', 'A', 'B', 'A' ...]
+
+    >>> # Depth:  1    2    3    4    5    6
+    >>> iter_ = ['A', 'B', 'C', 'D', 'E', 'F']
+    >>> _cycle_depth(iter_, depth=3)
+    itertools.cycle                      # ['A', 'B', 'C', 'A', 'B', 'C' ...]
+
+    Returns
+    -------
+    itertools.cycle
+        An infinite generator.
+
+    '''
+    if depth is None:
+        depth = len(iterable)
+    return it.cycle(it.islice(iterable, depth))
 
 
 # TODO: Abstract to Distribplot and PanelPlot classes
@@ -206,11 +242,11 @@ def _distribplot(
     halfplot : str
         Trim the DataFrame to read either |'tensile'|'compressive'|None|.
     extrema : bool
-        Plot minima and maxima only; equivalent to p=2. Default: True.
+        Plot minima and maxima only; equivalent to p=2.
     legend_on : bool
         Turn on/off plot. Default: True.
     colorblind : bool
-        Set line and marker colors as colorblind-safe. Default: False.
+        Set line and marker colors as colorblind-safe.
     grayscale : bool
         Set everything to grayscale.  Overrides colorblind.
     annotate : bool
@@ -242,8 +278,28 @@ def _distribplot(
 
     Raises
     ------
-        Exception
-            If no stress column is found.
+    InputError
+        If no stress column is found.
+    PlottingError
+        If multiple geometries try an unnormalized plot; cannot superimpose.
+
+    Notes
+    -----
+    Since this function pulls from existing axes with `gca`, it is currently up
+    to the coder to manage axes cleanup, particularly when making consecutive plot
+    instances.  The following example uses the clear axes f(x) to remedy this issue:
+
+    >>> # Plot consecutive instances
+    >>> case = ut.laminator(['400-200-800'])[0]
+    >>> LMs = case.LMs
+    >>> plot1 = la.output_._distribplot(LMs, normalized=True)
+    >>> plot1.cla()                                        # clear last plot, otherwise prevents infinite loop of gca from old plot
+    >>> plot2 = la.output_._distribplot(LMs, normalized=False)
+
+    If you want to keep your old axes, consider passing in a new axes.
+
+    >>> fig, new_ax = plt.subplots()
+    >>> plot3 = la.output_._distribplot(LMs, normalized=False, ax=new_ax)
 
     Examples
     --------
@@ -257,7 +313,6 @@ def _distribplot(
     <matplotlib.axes._subplots.AxesSubplot>
 
     '''
-
     # -------------------------------------------------------------------------
     '''Make cyclers colorblind and grayscale friendly'''
     if ax is None:
@@ -273,9 +328,9 @@ def _distribplot(
         y = 'k'
     elif not normalized and y is None:
         y = 'd(m)'
-    '''Will have trouble standardizing the name of the stress column.'''
-    '''Need to de-hard-code x label since changes with model'''
-    '''Try looking for stress columns, and select last one, else look for strain.'''
+    # NOTE: Will have trouble standardizing the name of the stress column.
+    # NOTE: Need to de-hard-code x label since changes with model
+    # TODO: Try looking for stress columns, and select last one, else look for strain.
 
     # see loop on handling stress column
 
@@ -355,22 +410,31 @@ def _distribplot(
         # Handle arbitrary name of x column by
         # selecting last 'stress' column; assumes 'stress_f (MPa)' for Wilson_LT
         # if none found, exception is raised. user should input x value
+        #logging.debug('x: {}'.format(x))
+        x_col = x
+        y_col = y
         try:
-            df[x]
+            df[x_col]
         except KeyError:
-            stress_names = df.columns.str.startswith('stress')
-            stress_cols = df.loc[:, stress_names]
-            ##stress_cols = df.loc[stress_names]
-            x_series = stress_cols.iloc[:, -1]
-            x = x_series.name
-            #print ('stress_cols ', stress_cols)
-            #print(x)
-        except KeyError:
-            # TODO: make a custom exception
-            raise Exception("Stress column '{}' not found. "
-                            'Specify y column in plot() method.'.format(x))
+            try:
+                # Try to discern if input wants a stress column.
+                stress_names = df.columns.str.startswith('stress')
+                stress_cols = df.loc[:, stress_names]
+                ##stress_cols = df.loc[stress_names]
+                x_series = stress_cols.iloc[:, -1]
+                x_col = x_series.name
+                logging.info(
+                    "Stress column '{}' not found."
+                    " Using '{}' column.".format(x, x_col)
+                )
+            # TODO: unable to test without configuring model.  Make mock model for test.
+            except KeyError:
+                raise InputError(
+                    "Stress column '{}' not found."
+                    ' Specify `y` column in plot() method.'.format(x_col)
+                )
 
-        x_series, y_series = df[x], df[y]
+        x_series, y_series = df[x_col], df[y_col]
         xs, ys = x_series.tolist(), y_series.tolist()
 
         # Update plot boundaries
@@ -404,7 +468,7 @@ def _distribplot(
 
     # Smart-cycle layer colors list; slice iterable the length of materials
     # Draw layers only for # y = {k_ and d_(if nplies=1)}
-    layer_cycle = _cycle_depth(layercolors, n=len(materials))      # assumes all Cases materials equiv.
+    layer_cycle = _cycle_depth(layercolors, depth=len(materials))  # assumes all Cases materials equiv.
 
     # -------------------------------------------------------------------------
     # Annotations anchored to layers instead of plot; iterates layers
@@ -416,11 +480,17 @@ def _distribplot(
             thick = t_ / 1e6
             ypos = incrementer
         else:
-            '''Add this to warning.'''
-            print('CAUTION: Unnormalized plots (y=d(m)) is cumbersome for '
-                  'geometries>1. Consider normalized=True for multi-geometry '
-                  'plots.')
-            return None
+            raise PlottingError(
+                'Unnormalized plots (i.e. y=d(m)) are visually cumbersome for'
+                ' geometries > 1. Consider using the `normalized=True` keyword'
+                ' for displaying simultaneous multi-geometry data.'
+            )
+            # NOTE: Replaced with raise in 0.4.11.dev0
+            #'''Add this to warning.'''
+            #print('CAUTION: Unnormalized plots (y=d(m)) are cumbersome for '
+            #      'geometries > 1. Consider normalized=True for multi-geometry '
+            #      'plots.')
+            #return None
 
         patch_kw.update({'facecolor': next(layer_cycle)})          # adv. cyclers
         rect = mpl.patches.Rectangle((minX, ypos), width, thick, **patch_kw)
@@ -482,11 +552,14 @@ def _distribplot(
     return ax
 
 
+# TODO: Needs to return an axes or figure plot
+# TODO: caselets are defined as containers of str, lists of str or cases, in LPEP 003.
+# Here caseslets are an LM, LMs or cases; list of cases(?) or cases object.
 def _multiplot(
-    caselets, x=None, y=None, title=None, normalized=True, halfplot='tensile',
-    colorblind=False, grayscale=False, annotate=False, labels_off=False,
-    suptitle_kw=None, subplots_kw=None, patch_kw=None, plot_kw=None,
-    legend_kw=None, labels_kw=None, **kwargs
+    caselets, x=None, y=None, title=None, normalized=True, extrema=False,
+    halfplot='tensile', colorblind=False, grayscale=False, annotate=False,
+    labels_off=False, suptitle_kw=None, subplots_kw=None, patch_kw=None,
+    plot_kw=None, legend_kw=None, labels_kw=None, **kwargs
 ):
     '''Return figure of axes containing several plots.
 
@@ -499,9 +572,41 @@ def _multiplot(
 
     Parameters
     ----------
+    caselets : LM, LMs or cases
+        Should be a container of str, lists of str or cases; however, accepting
+        LM, LMs or cases.  Refactoring required.
+    x, y : str
+        DataFrame column names.  Users can pass in other columns names.
+    title : str
+        Figure title.
+    normalized : bool
+        If true, plots y = k_; else plots y = d_ unless specified otherwise.
+    extrema : bool, default: False
+        Plot minima and maxima only; equivalent to p=2.
+        Forced off for clarity in separate plots.
+    halfplot : str
+        Trim the DataFrame to read either |'tensile'|'compressive'|None|.
+    colorblind : bool
+        Set line and marker colors as colorblind-safe.
+    grayscale : bool
+        Set everything to grayscale.  Overrides colorblind.
+    annotate : bool
+        Annotate names of layer types.
+    labels_off : bool
+        Toggle labels.
     labels_kw : dict
         One stop for custom labels and annotated text passed in from user.
         axestitle, sublabels, legendtitles are lists of labels for each caselet.
+
+
+    These keywords control general plotting aesthetics.
+    {subplot, patch, plot, legend, suptitle}_kw : dict
+        Default keywords are initialized to set up the distribution plots.
+        - subplots: |ncols=4|
+        - patch: None
+        - plot: |clip_on=True|
+        - legend: |loc=1|fontsize='small'|
+        - suptitle: |t=''|fontsize=22|fontweight='bold'|
 
     Returns
     -------
@@ -597,6 +702,7 @@ def _multiplot(
     #print('kwargs:{} '.format(kwargs))
     #print('nrows: {}, ncols: {}'.format(nrows, ncols_dft))
 
+    # NOTE: does not return ax.  Fix?
     def plot_caselets(i, ax):
         '''Iterate axes of the subplots; apply a small plot ("caselet").
 
@@ -616,16 +722,20 @@ def _multiplot(
             legend_kw.update(title=ltitle)
             sublabel_kw = dict(s=sublabel)
 
-            # Caselet could be a case or LM, but distribplot needs LMs
+
+            # TODO: Refactor
+            # Caselet could be a case or LM, but distribplot needs a list of LMs
             try:
+                # Case
                 LMs = caselet.LMs
             except (AttributeError):
-                # Case is actually a LaminateModel; see distributions.Case.plot().
+                # Single LaminateModel
                 LMs = [caselet]
                 #print('Exception was caught; not a case')
+                # NOTE: what about LMs?
 
             _distribplot(
-                LMs, x=x, y=y, halfplot=halfplot, annotate=annotate,
+                LMs, x=x, y=y, halfplot=halfplot, extrema=extrema, annotate=annotate,
                 normalized=normalized, ax=ax, colorblind=colorblind,
                 grayscale=grayscale, plot_kw=plot_kw, patch_kw=patch_kw,
                 legend_kw=legend_kw, sublabel_kw=sublabel_kw, **kwargs
@@ -655,4 +765,53 @@ def _multiplot(
     # Common Figure Labels
     fig.suptitle(**suptitle_kw)
     plt.rcParams.update({'font.size': 18})
-    plt.show()
+
+    # NOTE: Add a figure return and show deprecation in 0.4.11.dev0
+    return fig
+    #plt.show()
+
+
+# -----------------------------------------------------------------------------
+# AXES-LEVEL ------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+class AxesPlot():
+    '''Return a matplotblib axes.
+
+    See Also
+    --------
+    - _distribplot()
+    - singleplot()
+    - halfplot()
+    - quarterplot()
+    - predictplot()
+
+    '''
+    pass
+
+
+# -----------------------------------------------------------------------------
+# FIGURE-LEVEL ----------------------------------------------------------------
+# -----------------------------------------------------------------------------
+class FigurePlot():
+    '''Return a matplotlib figure.
+
+    This class sets up a figure to accept data for multiple plots.
+
+
+    Attributes
+    -----------
+    nrows, ncols = int, int
+        Figure rows and columns.
+
+    Notes
+    -----
+    Each subplot is a separate axes.
+
+    See Also
+    --------
+    - _multiplot()
+    - ratioplot()
+
+    '''
+    #figsize = (ncols * size * aspect, nrows * size)
+    pass

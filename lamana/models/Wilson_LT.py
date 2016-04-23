@@ -25,6 +25,7 @@ class Model(BaseModel):
         self.LaminateModel = None
 
     # TODO: eventually abstract into BaseModel and deprecate direct coding
+    # TODO: accept kwargs from Case -> handshake
     def _use_model_(self, Laminate, adjusted_z=False):
         '''Return updated DataFrame and FeatureInput Return None if exceptions raised.
 
@@ -153,6 +154,7 @@ class Model(BaseModel):
         q_11 = df['Q_11']
         q_12 = df['Q_12']
         h = df['h(m)']
+        # TODO: need to fix kwargs passing first; tabled since affects many modules.
         if not adj_z:
             z = df['z(m)']
         else:

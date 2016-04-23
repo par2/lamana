@@ -2,9 +2,8 @@
 '''A class for storing weblinks and references for package development.'''
 
 
-
 class Reference(object):
-    '''A nonfunctional class containing urls for supporting code.'''
+    '''A non-functional class containing urls for supporting code.'''
 
     # ----- ---------                           -------------
     # (001) imp.relaod                          http://stackoverflow.com/questions/961162/reloading-module-giving-error-reload-is-not-defined
@@ -53,6 +52,16 @@ class Reference(object):
     # (044) regex to find comma inside (),[]    https://stackoverflow.com/questions/33793037/python-regex-to-find-special-characters-between-delimiters/33793322#33793322
     # (045) Good integreation practices         https://pytest.org/latest/goodpractises.html
     # (046) sorted with a key                   http://www.thegeekstuff.com/2014/06/python-sorted/
+    # (047) Force create directory              https://stackoverflow.com/questions/273192/in-python-check-if-a-directory-exists-and-create-it-if-necessary
+    # (048) Deprecation of __getslice__         https://docs.python.org/2/reference/datamodel.html#additional-methods-for-emulation-of-sequence-types
+    # (049) Axes and Figure plots in seaborn    http://stackoverflow.com/questions/23969619/plotting-with-seaborn-using-the-matplotlib-object-oriented-interface
+    # (050) DISPLAY variable error              https://stackoverflow.com/questions/2801882/generating-a-png-with-matplotlib-when-display-is-undefined
 
     pass
 #------------------------------------------------------------------------------
+
+class RegexLinks(object):
+    '''A non-functional class containing urls for regular expressions.'''
+
+    # ----- ---------                           -------------
+    # (001) Inners, not duples                  http://pythex.org/?regex=(%3F%3C!%5B(%5Cd%2B%5D)(%5Cd*%5C.*%5Cd*%20*%5C%2C*%3F)(%3F!%5B%5Cd%5C.)%5D)&test_string=0%0A1%0A1.%0A10%0A10.%0A100%0A10.0%0A100.0%0A1000.0%0A1S%0A1.S%0A1.0S%0A%5B100%5D%0A%5B100.%5D%0A%5B100.0%5D%0A%5B100%2C100%5D%0A%5B100.%2C100.%5D%0A%5B100.0%2C100.0%5D%0A%5B100.0%2C100%5D%0A%5B100%2C%20(100%2C100)%5D&ignorecase=0&multiline=0&dotall=0&verbose=0
