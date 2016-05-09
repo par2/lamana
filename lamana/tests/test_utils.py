@@ -4,6 +4,7 @@
 
 
 import os
+import logging
 import collections as ct
 
 import nose.tools as nt
@@ -94,6 +95,8 @@ def test_laminator_gencon1():
             nt.assert_equal(actual, expected)
 
 
+# NOTE: These functions don't have except statements...
+# TODO: Make the
 # Write CSV -------------------------------------------------------------------
 def test_tools_write1():
     '''Check DataFrame is written of csv and read DataFrame is the same.
@@ -113,8 +116,9 @@ def test_tools_write1():
     - test_write2(): overwrite=False; may give unexpected results in tandem
 
     '''
+    case = ut.laminator(['400-200-800'])
     try:
-        case = ut.laminator(['400-200-800'])
+        ##case = ut.laminator(['400-200-800'])
         # Write files to default output dir
         for case_ in case.values():
             for LM in case_.LMs:
@@ -142,10 +146,12 @@ def test_tools_write2():
     if debugging required.
 
     '''
+    case = ut.laminator(['400-200-800', '400-200-800'])
+    filepaths = []
     try:
-        case = ut.laminator(['400-200-800', '400-200-800'])
+        ##case = ut.laminator(['400-200-800', '400-200-800'])
         # Write files to default output dir
-        filepaths = []
+        ##filepaths = []
         for case_ in case.values():
             for LM in case_.LMs:
                 #filepath = ut.write_csv(LM, overwrite=False, verbose=True, prefix='temp')
@@ -164,9 +170,14 @@ def test_tools_write2():
 
 # Read CSV --------------------------------------------------------------------
 # TODO: add modified write file
-def test_read1():
+# BUG: seems temps aren't deleting if non-csv file exists in export folder
+def test_tools_read1():
+    '''Checks reads file when case items are written to files.'''
+    case = ut.laminator(['400-200-800', '400-[100,100]-800'])
+    written_filepaths = []
+    d = ct.defaultdict(list)
     try:
-        case = ut.laminator(['400-200-800', '400-[100,100]-800'])
+        ##case = ut.laminator(['400-200-800', '400-[100,100]-800'])
 
         # Expected: Write LaminateModels
         # Make files in a default export dir, and catch expected dfs
@@ -176,6 +187,7 @@ def test_read1():
                 df_l = LM.LMFrame
                 filepath_l = ut.write_csv(LM, overwrite=False, prefix='temp')
                 list_l.append((df_l, filepath_l))
+                logging.info('File path {}'.format(filepath_l))
 
         # Actual: Read Files
         # Get dirpath from last filepath_l; assumes default path structure from write_csv
@@ -184,7 +196,7 @@ def test_read1():
 
         # Use a defaultdict to place same dfs with matching paths
         # {'...\filename': [df_l, df_r]}
-        d = ct.defaultdict(list)
+        ##d = ct.defaultdict(list)
         for df_l, filepath_l in list_l:
             d[filepath_l].append(df_l)
 
