@@ -57,6 +57,7 @@ class Reference(object):
     # (049) Axes and Figure plots in seaborn    http://stackoverflow.com/questions/23969619/plotting-with-seaborn-using-the-matplotlib-object-oriented-interface
     # (050) DISPLAY variable error              https://stackoverflow.com/questions/2801882/generating-a-png-with-matplotlib-when-display-is-undefined
     # (051) Many DataFrames w/xlsxwriter        http://xlsxwriter.readthedocs.io/working_with_pandas.html
+    # (052) tempfile                            https://pymotw.com/2/tempfile/
 
     pass
 
