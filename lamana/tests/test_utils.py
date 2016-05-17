@@ -5,6 +5,8 @@
 
 import os
 import logging
+import tempfile
+import difflib
 import collections as ct
 
 import nose.tools as nt
@@ -16,6 +18,7 @@ from lamana.utils import tools as ut
 
 dft = wlt.Defaults()                                       # from inherited class in models; user
 
+RANDOMCHARS = 'xZ(1-)[]'                                   # file characters
 
 # PARAMETERS ------------------------------------------------------------------
 # Build dicts of geometric and material parameters
@@ -95,136 +98,470 @@ def test_laminator_gencon1():
             nt.assert_equal(actual, expected)
 
 
-# NOTE: These functions don't have except statements...
-# TODO: Make the
-# Write CSV -------------------------------------------------------------------
-def test_tools_write1():
-    '''Check DataFrame is written of csv and read DataFrame is the same.
-
-    Notes
-    -----
-    Builds case(s), pulls the DataFrame, write a temporary csv in the default
-    "export" directory (overwrites if the temporary file exists to keep clean).
-    Then use pandas to read the csv back as a DataFrame.  Finally compare
-    equality between DataFrames, then removes the file.
-
-    DEV: File is removed even if fails to keep the export dir clean.  Comment
-    if debugging required.
-
-    See also
-    --------
-    - test_write2(): overwrite=False; may give unexpected results in tandem
-
-    '''
-    case = ut.laminator(['400-200-800'])
-    try:
-        ##case = ut.laminator(['400-200-800'])
-        # Write files to default output dir
-        for case_ in case.values():
-            for LM in case_.LMs:
-                expected = LM.LMFrame
-                filepath = ut.write_csv(LM, overwrite=True, prefix='temp')
-
-                # Read a file
-                actual = pd.read_csv(filepath, index_col=0)
-                ut.assertFrameEqual(actual, expected)
-    finally:
-        # Remove temporary file
-        os.remove(filepath)
-        #pass
+# IO Tests -------------------------------------------------------------------
+# These tests create temporary files in the OS temp directory.
+# Files are removed after testing.
+# Attempts to remove remnant files
+def test_tool_get_path_default():
+    '''Verify returns default export path if no args.'''
+    path = ut.get_path()
+    actual = path.endswith(os.path.join('lamana', 'export'))
+    nt.assert_true(actual)
 
 
-def test_tools_write2():
-    '''Check if overwrite=False retains files.
+def test_tool_get_path_name1():
+    '''Verify returns path name correctly.'''
+    path = ut.get_path(filename=RANDOMCHARS, suffix='.csv')
+    actual = path.endswith('.'.join([RANDOMCHARS, 'csv']))
+    nt.assert_true(actual)
 
-    Notes
-    -----
-    Make two files of the same name.  Force write_csv to increment files.
-    Check the filepath names exist.  Finally remove all files.
 
-    DEV: Files are removed even if fails to keep the export dir clean.  Comment
-    if debugging required.
+def test_tool_get_path_name2():
+    '''Verify returns path name correctly, for a dashboard; pretend "dash_".'''
+    path = ut.get_path(filename=RANDOMCHARS, suffix='.csv', dashboard=True)
+    actual1 = path.endswith('.'.join([RANDOMCHARS, 'csv']))
+    actual2 = os.path.basename(path).startswith('dash_')
+    nt.assert_true(actual1)
+    nt.assert_true(actual2)
 
-    '''
-    case = ut.laminator(['400-200-800', '400-200-800'])
-    filepaths = []
-    try:
-        ##case = ut.laminator(['400-200-800', '400-200-800'])
-        # Write files to default output dir
-        ##filepaths = []
-        for case_ in case.values():
-            for LM in case_.LMs:
-                #filepath = ut.write_csv(LM, overwrite=False, verbose=True, prefix='temp')
-                filepath = ut.write_csv(LM, overwrite=False, prefix='temp')
-                filepaths.append(filepath)
 
-        for file_ in filepaths:
-            actual = os.path.isfile(file_)
+def test_tool_get_path_name3():
+    '''Verify returns path name correctly.'''
+    path = ut.get_path(filename=RANDOMCHARS, suffix='.xlsx')
+    actual = path.endswith('.'.join([RANDOMCHARS, 'xlsx']))
+    nt.assert_true(actual)
+
+
+def test_tool_get_path_name4():
+    '''Verify returns path name correctly, for a dashboard; no "dash_" for xlsx.'''
+    # The following should inform dashboards are not separate files.
+    path = ut.get_path(filename=RANDOMCHARS, suffix='.xlsx', dashboard=True)
+    actual1 = path.endswith('.'.join([RANDOMCHARS, 'xlsx']))
+    actual2 = os.path.basename(path).startswith('dash_')
+    nt.assert_true(actual1)
+    nt.assert_false(actual2)
+
+
+def test_tool_get_path_warn1():
+    '''Verify correct path for no extension; no suffix kwarg.'''
+    path = ut.get_path(filename=RANDOMCHARS)               # should raise a logger warning
+    actual = path.endswith(RANDOMCHARS)
+    nt.assert_true(actual)
+
+
+def test_tool_get_path_warn2():
+    '''Verify correct path for no filename; uses default path.'''
+    actual = ut.get_path(suffix='.csv')                    # should raise a logger warning
+    expected = ut.get_path()                               # default path
+    nt.assert_equals(actual, expected)
+
+
+def test_tool_get_path_warn3():
+    '''Verify correct path for no filename; uses default path.'''
+    actual = ut.get_path(dashboard=True)                   # should raise a logger warning
+    expected = ut.get_path()                               # default path
+    nt.assert_equals(actual, expected)
+
+
+class TestExport():
+    '''Comprise a sample LaminateModel and FeatureInput to test exported files.'''
+    # See Also: Scratchpad - Dashboard.ipynb
+
+    # Setup -------------------------------------------------------------------
+    # TODO: Make a Fixture
+    case = ut.laminator(dft.geos_standard)[0]
+    LM = case.LMs[0]
+    FI = LM.FeatureInput
+
+    # Path Munging
+    temp_dirpath = tempfile.gettempdir()
+    csv_fpath = os.path.join(
+        temp_dirpath, 't_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+    )
+    csv_dash_fpath = os.path.join(
+        temp_dirpath, 't_dash_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+    )
+    xlsx_fpath = os.path.join(
+        temp_dirpath, 't_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.xlsx'
+    )
+
+    # Pre-clean directory
+    if os.path.exists(csv_fpath):
+        os.remove(csv_fpath)
+    if os.path.exists(csv_dash_fpath):
+        os.remove(csv_dash_fpath)
+    if os.path.exists(xlsx_fpath):
+        os.remove(xlsx_fpath)
+
+    # Tests -------------------------------------------------------------------
+    # .csv files
+    # The following use temporary files
+    def test_export_csv_temp1(self):
+        '''Verify write csv files, unnamed tempfile.'''
+        try:
+            # Write unnamed tempfiles and see if exists; then remove.
+            data_fpath, dash_fpath = ut.export(
+                self.LM, overwrite=True, suffix='.csv', temp=True, keepname=False,
+                delete=False
+            )
+            actual1 = os.path.exists(data_fpath)
+            actual2 = os.path.exists(dash_fpath)
+            nt.assert_true(actual1)
+            nt.assert_true(actual2)
+        finally:
+            os.remove(data_fpath)
+            os.remove(dash_fpath)
+            logging.info('File has been deleted: {}'.format(data_fpath))
+            logging.info('File has been deleted: {}'.format(dash_fpath))
+
+    def test_export_csv_temp2(self):
+        '''Verify write csv files; named tempfile.'''
+        try:
+            # Write named tempfiles, verify, then remove
+            data_fpath, dash_fpath = ut.export(
+                self.LM, overwrite=True, suffix='.csv', temp=True, keepname=True,
+                delete=False
+            )
+            actual1, actual2 = data_fpath, dash_fpath
+            expected1, expected2 = self.csv_fpath, self.csv_dash_fpath
+            nt.assert_equals(actual1, expected1)
+            nt.assert_equals(actual2, expected2)
+        finally:
+            os.remove(data_fpath)
+            os.remove(dash_fpath)
+            logging.info('File has been deleted: {}'.format(data_fpath))
+            logging.info('File has been deleted: {}'.format(dash_fpath))
+
+    def test_export_csv_temp_del1(self):
+        '''Verify write csv, unnamed tempfile; delete afterwards.'''
+        # Write unnamed tempfiles and see if exists; then remove.
+        data_fpath, dash_fpath = ut.export(
+            self.LM, overwrite=True, suffix='.csv', temp=True, keepname=False,
+            delete=True
+        )
+        actual1 = os.path.exists(data_fpath)
+        actual2 = os.path.exists(dash_fpath)
+        nt.assert_false(actual1)
+        nt.assert_false(actual2)
+
+    def test_export_csv_temp_del2(self):
+        '''Verify write csv, named tempfile; delete afterwards.'''
+        # Write named tempfiles, verify, then remove
+        data_fpath, dash_fpath = ut.export(
+            self.LM, overwrite=True, suffix='.csv', temp=True, keepname=True,
+            delete=True
+        )
+        actual1 = os.path.exists(data_fpath)
+        actual2 = os.path.exists(dash_fpath)
+        nt.assert_false(actual1)
+        nt.assert_false(actual2)
+
+    def test_export_csv_temp_increment1(self):
+        '''Verify writes incremented csv if same filename found; named tempfile.
+
+        Notes
+        -----
+        Test the data file, but since dashboards are written, deletes both files.
+        Simply sees if incremented file is greater.  If incremented file is empty
+        (starting fresh), then ignore loop.
+
+        '''
+        fname_list = []
+        try:
+            baseline = self.csv_fpath
+            for i in range(3):
+                # Increment filepath after first loop
+                data_fpath, dash_fpath = ut.export(
+                    self.LM, overwrite=False, prefix=None, suffix='.csv',
+                    temp=True, keepname=True, delete=False
+                )
+                # See differences (should be the increment); assert last number < current
+                incremented = data_fpath
+                prior_inc = [int(i[2:]) for i in difflib.ndiff(baseline, incremented)
+                             if '-' in i and i[2:].isdigit()]
+                post_inc = [int(i[2:]) for i in difflib.ndiff(baseline, incremented)
+                            if '+' in i and i[2:].isdigit()]
+                if prior_inc == []: prior_inc = [0]            # reset prior
+                if post_inc:                                   # ignore loop if [], means first loop, and hasn't incremented yet
+                    actual = prior_inc[0] < post_inc[0]
+                    nt.assert_true(actual)
+                baseline = data_fpath
+
+                fname_list.append(data_fpath)
+                fname_list.append(dash_fpath)                  # not used by still written, so need cleaning
+        finally:
+            for fpath in fname_list:
+                os.remove(fpath)
+                logging.info('File has been deleted: {}'.format(fpath))
+
+    # .xlsx files
+    # The following use temporary files
+    def test_export_xlsx_temp1(self):
+        '''Verify write xslx files, unnamed tempfile.'''
+        try:
+            # Write unnamed tempfiles and see if exists; then remove.
+            workbook_fpath, = ut.export(
+                self.LM, overwrite=True, suffix='.xlsx', temp=True, keepname=False,
+                delete=False
+            )
+            actual1 = os.path.exists(workbook_fpath)
+            nt.assert_true(actual1)
+        finally:
+            os.remove(workbook_fpath)
+            logging.info('File has been deleted: {}'.format(workbook_fpath))
+
+    def test_export_xlsx_temp2(self):
+        '''Verify write xslx files; named tempfile.'''
+        try:
+            # Write named tempfiles, verify, then remove
+            workbook_fpath, = ut.export(
+                self.LM, overwrite=True, suffix='.xlsx', temp=True, keepname=True,
+                delete=False
+            )
+            actual1 = workbook_fpath
+            expected1 = self.xlsx_fpath
+            nt.assert_equals(actual1, expected1)
+        finally:
+            os.remove(self.xlsx_fpath)
+            logging.info('File has been deleted: {}'.format(workbook_fpath))
+
+    def test_export_xlsx_temp_del1(self):
+        '''Verify write xslx, unnamed tempfile; delete afterwards.'''
+        # Write unnamed tempfiles and see if exists; then remove.
+        workbook_fpath, = ut.export(
+            self.LM, overwrite=True, suffix='.xlsx', temp=True, keepname=False,
+            delete=True
+        )
+        actual1 = os.path.exists(workbook_fpath)
+        nt.assert_false(actual1)
+
+    def test_export_xlsx_temp_del2(self):
+        '''Verify write xslx, named tempfile; delete afterwards.'''
+        # Write named tempfiles, verify, then remove
+        workbook_fpath, = ut.export(
+            self.LM, overwrite=True, suffix='.xlsx', temp=True, keepname=True,
+            delete=True
+        )
+        actual1 = os.path.exists(workbook_fpath)
+        nt.assert_false(actual1)
+
+    def test_export_xlsx_temp_increment1(self):
+        '''Verify writes incremented xslx if same filename found; named tempfile.
+
+        Notes
+        -----
+        Test the data file, but since dashboards are written, deletes both files.
+        Simply sees if incremented file is greater.  If incremented file is empty
+        (starting fresh), then ignore loop.
+
+        '''
+        fname_list = []
+        try:
+            baseline = self.xlsx_fpath
+            for i in range(3):
+                # Increment filepath after first loop
+                workbook_fpath, = ut.export(
+                    self.LM, overwrite=False, prefix=None, suffix='.xlsx',
+                    temp=True, keepname=True, delete=False
+                )
+                # See differences (should be the increment); assert last number < current
+                incremented = workbook_fpath
+                prior_inc = [int(i[2:]) for i in difflib.ndiff(baseline, incremented)
+                             if '-' in i and i[2:].isdigit()]
+                post_inc = [int(i[2:]) for i in difflib.ndiff(baseline, incremented)
+                            if '+' in i and i[2:].isdigit()]
+                if prior_inc == []: prior_inc = [0]            # reset prior
+                if post_inc:                                   # ignore loop if [], means first loop, and hasn't incremented yet
+                    actual = prior_inc[0] < post_inc[0]
+                    nt.assert_true(actual)
+                baseline = workbook_fpath
+
+                fname_list.append(workbook_fpath)
+        finally:
+            for fpath in fname_list:
+                os.remove(fpath)
+                logging.info('File has been deleted: {}'.format(fpath))
+
+
+class TestFeatureInputTools:
+    '''Comprise test functions to convert and reorder FeatureInputs.'''
+    case = ut.laminator(dft.geos_standard)[0]
+    LM = case.LMs[0]
+    FI = LM.FeatureInput
+    converted_FI = ut.convert_featureinput(FI)
+
+    def test_tool_convert_featureinput1(self):
+        '''Verify all dict values are DataFrames.'''
+        for value in self.converted_FI.values():
+            actual = isinstance(value, pd.DataFrame)
             nt.assert_true(actual)
 
-    finally:
-        # Remove temporary file
-        for file_ in filepaths:
-            os.remove(file_)
+    def test_tool_reorder_featureinput1(self):
+        '''Verify default list order if no args given.'''
+        for value in self.converted_FI.values():
+            reordered_FI = ut.reorder_featureinput(self.FI)
+            actual = list(reordered_FI.keys())
+            expected = [
+                'Geometry', 'Model', 'Materials', 'Parameters', 'Globals',
+                'Properties'
+            ]
+            nt.assert_equals(actual, expected)
+
+    def test_tool_reorder_featureinput2(self):
+        '''Verify reorder dict keys if keys given.'''
+        for value in self.converted_FI.values():
+            rev_keys = reversed(
+                ['Geometry', 'Model', 'Materials', 'Parameters', 'Globals',
+                 'Properties']
+            )
+            reordered_FI = ut.reorder_featureinput(self.FI, keys=rev_keys)
+            actual = list(reordered_FI.keys())
+            expected = [
+                'Properties', 'Globals', 'Parameters', 'Materials', 'Model',
+                'Geometry'
+            ]
+            nt.assert_equals(actual, expected)
+
+    def test_tool_reorder_featureinput3(self):
+        '''Verify missing keys are added if few args given.'''
+        for value in self.converted_FI.values():
+            reordered_FI = ut.reorder_featureinput(self.FI, ['Model', 'Geometry'])
+            actual = set(reordered_FI.keys())
+            expected = set(
+                ['Model', 'Geometry', 'Materials', 'Parameters', 'Globals', 'Properties']
+            )
+            nt.assert_equals(actual, expected)
 
 
-# Read CSV --------------------------------------------------------------------
-# TODO: add modified write file
-# BUG: seems temps aren't deleting if non-csv file exists in export folder
-def test_tools_read1():
-    '''Checks reads file when case items are written to files.'''
-    case = ut.laminator(['400-200-800', '400-[100,100]-800'])
-    written_filepaths = []
-    d = ct.defaultdict(list)
-    try:
-        ##case = ut.laminator(['400-200-800', '400-[100,100]-800'])
-
-        # Expected: Write LaminateModels
-        # Make files in a default export dir, and catch expected dfs
-        list_l = []
-        for case_ in case.values():
-            for LM in case_.LMs:
-                df_l = LM.LMFrame
-                filepath_l = ut.write_csv(LM, overwrite=False, prefix='temp')
-                list_l.append((df_l, filepath_l))
-                logging.info('File path {}'.format(filepath_l))
-
-        # Actual: Read Files
-        # Get dirpath from last filepath_l; assumes default path structure from write_csv
-        dirpath = os.path.dirname(filepath_l)
-        gen_r = ut.read_csv_dir(dirpath)                   # yields (file, filepath)
-
-        # Use a defaultdict to place same dfs with matching paths
-        # {'...\filename': [df_l, df_r]}
-        ##d = ct.defaultdict(list)
-        for df_l, filepath_l in list_l:
-            d[filepath_l].append(df_l)
-
-        for df_r, filepath_r in gen_r:
-            d[filepath_r].append(df_r)
-
-        # If files are already present in export dir, the # write files < # read files
-        # Need to filter the dict entries that don't have both read and write (left-right) values
-        # Only need to iterate over keys for the written files i.e. filepath_l
-        written_filepaths = [path for df, path in list_l]
-
-        # Verify Equivalence
-        # Compare DataFrames sharing the same pathname (ensure correct file for left and right)
-        for k, v in d.items():
-            filename = k
-            if filename in written_filepaths:
-                expected, actual = v
-                #print(filename)
-                #print(expected.info)
-                ut.assertFrameEqual(actual, expected)
-
-    # Cleanup
-    # Only remove the written temporary files
-    finally:
-        for file_ in d:
-            if file_ in written_filepaths:
-                print('Cleaning up temporary files ...')
-                os.remove(file_)
+# # DEPRECATE Following write_csv tests 0.4.11.dev0
+# # Write CSV -------------------------------------------------------------------
+# def test_tools_write1():
+#     '''Check DataFrame is written of csv and read DataFrame is the same.
+#
+#     Notes
+#     -----
+#     Builds case(s), pulls the DataFrame, write a temporary csv in the default
+#     "export" directory (overwrites if the temporary file exists to keep clean).
+#     Then use pandas to read the csv back as a DataFrame.  Finally compare
+#     equality between DataFrames, then removes the file.
+#
+#     DEV: File is removed even if fails to keep the export dir clean.  Comment
+#     if debugging required.
+#
+#     See also
+#     --------
+#     - test_write2(): overwrite=False; may give unexpected results in tandem
+#
+#     '''
+#     case = ut.laminator(['400-200-800'])
+#     try:
+#         ##case = ut.laminator(['400-200-800'])
+#         # Write files to default output dir
+#         for case_ in case.values():
+#             for LM in case_.LMs:
+#                 expected = LM.LMFrame
+#                 filepath = ut.write_csv(LM, overwrite=True, prefix='temp')
+#
+#                 # Read a file
+#                 actual = pd.read_csv(filepath, index_col=0)
+#                 ut.assertFrameEqual(actual, expected)
+#     finally:
+#         # Remove temporary file
+#         os.remove(filepath)
+#         #pass
+#
+#
+# def test_tools_write2():
+#     '''Check if overwrite=False retains files.
+#
+#     Notes
+#     -----
+#     Make two files of the same name.  Force write_csv to increment files.
+#     Check the filepath names exist.  Finally remove all files.
+#
+#     DEV: Files are removed even if fails to keep the export dir clean.  Comment
+#     if debugging required.
+#
+#     '''
+#     case = ut.laminator(['400-200-800', '400-200-800'])
+#     filepaths = []
+#     try:
+#         ##case = ut.laminator(['400-200-800', '400-200-800'])
+#         # Write files to default output dir
+#         ##filepaths = []
+#         for case_ in case.values():
+#             for LM in case_.LMs:
+#                 #filepath = ut.write_csv(LM, overwrite=False, verbose=True, prefix='temp')
+#                 filepath = ut.write_csv(LM, overwrite=False, prefix='temp')
+#                 filepaths.append(filepath)
+#
+#         for file_ in filepaths:
+#             actual = os.path.isfile(file_)
+#             nt.assert_true(actual)
+#
+#     finally:
+#         # Remove temporary file
+#         for file_ in filepaths:
+#             os.remove(file_)
+#
+#
+# # Read CSV --------------------------------------------------------------------
+# # TODO: add modified write file
+# # BUG: seems temps aren't deleting if non-csv file exists in export folder
+# def test_tools_read1():
+#     '''Checks reads file when case items are written to files.'''
+#     case = ut.laminator(['400-200-800', '400-[100,100]-800'])
+#     written_filepaths = []
+#     d = ct.defaultdict(list)
+#     try:
+#         ##case = ut.laminator(['400-200-800', '400-[100,100]-800'])
+#
+#         # Expected: Write LaminateModels
+#         # Make files in a default export dir, and catch expected dfs
+#         list_l = []
+#         for case_ in case.values():
+#             for LM in case_.LMs:
+#                 df_l = LM.LMFrame
+#                 filepath_l = ut.write_csv(LM, overwrite=False, prefix='temp')
+#                 list_l.append((df_l, filepath_l))
+#                 logging.info('File path {}'.format(filepath_l))
+#
+#         # Actual: Read Files
+#         # Get dirpath from last filepath_l; assumes default path structure from write_csv
+#         dirpath = os.path.dirname(filepath_l)
+#         gen_r = ut.read_csv_dir(dirpath)                   # yields (file, filepath)
+#
+#         # Use a defaultdict to place same dfs with matching paths
+#         # {'...\filename': [df_l, df_r]}
+#         ##d = ct.defaultdict(list)
+#         for df_l, filepath_l in list_l:
+#             d[filepath_l].append(df_l)
+#
+#         for df_r, filepath_r in gen_r:
+#             d[filepath_r].append(df_r)
+#
+#         # If files are already present in export dir, the # write files < # read files
+#         # Need to filter the dict entries that don't have both read and write (left-right) values
+#         # Only need to iterate over keys for the written files i.e. filepath_l
+#         written_filepaths = [path for df, path in list_l]
+#
+#         # Verify Equivalence
+#         # Compare DataFrames sharing the same pathname (ensure correct file for left and right)
+#         for k, v in d.items():
+#             filename = k
+#             if filename in written_filepaths:
+#                 expected, actual = v
+#                 #print(filename)
+#                 #print(expected.info)
+#                 ut.assertFrameEqual(actual, expected)
+#
+#     # Cleanup
+#     # Only remove the written temporary files
+#     finally:
+#         for file_ in d:
+#             if file_ in written_filepaths:
+#                 print('Cleaning up temporary files ...')
+#                 os.remove(file_)
 
 
 # Extract geo_strings ---------------------------------------------------------
