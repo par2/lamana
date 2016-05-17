@@ -17,11 +17,16 @@
 import os
 import re
 import logging
+import tempfile
+import collections as ct
 
 import pandas as pd
 import pandas.util.testing as pdt
 
 import lamana as la
+
+
+EXTENSIONS = ('.csv', '.xlsx')
 
 
 def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False):
@@ -367,99 +372,6 @@ def get_special_geometry(Frame):
 #         print('\n')
 #         print('Finished getting DataFrames.')
 
-# DEPRECATE: verbose; use logging instead
-def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
-    '''Convert DataFrame to csv files and write them to a specified directory.
-
-    Parameters
-    ----------
-    LM : DataFrame
-        LaminateModel containing data calculations and attributes.
-    path : str, optional; default "lamana/export" directory
-        Directory path to store resulting csv files.
-    verbose : bool; default True
-        Print additional information during the writing process.
-    overwrite : bool; default False
-        Save over files with the same name.  Prevents file incrementation
-        and excess files after cyclic calls.
-    prefix : str; default None
-        Add a prefix to the file name; good for temporary files.
-        - '' : legacy
-        - 'w': written
-        - 'r': redone; altered from legacy
-        - 'temp': temporary
-
-    Notes
-    -----
-    Writes csv file of data contained in LM (a DataFrame) to a given or default
-    path.  Contents are written into an "export" directory.
-
-    It is decided in 0.4.11.dev0 to set default paths here; a global approach
-    to handling all uses of this function from any module.
-
-    Returns
-    -------
-    str
-        Full path of the created file.
-
-    '''
-    # Parse Laminate Properties
-    nplies = LM.nplies
-    p = LM.p
-    # TODO: Fix units
-    t_total = LM.total * 1e3                               # (in mm)
-    geometry = LM.Geometry.string
-    df = LM.LMFrame
-
-    # Send default csv to export directory
-    if path is None:
-        # TODO: write file paths pythonically; use abspath()
-        path = os.getcwd()                                 # use for the test in the correct path
-        ##path = path + r'\lamana\tests\controls_LT'         # for Main Script. Comment out in tests
-        ##path = ''.join([path, r'\lamana\output'])
-        dirpath = ''.join([path, r'\export'])              # \export in root dir
-    else:                                                  # pragma: no cover
-        dirpath = path
-
-    # Filename
-    if prefix is None:                                      # pragma: no cover
-        prefix = r'w'                                       # for written by lamana
-
-    prefix = ''.join([prefix, '_'])
-
-    # Prepend files with 'w' for "written" by the package
-    filename = r'\{}laminate_{}ply_p{}_t{:.1f}_{}'.format(
-        prefix, nplies, p, t_total, geometry
-    )
-    suffix = r'.csv'
-    fullpath = ''.join([dirpath, filename, suffix])
-    #print(path)
-
-    # Force create  export directory or path (REF 047)
-    if not os.path.exists(dirpath):
-        os.makedirs(dirpath)
-
-    # Check for duplicates before writing; overwrite protection
-    if not overwrite:
-        # Read dir if file exists.  Append counter to path name if exists.
-        counter = 1
-        while os.path.isfile(fullpath):
-            print('Overwrite protection: File exists.  Incrementing file...')
-            increment = ''.join(['(', str(counter), ')'])
-            fullpath = ''.join([dirpath, filename, increment, suffix])
-            counter += 1
-
-    # Write DataFrame to csv file
-    if verbose:
-        #print('Writing DataFrame to csv in:', fullpath)
-        logging.info('Writing DataFrame to csv in: {}'.format(fullpath))
-
-    df.to_csv(fullpath)
-    return fullpath
-
-
-# TODO: Add write functions from controls.py here
-
 
 def compare_set(it, others, how='union', test=None):
     '''Return a specific set of unique values based on `how` it is evaluated.
@@ -576,6 +488,533 @@ def is_matched(string, pattern=None):
     #print('l_bracket: {0}, r_bracket: {1}, '
     #      'l_paren {2}, r_paren: {3}'.format(bra, ket, par, ren))
     return bra == ket and par == ren
+
+
+# IO --------------------------------------------------------------------------
+# IO-related functions
+# DEPRECATE: function; use export instead
+# DEPRECATE: verbose; use logging instead
+def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
+    '''Convert DataFrame to csv files and write them to a specified directory.
+
+    Parameters
+    ----------
+    LM : DataFrame
+        LaminateModel containing data calculations and attributes.
+    path : str, optional; default "lamana/export" directory
+        Directory path to store resulting csv files.
+    verbose : bool; default True
+        Print additional information during the writing process.
+    overwrite : bool; default False
+        Save over files with the same name.  Prevents file incrementation
+        and excess files after cyclic calls.
+    prefix : str; default None
+        Add a prefix to the file name; good for temporary files.
+        - '' : legacy
+        - 'w': written
+        - 'r': redone; altered from legacy
+        - 'temp': temporary
+
+    Notes
+    -----
+    Writes csv file of data contained in LM (a DataFrame) to a given or default
+    path.  Contents are written into an "export" directory.
+
+    It is decided in 0.4.11.dev0 to set default paths here; a global approach
+    to handling all uses of this function from any module.
+
+    Returns
+    -------
+    str
+        Full path of the created file.
+
+    '''
+    # Parse Laminate Properties
+    nplies = LM.nplies
+    p = LM.p
+    # TODO: Fix units
+    t_total = LM.total * 1e3                               # (in mm)
+    geometry = LM.Geometry.string
+    df = LM.LMFrame
+
+    # Send default csv to export directory
+    if path is None:
+        # TODO: write file paths pythonically; use abspath()
+        path = os.getcwd()                                 # use for the test in the correct path
+        ##path = path + r'\lamana\tests\controls_LT'         # for Main Script. Comment out in tests
+        ##path = ''.join([path, r'\lamana\output'])
+        dirpath = ''.join([path, r'\export'])              # \export in root dir
+    else:                                                  # pragma: no cover
+        dirpath = path
+
+    # Filename
+    if prefix is None:                                      # pragma: no cover
+        prefix = r'w'                                       # for written by lamana
+
+    prefix = ''.join([prefix, '_'])
+
+    # Prepend files with 'w' for "written" by the package
+    filename = r'\{}laminate_{}ply_p{}_t{:.1f}_{}'.format(
+        prefix, nplies, p, t_total, geometry
+    )
+    suffix = r'.csv'
+    fullpath = ''.join([dirpath, filename, suffix])
+    #print(path)
+
+    # Force create  export directory or path (REF 047)
+    if not os.path.exists(dirpath):
+        os.makedirs(dirpath)
+
+    # Check for duplicates before writing; overwrite protection
+    if not overwrite:
+        # Read dir if file exists.  Append counter to path name if exists.
+        counter = 1
+        while os.path.isfile(fullpath):
+            print('Overwrite protection: File exists.  Incrementing file...')
+            increment = ''.join(['(', str(counter), ')'])
+            fullpath = ''.join([dirpath, filename, increment, suffix])
+            counter += 1
+
+    # Write DataFrame to csv file
+    if verbose:
+        #print('Writing DataFrame to csv in:', fullpath)
+        logging.info('Writing DataFrame to csv in: {}'.format(fullpath))
+
+    df.to_csv(fullpath)
+    return fullpath
+
+
+# TODO: Add write functions from controls.py here
+
+
+def convert_featureinput(FI):
+    '''Return FeaureInput dict with converted values to Dataframes.
+
+    Can accept almost any dict.  Converts to DataFrames depending on type.
+
+    Returns
+    -------
+    defaultdict
+        Values are DataFrames.
+
+    '''
+    logging.info('Converting FeatureInput values to DataFrames: {}...'.format(
+        FI.get('Geometry')))
+
+    dd = ct.defaultdict(list)
+    for k, v in FI.items():
+        if isinstance(v, dict):
+            logging.debug('{0} {1} -> df'.format(k, type(v)))
+            try:
+                # if dict of dicts
+                dd[k] = pd.DataFrame(v).T
+            except(ValueError):
+                # if regular dict, put in a list
+                dd[k] = pd.DataFrame([v], index=[k]).T
+        elif isinstance(v, list):
+            logging.debug('{0} {1} -> df'.format(k, type(v)))
+            dd[k] = pd.DataFrame(v, columns=[k])
+        elif isinstance(v, str):
+            logging.debug('{0} {1} -> df'.format(k, type(v)))
+            dd[k] = pd.DataFrame({'': {k: v}})
+        elif isinstance(v, la.input_.Geometry):
+            logging.debug('{0} {1} -> df'.format(k, type(v)))
+            v = v.string                                       # get geo_string
+            dd[k] = pd.DataFrame({'': {k: v}})
+        elif isinstance(v, pd.DataFrame):                      # sometimes materials is df
+            logging.debug('{0} {1} -> df'.format(k, type(v)))
+            dd[k] = v
+        else:
+            logging.debug('{0} -> Skipped'.format(type(v)))
+
+    return dd
+
+
+def reorder_featureinput(d, keys=None):
+    '''Return an OrderedDict given a list of keys.
+
+    Parameters
+    ----------
+    d : dict
+        Any dict; expects a FeatureInput.
+    keys : list of strings, deafult None
+        Order of keys of a FeatureInput.
+
+    Examples
+    --------
+    >>> case = ut.laminator(dft.geos_standard)[0]
+    >>> LM = case.LMs[0]
+    >>> FI = LM.FeatureInput
+
+    >>> # Default order
+    >>> fi = reorder_featureinput(FI)
+    >>> list(fi.keys())
+    ['Geometry',  'Model', 'Materials', 'Parameters', 'Globals', 'Properties']
+
+    >>> # Manage key order
+    >>> rev_keys = reversed(['Geometry',  'Model', 'Materials',
+    ... 'Parameters', 'Globals', 'Properties'])
+    >>> fi = reorder_featureinput(FI, keys=rev_keys)
+    >>> list(fi.keys())
+    ['Properties', 'Globals', 'Parameters', 'Materials', 'Model', 'Geometry']
+
+    >>> # Add missing keys (in random order)
+    >>> fi = reorder_featureinput(FI, [Model', 'Geometry'])
+    >>> list(fi.keys())
+    ['Model', 'Geometry', 'Materials', 'Parameters', 'Globals', 'Properties']
+
+    Notes
+    -----
+    - Keys are optional; assumes a typical FeatureInput with default keys.
+    - If passed keys are shorter the FI keys, ignores empty entries.
+    - Groups single string entries (i.e. Geometry, Model) upfront for dashboard.
+    - Properties are last as the materials expand expand column-wise.
+
+    '''
+    # Default keys for standard FeatureInput
+    if keys is None:
+        keys = ['Geometry', 'Model', 'Materials', 'Parameters',
+                'Globals', 'Properties']
+
+    od = ct.OrderedDict()
+    for key in keys:
+        od[key] = d[key]
+
+    # If keys is shorter the FI.keys(), tag on the missing keys
+    for k in d.keys():
+        if k not in od:
+            od[k] = d[k]
+
+    return od
+
+
+def get_path(filename=None, prefix=None, suffix=None, overwrite=True,
+             dashboard=False, validate=None,):
+    '''Return the default export path or a file path if given a filename.
+
+    Verifies existing paths, else returns an new path.
+
+    Parameters
+    ----------
+    filename : str, default None
+        File name.
+    prefix : str, default None
+        File name prefix.
+    suffix : |'.csv'|'.xlsx'|, default None
+        File name extension.
+    overwrite : bool, default True
+        Toggle of overwrite protection. If False, increments filename.
+    dashboard : bool, default False
+        Auto-append 'dash_' to filename.  Flag a dashboard is being made;
+        only .csv files supportted.
+    validate : str, default None, optional
+        Verifies if full file path exists; if so, return incremented file path.
+
+    Notes
+    -----
+    Need to return different types of paths depending on output file.  Here is
+    what this function can do:
+    - OK  Standardize the default "\export" directory
+    - OK  Give path for csv data file
+    - OK  Give path for csv dashboard file; prepend "dash_"
+    - OK  Give path for xlsx file only (no dashboard)
+    - OK  Support overwrite protection of pre-existing files
+    - OK  Reprocess paths for temporary files
+    - X   Join path components and return a safe path
+    - X   Accept directory paths arg to override the default path; security issue
+
+    Key Terms:
+    * currpath = current working directory
+    * dirpath = full path - base name
+    * filepath = full path (includes suffix)
+    * basename = prefix + filename + suffix
+    * filename = base name - suffix - prefix
+
+    Returns
+    -------
+    str
+        Default export directory path, unless given other information
+
+    '''
+
+    # Helpers -----------------------------------------------------------------
+    def protect_overwrite(filepath):
+        '''Return a new filepath by looping existing files and incrementing.
+
+        Notes
+        -----
+        - Check for duplicates before writing; overwrite protection
+        - Read dir if file exists.  Append counter to path name if exists.
+
+        '''
+        basename = os.path.basename(filepath)
+        dirpath = os.path.dirname(filepath)
+        counter = 1
+        # Edit basename
+
+        while os.path.isfile(filepath):
+            ##suffix = [ext for ext in EXTENSIONS if basename.endswith(ext)][0]
+            ##filename = basename.replace(suffix, '')
+            filename, suffix = os.path.splitext(basename)
+            logging.debug('filename: {}, suffix: {}'.format(filename, suffix))
+
+            increment = ''.join(['(', str(counter), ')'])
+            filename = ''.join([filename, increment])
+            logging.info("Overwrite protection: filename exists."
+                         " Incrementing name to '{}' ...".format(filename))
+            # Pretend the default directory path with a simple recursive call
+            ##filepath = get_path(filename=filename, suffix=suffix, overwrite=True)  # or inifinite loop
+            filepath = os.path.join(dirpath, ''.join([filename, suffix]))
+            counter += 1
+        return filepath
+
+    # Reset Defaults ----------------------------------------------------------
+    if filename is None:
+        filename = ''
+    if prefix is None:
+        prefix = ''
+    if suffix is None:
+        suffix = ''
+    elif suffix.endswith('csv'):
+        suffix = EXTENSIONS[0]
+    elif suffix.endswith('xlsx'):
+        suffix = EXTENSIONS[1]
+
+    # Set Root/Source/Default Paths -------------------------------------------
+    # The export folder is relative to the root (package) path
+    sourcepath = os.path.abspath(os.path.dirname(la.__file__))
+    packagepath = os.path.dirname(sourcepath)
+    defaultpath = os.path.join(packagepath, 'export')
+
+    dirpath = defaultpath
+
+    logging.debug('Root path: {}'.format(packagepath))
+    if not filename and (suffix or dashboard):
+        logging.warn("Missing 'filename' arg.  Using default export directory ...")
+
+    # File Path ---------------------------------------------------------------
+    if validate:
+        # Just check if exists.  Give new filepath is so.
+        return protect_overwrite(validate)
+
+    if filename:
+        prefix = 'dash_'if dashboard and suffix.endswith('csv') else ''
+        if dashboard and not suffix.endswith('csv'):
+            logging.info('Only .csv files support separate dashboards.'
+                         ' Using default export directory...')
+        if not suffix:
+            logging.warn('Missing suffix.  No action taken.')
+        basename = ''.join([prefix, filename, suffix])
+        filepath = os.path.join(dirpath, basename)
+
+        if not overwrite:
+            return protect_overwrite(filepath)
+        return filepath
+
+    return dirpath
+
+
+def export(LM, overwrite=False, prefix=None, suffix=None, order=None,
+           offset=3, dirpath=None, temp=False, keepname=True, delete=False):
+    '''Write LaminateModels and FeatureInput to files; return a tuple of paths.
+
+    Supported formats:
+    - .csv: two files; separate data and dashboard files
+    - .xlsx: one file; data and dashboard sheets
+
+    Parameters
+    ----------
+    LM : DataFrame
+        LaminateModel containing data calculations and attributes.
+    overwrite : bool; default False
+        Save over files with the same name.  Prevents file incrementation
+        and excess files after cyclic calls.
+    prefix : str; default None
+        Prepend a prefix to the filename.  Conventions are:
+        - '' : legacy or new
+        - 'w': written by the package
+        - 't': temporary file; used when tempfile is renamed
+        - 'r': redone; altered from legacy
+        - 'dash': dashboard
+    suffix : |'.csv'|'.xlsx'|
+        Determines the file format by appending to filename; default '.xlsx'.
+    order: list
+        Keys of the FeatureInput.
+    offset : int
+        Blank columns between data in the dashboard.
+    dirpath : str, optional; default "/export" directory
+        Directory path to store resulting csv files; custom path NotImplemented.
+    temp : bool, default False
+        Make temporary files in the OS Temp directory instead.
+    keepname : bool, True
+        Toggle renaming temporary files; temp must be True.
+    delete : bool, default False
+        Force file removal after created; mainly used for temporary files.
+
+    Returns
+    -------
+    tuple
+        Full file paths (str) of the created files LM and dashboard data.
+
+    See Also
+    --------
+    - get_path(): deals with munging paths and validations
+    - convert_featureinput(): convert dict values to DataFrames
+    - reorder_featureinput(): make and ordered list for the dashboard
+    - make_tempfile(): review how Python 'mkstemp' makes temp; NotImplemented
+    - rename_tempfile(): rename the file post closing file.
+
+    Notes
+    -----
+    Contents are written into an "/export" directory. FeatureInput data a.k.a "dashboard".
+    We use mkstemp (low-level), which leaves it open for to_excel to write.
+    Here are technical characteristics:
+    - OK  Outputs different file formats.
+    - OK  Writes regular or temporary files (get auto-deleted by the OS; for tests)
+    - OK  Calls helper functions to clean paths and datastructures.
+    - OK  Allows prefixing for file indentification.
+    - OK  Outputs data and dashboards.
+    - OK  Works even when files exist in the directory.
+    - OK  Auto creates "\export" directory if none exists.
+    - OK  Renames temporary files by default.
+    - X   Supports custom directory paths.
+
+    '''
+    def rename_tempfile(filepath, filename):
+        '''Return new file path; renames an extant file in-place.'''
+        dirpath = os.path.dirname(filepath)
+        new_filepath = os.path.join(dirpath, filename)
+        new_filepath = get_path(validate=new_filepath)
+        os.rename(filepath, new_filepath)
+        return new_filepath
+
+    # Parse for Filename ------------------------------------------------------
+    nplies = LM.nplies
+    p = LM.p
+    # TODO: Fix units
+    t_total = LM.total * 1e3                               # (in mm)
+    geo_string = LM.Geometry.string
+    FI = LM.FeatureInput
+    ##df = LM.LMFrame
+
+    # Path Munge --------------------------------------------------------------
+    if prefix is None:
+        prefix = ''
+    if suffix is None:
+        suffix = EXTENSIONS[1]
+
+    if dirpath is None:
+        ###
+        # Prepend files with 'w' for "written" by the package
+        # NOTE: removed default w_ prefix; check the control and other uses to maintain coding
+        # TODO: rename legacy files with "l_"
+        ###
+
+        filename = r'{}laminate_{}ply_p{}_t{:.1f}_{}'.format(
+            prefix, nplies, p, t_total, geo_string)
+
+        # Force-create export directory or path (REF 047)
+        # Send default csv to export directory
+        defaultpath = get_path()
+        if not os.path.exists(defaultpath):
+            os.makedirs(defaultpath)
+    else:
+        raise NotImplementedError('Custom directory paths are not yet implemented.')
+
+    # Prepare FeatureInput ----------------------------------------------------
+    if order is None:
+        order = ['Geometry', 'Model', 'Materials',
+                 'Parameters', 'Globals', 'Properties']    # default
+
+    converted_FI = convert_featureinput(FI)
+    reordered_FI = reorder_featureinput(converted_FI, order) # elevates strings
+    dash_df = pd.concat(reordered_FI)                      # combines all dfs into one
+    data_df = LM.LMFrame
+
+    # Assemble ----------------------------------------------------------------
+    # Build csv data and dashboard (as optional temporary file)
+    if not suffix.endswith('xlsx'):
+        try:
+            if temp:
+                data_des, data_filepath = tempfile.mkstemp(suffix=suffix)
+                dash_des, dash_filepath = tempfile.mkstemp(suffix=suffix)
+            else:
+                data_filepath = get_path(filename, suffix=suffix, overwrite=overwrite)
+                dash_filepath = get_path(filename, suffix=suffix, overwrite=overwrite,
+                                         dashboard=True)
+
+            # Write File
+            data_df.to_csv(data_filepath)
+            dash_df.to_csv(dash_filepath)
+
+            # Tempfile Options
+            if temp:
+                os.close(data_des)
+                os.close(dash_des)
+
+            if temp and keepname:
+                data_filepath = rename_tempfile(
+                    data_filepath, ''.join(['t_', filename, suffix]))
+                dash_filepath = rename_tempfile(
+                    dash_filepath, ''.join(['t_', 'dash_', filename, suffix]))
+
+            logging.info('DataFrame written as {} file in: {}'.format(suffix, data_filepath))
+            logging.info('Dashboard written as {} file in: {}'.format(suffix, dash_filepath))
+
+        finally:
+            if delete:
+                os.remove(data_filepath)
+                os.remove(dash_filepath)
+                logging.info('File has been deleted: {}'.format(data_filepath))
+                logging.info('File has been deleted: {}'.format(dash_filepath))
+            pass
+        return (data_filepath, dash_filepath)
+
+    # For Excel Files Only
+    elif suffix.endswith('xlsx'):
+        try:
+            if temp:
+                data_des, workbook_filepath = tempfile.mkstemp(suffix=suffix)
+            else:
+                workbook_filepath = get_path(filename, suffix=suffix,
+                                             overwrite=overwrite)
+
+            # Excel worksheet code block --------------------------------------
+            writer = pd.ExcelWriter(workbook_filepath)
+
+            # Data sheet
+            sheetname = geo_string.replace('[', '|').replace(']', '|')
+            data_sheetname = ' '.join(['Data', sheetname])
+            data_df.to_excel(writer, data_sheetname)
+
+            # Dashboard sheet
+            dash_sheetname = ' '.join(['Dash', sheetname])
+
+            for i, dict_df in enumerate(reordered_FI.values()):
+                if dict_df.size == 1:                      # assumes string strs are ordered first
+                    dict_df.to_excel(writer, dash_sheetname, startrow=4**i)
+                else:
+                    dict_df.to_excel(writer, dash_sheetname, startcol=(i-1)*offset)
+
+            writer.save()
+
+            if temp:
+                os.close(data_des)
+
+            if temp and keepname:
+                workbook_filepath = rename_tempfile(
+                    workbook_filepath, ''.join(['t_', filename, suffix]))
+
+            logging.info('Data and dashboard written as {} file in: {}'.format(suffix, workbook_filepath))
+
+        finally:
+            if delete:
+                os.remove(workbook_filepath)
+                logging.info('File has been deleted: {}'.format(workbook_filepath))
+            pass
+
+        return (workbook_filepath,)
+
 
 # =============================================================================
 # CITED CODE ------------------------------------------------------------------
