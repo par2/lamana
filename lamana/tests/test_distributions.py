@@ -3,7 +3,7 @@
 
 import os
 import copy
-
+import logging
 import itertools as it
 
 import nose.tools as nt
@@ -959,6 +959,71 @@ def test_Case_mthd_apply_LaminateModels_None1():
     nt.assert_equal(actual, expected)
 
 
+class TestCaseExportMethods():
+    '''Comprise tests for export methods of Case; use simple laminate and tempfiles.'''
+    case = la.distributions.Case(load_params, mat_props)
+    case.apply(['400-[200]-800', '400-[400]-400', '400-[100,100]-800'])
+
+    def test_Case_mtd_to_csv1(self):
+        '''Verify number of files written; use tempfiles.'''
+        try:
+            list_of_tupled_paths = self.case.to_csv(temp=True)
+            actual1 = len(list_of_tupled_paths)
+            actual2 = len([dash_fpath
+                           for data_fpath, dash_fpath in list_of_tupled_paths])
+            expected1 = 3                                  # tuples
+            expected2 = 3                                  # dashboards
+            nt.assert_equals(actual1, expected1)
+            nt.assert_equals(actual2, expected2)
+        finally:
+            for data_fpath, dash_fpath in list_of_tupled_paths:
+                os.remove(data_fpath)
+                os.remove(dash_fpath)
+                logging.info('File has been deleted: {}'.format(data_fpath))
+                logging.info('File has been deleted: {}'.format(dash_fpath))
+
+    def test_Case_mtd_to_csv2(self):
+        '''Verify type of to_csv.'''
+        try:
+            result = self.case.to_csv(temp=True)
+            actual1 = isinstance(result, list)
+            actual2 = isinstance(result[0], tuple)
+            nt.assert_true(actual1)
+            nt.assert_true(actual2)
+        finally:
+            for data_fpath, dash_fpath in result:
+                os.remove(data_fpath)
+                os.remove(dash_fpath)
+                logging.info('File has been deleted: {}'.format(data_fpath))
+                logging.info('File has been deleted: {}'.format(dash_fpath))
+
+    def test_Case_mtd_to_xlsx1(self):
+        '''Verify returns 2 sheets per LamainateModel in the same file; half dashboards.'''
+        try:
+            workbook_fpath = self.case.to_xlsx(temp=True)
+            excel_file = pd.ExcelFile(workbook_fpath)
+            actual1 = len(excel_file.sheet_names)
+            actual2 = len([fname for fname in excel_file.sheet_names
+                          if fname.startswith('Dash')])
+            expected1 = 6
+            expected2 = actual1/2.
+            nt.assert_equals(actual1, expected1)
+            nt.assert_equals(actual2, expected2)
+        finally:
+            os.remove(workbook_fpath)
+            logging.info('File has been deleted: {}'.format(workbook_fpath))
+
+    def test_Case_mtd_to_xlsx2(self):
+        '''Verify type of to_xlsx.'''
+        try:
+            result = self.case.to_xlsx(temp=True)
+            actual = isinstance(result, str)
+            nt.assert_true(actual)
+        finally:
+            os.remove(result)
+            logging.info('File has been deleted: {}'.format(result))
+
+
 #------------------------------------------------------------------------------
 # CASES
 #------------------------------------------------------------------------------
@@ -1206,37 +1271,37 @@ def test_Cases_mthd_plot():
     # TODO: Try checking return is an ax instance
     pass
 
-
-def test_Cases_mthd_tocsv():
-    '''Check utils.write_csv is called, file is written to default directory.
-
-    Notes
-    -----
-    Add files to export, then removes them.  Adapted from test_tools_write1().
-    Instantiate a Cases object, iterate, call `to_csv` that writes the file.
-    The read those temporary files.
-
-    See Also
-    --------
-    - utils.tools.write_csv(): main writer for csv files.
-    - test_tools_write1(): writes, tests and cleans up temporary files.
-
-    '''
-    try:
-        # TODO: Add standard case to the module namespace to reduce building.
-        cases = la.distributions.Cases(['400-200-800'])
-        # Write files to default output dir
-        # CAUTION: assumes the order of case.to_csv is the same as Cases.LMs
-        expected_dfs = cases.frames
-        filepaths = cases.to_csv(prefix='temp')
-        for filepath, expected in zip(filepaths, expected_dfs):
-            # Read a file, get DataFrames
-            actual = pd.read_csv(filepath, index_col=0)
-            ut.assertFrameEqual(actual, expected)
-    finally:
-        # Remove temporary files
-        for filepath in filepaths:
-            os.remove(filepath)
+# DEPRECATE: 0.4.11
+# def test_Cases_mthd_tocsv():
+#     '''Check utils.write_csv is called, file is written to default directory.
+#
+#     Notes
+#     -----
+#     Add files to export, then removes them.  Adapted from test_tools_write1().
+#     Instantiate a Cases object, iterate, call `to_csv` that writes the file.
+#     The read those temporary files.
+#
+#     See Also
+#     --------
+#     - utils.tools.write_csv(): main writer for csv files.
+#     - test_tools_write1(): writes, tests and cleans up temporary files.
+#
+#     '''
+#     try:
+#         # TODO: Add standard case to the module namespace to reduce building.
+#         cases = la.distributions.Cases(['400-200-800'])
+#         # Write files to default output dir
+#         # CAUTION: assumes the order of case.to_csv is the same as Cases.LMs
+#         expected_dfs = cases.frames
+#         filepaths = cases.to_csv(prefix='temp')
+#         for filepath, expected in zip(filepaths, expected_dfs):
+#             # Read a file, get DataFrames
+#             actual = pd.read_csv(filepath, index_col=0)
+#             ut.assertFrameEqual(actual, expected)
+#     finally:
+#         # Remove temporary files
+#         for filepath in filepaths:
+#             os.remove(filepath)
 
 
 # TODO: Move to prop section; brittle, moving causes failures; not apparent why; suspect load_params namespace collision

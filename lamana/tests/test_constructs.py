@@ -1294,7 +1294,7 @@ def test_Laminate_compare_sets1():
     nt.assert_equal(len(set([LM1, LM2, LM3, LM4])), 3)
 
 
-class TestExportMethods():
+class TestLaminateExportMethods():
     '''Comprise tests for export methods of Laminate; use simple laminate and tempfiles.'''
     case = ut.laminator('400.0-[200.0]-800.0')[0]
     LM = case.LMs[0]
