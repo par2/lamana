@@ -6,7 +6,8 @@
 
 import os
 import importlib
-#import logging
+import logging
+import tempfile
 import collections as ct
 import itertools as it
 
@@ -65,6 +66,10 @@ class Case(object):
         strings.  Accept user geometries and selected model.
     plot(**kwargs)
         Return matplotlib plots given laminate DataFrames.
+    to_csv(**kwargs)
+        Write all LaminateModels and FeatureInputs to separate files.
+    to_xlsx(**kwargs)
+        Write all LaminateModels and FeatureInputs to one file.
 
     Raises
     ------
@@ -437,6 +442,108 @@ class Case(object):
 
             plt.show()
 
+    def to_csv(self, **kwargs):
+        '''Write all LaminateModels and FeatureInput dashboards as separate files.
+
+        Returns
+        -------
+        list
+            Paths for all files.
+
+        See Also
+        --------
+        - `utils.tools.export`: for kwargs and docstring.
+
+        '''
+        return [LM.to_csv(**kwargs) for LM in self.LMs]
+
+    def to_xlsx(self, filename=None, offset=3, temp=False, overwrite=False,
+                prefix=None, keepname=True, order=None, delete=False):
+        '''Write all LaminateModels and FeatureInput dashboards as one file.
+
+        Returns
+        -------
+        str
+            Path name of the written file.
+
+        See Also
+        --------
+        - `utils.tools.export`: for comparable kwargs and docstring.
+        - `utils.tools.reorder_featureinput`: for order of dashboard data
+
+        Notes
+        -----
+        All files for a given case are written to one file.
+
+        This is a reimplementation of the pandas `to_excel` method.  This is
+        separated from `export` due to how sheets are added in the ExcelWriter.
+
+        '''
+        def rename_tempfile(filepath, filename):
+            '''Return new file path; renames an extant file in-place.'''
+            dirpath = os.path.dirname(filepath)
+            new_filepath = os.path.join(dirpath, filename)
+            new_filepath = ut.get_path(validate=new_filepath)
+            os.rename(filepath, new_filepath)
+            return new_filepath
+
+        if filename is None:
+            filename = 'case_LaminateModels'
+        if prefix is None:
+            prefix = ''
+        suffix = '.xlsx'
+
+        if temp:
+            data_des, workbook_filepath = tempfile.mkstemp(suffix=suffix)
+        else:
+            workbook_filepath = ut.get_path(filename, suffix=suffix, overwrite=overwrite)
+
+        try:
+            # Excel code block ----------------------------------------------------
+            writer = pd.ExcelWriter(workbook_filepath)
+            for LM in self.LMs:
+                # Parse LaminateModel variables
+                ##nplies = LM.nplies
+                ##p = LM.p
+                # TODO: Fix units
+                ##t_total = LM.total * 1e3                   # (in mm)
+                geo_string = LM.Geometry.string
+                FI = LM.FeatureInput
+                data_df = LM.LMFrame
+                converted_FI = ut.convert_featureinput(FI)
+                reordered_FI = ut.reorder_featureinput(converted_FI, order)
+
+                # Data sheet
+                sheetname = geo_string.replace('[', '|').replace(']', '|')
+                data_sheetname = ' '.join(['Data', sheetname])
+                data_df.to_excel(writer, data_sheetname)
+
+                # Dashboard sheet
+                dash_sheetname = ' '.join(['Dash', sheetname])
+                for i, dict_df in enumerate(reordered_FI.values()):
+                    if dict_df.size == 1:                      # assumes string strs are ordered first
+                        dict_df.to_excel(writer, dash_sheetname, startrow=4**i)
+                    else:
+                        dict_df.to_excel(writer, dash_sheetname, startcol=(i-1)*offset)
+
+            writer.save()
+
+            if temp:
+                os.close(data_des)
+
+            if temp and keepname:
+                workbook_filepath = rename_tempfile(
+                    workbook_filepath, ''.join(['t_', filename, suffix]))
+                logging.info('Data and dashboard written as {} file in: {}'.format(
+                    suffix, workbook_filepath))
+        finally:
+            if delete:
+                os.remove(workbook_filepath)
+                logging.info('File has been deleted: {}'.format(workbook_filepath))
+            pass
+
+        return workbook_filepath
+
     @property
     def materials(self):
         '''Override the _materials attribute.
@@ -551,6 +658,10 @@ class Cases(ct.MutableMapping):
     - writable: write DataFrames to csv files
     - selectable: perform set operations and return unique subsets
 
+    .. note:: Deprecate warning LamAna 0.4.11
+            `to_csv` will be removed in LamAna 0.4.12 and will not be replaced,
+            due to risk of memory crashing if not used cautiously.
+
     Attributes
     ----------
     LMs
@@ -584,8 +695,6 @@ class Cases(ct.MutableMapping):
         Return a set (subset) of LaminateModels given keyword conditions.
     plot(**kwargs)
         BETA (0.4.4b3): Plot caselets as subplots.
-    to_csv(path=None, verbose=True, **kwargs):
-        Write all collected LaminateModels as csv files to a specified path.
 
     Raises
     ------
@@ -1066,8 +1175,13 @@ class Cases(ct.MutableMapping):
                               subplots_kw=subplots_kw, suptitle_kw=suptitle_kw,
                               **kwargs)
 
+# DEPRECATE: 0.4.11
     def to_csv(self, path=None, verbose=True, **kwargs):
         '''Write all collected LaminateModels as csv files to a specified path.
+
+        .. note:: Deprecate warning LamAna 0.4.11
+                `to_csv` will be removed in LamAna 0.4.12 and will not be replaced,
+                due to risk of memory crashing if not used cautiously.
 
         Parameters
         ----------
