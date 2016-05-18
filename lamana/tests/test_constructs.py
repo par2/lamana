@@ -1,6 +1,8 @@
 #------------------------------------------------------------------------------
 '''Confirm output of general Laminate structure.'''
 # NOTE: Refactoring in 0.4.3c5b led to patching container orders.
+import os
+import logging
 
 import nose.tools as nt
 import pandas as pd
@@ -1314,6 +1316,38 @@ def test_Laminate_num_middle1():
     #assert actual <= expected
     nt.assert_less_equal(actual, expected)
     #return actual
+
+
+def test_Laminate_mtd_to_excel1():
+    '''Verify uses export function; writes temporary file then deletes.'''
+    case = ut.laminator('400.0-[200.0]-800.0')[0]
+    LM = case.LMs[0]
+
+    try:
+        (workbook_fpath,) = ut.export(LM, suffix='.xlsx', temp=True)
+        actual = os.path.exists(workbook_fpath)
+        nt.assert_true(actual)
+    finally:
+        os.remove(workbook_fpath)
+        logging.info('File has been deleted: {}'.format(workbook_fpath))
+
+
+def test_Laminate_mtd_to_csv1():
+    '''Verify uses export function; writes temporary file then deletes.'''
+    case = ut.laminator('400.0-[200.0]-800.0')[0]
+    LM = case.LMs[0]
+
+    try:
+        data_fpath, dash_fpath = ut.export(LM, suffix='.csv', temp=True)
+        actual1 = os.path.exists(data_fpath)
+        actual2 = os.path.exists(dash_fpath)
+        nt.assert_true(actual1)
+        nt.assert_true(actual2)
+    finally:
+        os.remove(data_fpath)
+        os.remove(dash_fpath)
+        logging.info('File has been deleted: {}'.format(data_fpath))
+        logging.info('File has been deleted: {}'.format(dash_fpath))
 
 
 def test_Laminate_num_outer1():
