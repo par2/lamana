@@ -29,13 +29,14 @@ import lamana as la
 EXTENSIONS = ('.csv', '.xlsx')
 
 
+# TODO: Add deprecation warning
 def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False):
     '''Return a dict of Cases; quickly build and encase a suite of Case objects.
 
     This is useful for tests requiring laminates with different thicknesses,
     ps and geometries.
 
-    .. note:: DEPRECATE LamAna 0.4.10
+    .. note:: Deprecate warning LamAna 0.4.10
             `lamanator` will be removed in LamAna 0.5 and replaced by
             `lamana.distributions.Cases` because the latter is more efficient.
 
@@ -492,13 +493,13 @@ def is_matched(string, pattern=None):
 
 # IO --------------------------------------------------------------------------
 # IO-related functions
-# DEPRECATE: function; use export instead
+# DEPRECATE: 0.4.11; use export instead
 # DEPRECATE: verbose; use logging instead
 def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
     '''Convert DataFrame to csv files and write them to a specified directory.
 
-    .. note:: Deprecated in LamAna 0.4.12
-              `write_csv` will be removed in Numpy 0.4.12, it is replaced by
+    .. note:: Deprecate warning LamAna 0.4.11
+              `write_csv` will be removed in LamAna 0.4.12, it is replaced by
               `export` because the latter extends formats, tempfiles and more.
 
     Parameters
