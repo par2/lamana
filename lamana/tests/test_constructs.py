@@ -1294,6 +1294,62 @@ def test_Laminate_compare_sets1():
     nt.assert_equal(len(set([LM1, LM2, LM3, LM4])), 3)
 
 
+class TestExportMethods():
+    '''Comprise tests for export methods of Laminate; use simple laminate and tempfiles.'''
+    case = ut.laminator('400.0-[200.0]-800.0')[0]
+    LM = case.LMs[0]
+
+    def test_Laminate_mtd_to_csv1(self):
+        '''Verify uses export function; writes temporary file then deletes.'''
+        try:
+            data_fpath, dash_fpath = self.LM.to_csv(temp=True)
+            actual1 = os.path.exists(data_fpath)
+            actual2 = os.path.exists(dash_fpath)
+            nt.assert_true(actual1)
+            nt.assert_true(actual2)
+        finally:
+            os.remove(data_fpath)
+            os.remove(dash_fpath)
+            logging.info('File has been deleted: {}'.format(data_fpath))
+            logging.info('File has been deleted: {}'.format(dash_fpath))
+
+    def test_Laminate_mtd_to_csv2(self):
+        '''Verify returns tuple of 2 paths; writes temporary file then deletes.'''
+        result = self.LM.to_csv(temp=True, delete=True)
+        actual1 = isinstance(result, tuple)
+        actual2 = len(result)
+        actual3 = isinstance(result[1], str)
+        expected = 2
+        nt.assert_true(actual1)
+        nt.assert_equals(actual2, expected)
+        nt.assert_true(actual3)
+        logging.info('File has been deleted: {}'.format(result[0]))
+        logging.info('File has been deleted: {}'.format(result[1]))
+
+    def test_Laminate_mtd_to_xlsx1(self):
+        '''Verify uses export function; writes temporary file then deletes.'''
+        try:
+            (workbook_fpath,) = self.LM.to_xlsx(temp=True)
+            actual = os.path.exists(workbook_fpath)
+            nt.assert_true(actual)
+        finally:
+            os.remove(workbook_fpath)
+            logging.info('File has been deleted: {}'.format(workbook_fpath))
+
+    def test_Laminate_mtd_to_xlsx2(self):
+        '''Verify returns tuple of 1 path; writes temporary file then deletes.'''
+        # Maintains tuple for consistency
+        result = self.LM.to_xlsx(temp=True, delete=True)
+        actual1 = isinstance(result, tuple)
+        actual2 = len(result)
+        actual3 = isinstance(result[0], str)
+        expected = 1
+        nt.assert_true(actual1)
+        nt.assert_equals(actual2, expected)
+        nt.assert_true(actual3)
+        logging.info('File has been deleted: {}'.format(result))
+
+
 '''Make a test where the FeautreInpts are different but df are equal --> fail test.'''
 #  assert even_LM.FeatureInput != standard[0].FeatureInput
 
@@ -1316,38 +1372,6 @@ def test_Laminate_num_middle1():
     #assert actual <= expected
     nt.assert_less_equal(actual, expected)
     #return actual
-
-
-def test_Laminate_mtd_to_excel1():
-    '''Verify uses export function; writes temporary file then deletes.'''
-    case = ut.laminator('400.0-[200.0]-800.0')[0]
-    LM = case.LMs[0]
-
-    try:
-        (workbook_fpath,) = ut.export(LM, suffix='.xlsx', temp=True)
-        actual = os.path.exists(workbook_fpath)
-        nt.assert_true(actual)
-    finally:
-        os.remove(workbook_fpath)
-        logging.info('File has been deleted: {}'.format(workbook_fpath))
-
-
-def test_Laminate_mtd_to_csv1():
-    '''Verify uses export function; writes temporary file then deletes.'''
-    case = ut.laminator('400.0-[200.0]-800.0')[0]
-    LM = case.LMs[0]
-
-    try:
-        data_fpath, dash_fpath = ut.export(LM, suffix='.csv', temp=True)
-        actual1 = os.path.exists(data_fpath)
-        actual2 = os.path.exists(dash_fpath)
-        nt.assert_true(actual1)
-        nt.assert_true(actual2)
-    finally:
-        os.remove(data_fpath)
-        os.remove(dash_fpath)
-        logging.info('File has been deleted: {}'.format(data_fpath))
-        logging.info('File has been deleted: {}'.format(dash_fpath))
 
 
 def test_Laminate_num_outer1():

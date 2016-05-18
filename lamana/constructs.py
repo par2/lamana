@@ -950,6 +950,11 @@ class Laminate(Stack):
     def to_csv(self, **kwargs):
         '''Write LaminateModel data FeatureInput dashboard as separate files.
 
+        Returns
+        -------
+        tuple
+            Paths for both .csv files.
+
         See Also
         --------
         - `utils.tools.export`: for kwargs and docstring.
@@ -958,8 +963,13 @@ class Laminate(Stack):
         data_fpath, dash_fpath = ut.export(self, suffix='.csv', **kwargs)
         return data_fpath, dash_fpath
 
-    def to_excel(self, offset=3, **kwargs):
+    def to_xlsx(self, offset=3, **kwargs):
         '''Write LaminateModel data FeatureInput dashboard as one file.
+
+        Returns
+        -------
+        tuple
+            Path for .xlsx file; maintained For type consistency.
 
         See Also
         --------
@@ -967,7 +977,7 @@ class Laminate(Stack):
 
         '''
         (workbook_fpath,) = ut.export(self, suffix='.xlsx', offset=offset, **kwargs)
-        return workbook_fpath
+        return (workbook_fpath,)
 
     # Properties --------------------------------------------------------------
     '''Need Laminate info property to display on repr().'''
