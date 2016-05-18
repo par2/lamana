@@ -497,6 +497,10 @@ def is_matched(string, pattern=None):
 def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
     '''Convert DataFrame to csv files and write them to a specified directory.
 
+    .. note:: Deprecated in LamAna 0.4.12
+              `write_csv` will be removed in Numpy 0.4.12, it is replaced by
+              `export` because the latter extends formats, tempfiles and more.
+
     Parameters
     ----------
     LM : DataFrame
@@ -879,6 +883,27 @@ def export(LM, overwrite=False, prefix=None, suffix=None, order=None,
     - OK  Renames temporary files by default.
     - X   Supports custom directory paths.
 
+    Examples
+    --------
+    >>> case = ut.laminator('400.0-[200.0]-800.0')[0]
+    >>> LM = case.LMs[0]
+    >>> export(LM)
+    '~/lamana/export/laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.xlsx'
+
+    >>> # Overwrite Protection
+    >>> export(LM, overwrite=False)
+    '~/lamana/export/laminate_5ply_p5_t2.0_400.0-[200.0]-800.0(1).xlsx'
+
+    >>> # Optional .csv Format
+    >>> export(LM, suffix='.csv')
+    '~/lamana/export/dash_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+    '~/lamana/export/laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+
+    >>> # Optional Temporary Files
+    >>> export(LM, suffix='.csv', temp=True)
+    'temp/t_dash_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+    'temp/t_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+
     '''
     def rename_tempfile(filepath, filename):
         '''Return new file path; renames an extant file in-place.'''
@@ -901,7 +926,7 @@ def export(LM, overwrite=False, prefix=None, suffix=None, order=None,
     if prefix is None:
         prefix = ''
     if suffix is None:
-        suffix = EXTENSIONS[1]
+        suffix = EXTENSIONS[1]                             # .xlsx
 
     if dirpath is None:
         ###
