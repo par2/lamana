@@ -1,3 +1,4 @@
+name: lamana_docs
 dependencies:
     - pip:
         - nbsphinx==0.2.2
