@@ -630,7 +630,7 @@ def convert_featureinput(FI):
             logging.debug('{0} {1} -> df'.format(k, type(v)))
             dd[k] = v
         else:
-            logging.debug('{0} -> Skipped'.format(type(v)))
+            logging.debug('{0} -> Skipped'.format(type(v)))    # pragma: no cover
 
     return dd
 
@@ -961,13 +961,17 @@ def export(LM, overwrite=False, prefix=None, suffix=None, order=None,
     # Build csv data and dashboard (as optional temporary file)
     if not suffix.endswith('xlsx'):
         try:
+            # Tempfiles are used to obviate writing to package folders
             if temp:
                 data_des, data_filepath = tempfile.mkstemp(suffix=suffix)
                 dash_des, dash_filepath = tempfile.mkstemp(suffix=suffix)
             else:
-                data_filepath = get_path(filename, suffix=suffix, overwrite=overwrite)
-                dash_filepath = get_path(filename, suffix=suffix, overwrite=overwrite,
-                                         dashboard=True)
+                data_filepath = get_path(
+                    filename, suffix=suffix, overwrite=overwrite
+                )                                          # pragma: no cover
+                dash_filepath = get_path(
+                    filename, suffix=suffix, overwrite=overwrite, dashboard=True
+                )                                          # pragma: no cover
 
             # Write File
             data_df.to_csv(data_filepath)
@@ -999,11 +1003,13 @@ def export(LM, overwrite=False, prefix=None, suffix=None, order=None,
     # For Excel Files Only
     elif suffix.endswith('xlsx'):
         try:
+            # Tempfiles are used to obviate writing to package folders
             if temp:
                 data_des, workbook_filepath = tempfile.mkstemp(suffix=suffix)
             else:
-                workbook_filepath = get_path(filename, suffix=suffix,
-                                             overwrite=overwrite)
+                workbook_filepath = get_path(
+                    filename, suffix=suffix, overwrite=overwrite
+                )                                          # pragma: no cover
 
             # Excel worksheet code block --------------------------------------
             writer = pd.ExcelWriter(workbook_filepath)

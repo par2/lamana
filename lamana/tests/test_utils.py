@@ -142,6 +142,14 @@ def test_tool_get_path_name4():
     nt.assert_false(actual2)
 
 
+def test_tool_get_path_name5():
+    '''Verify overwrite protected filepath is returned if overwrite is False.'''
+    # Just testing that it's triggered; not that it increments.
+    path = ut.get_path(filename=RANDOMCHARS, suffix='.xlsx', overwrite=False)
+    actual = path.endswith('.'.join([RANDOMCHARS, 'xlsx']))
+    nt.assert_true(actual)
+
+
 def test_tool_get_path_warn1():
     '''Verify correct path for no extension; no suffix kwarg.'''
     path = ut.get_path(filename=RANDOMCHARS)               # should raise a logger warning
@@ -382,6 +390,18 @@ class TestExport():
                 os.remove(fpath)
                 logging.info('File has been deleted: {}'.format(fpath))
 
+    def test_export_xlsx_default(self):
+        '''Verify default suffix is '.xlsx'.'''
+        result = ut.export(self.LM, suffix=None, temp=True, delete=True)
+        actual = result[0].endswith('.xlsx')
+        nt.assert_true(actual)
+
+    @nt.raises(NotImplementedError)
+    def test_export_xlsx_error1(self):
+        '''Verify raises error if a directory name is passed in.'''
+        # This way for now due to security concerns accidentatly writing to disk.
+        ut.export(self.LM, dirpath='dummy', delete=True)
+
 
 class TestFeatureInputTools:
     '''Comprise test functions to convert and reorder FeatureInputs.'''
@@ -393,6 +413,14 @@ class TestFeatureInputTools:
     def test_tool_convert_featureinput1(self):
         '''Verify all dict values are DataFrames.'''
         for value in self.converted_FI.values():
+            actual = isinstance(value, pd.DataFrame)
+            nt.assert_true(actual)
+
+    def test_tool_convert_featureinput2(self):
+        '''Verify dict with DataFrame stays unconverted.'''
+        dict_frame = {0: pd.DataFrame({'': {'Geometry': '1-2-3'}}, )}
+        converted_dict = ut.convert_featureinput(dict_frame)
+        for value in converted_dict.values():
             actual = isinstance(value, pd.DataFrame)
             nt.assert_true(actual)
 
