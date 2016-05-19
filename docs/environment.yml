@@ -1,6 +1,6 @@
 name: lamana_docs
 dependencies:
-- python
+- python3
 - numpy
 - matplotlib
 - pandas
