@@ -479,14 +479,6 @@ class Case(object):
         separated from `export` due to how sheets are added in the ExcelWriter.
 
         '''
-        def rename_tempfile(filepath, filename):
-            '''Return new file path; renames an extant file in-place.'''
-            dirpath = os.path.dirname(filepath)
-            new_filepath = os.path.join(dirpath, filename)
-            new_filepath = ut.get_path(validate=new_filepath)
-            os.rename(filepath, new_filepath)
-            return new_filepath
-
         if filename is None:
             filename = 'case_LaminateModels'
         if prefix is None:
@@ -532,7 +524,7 @@ class Case(object):
                 os.close(data_des)
 
             if temp and keepname:
-                workbook_filepath = rename_tempfile(
+                workbook_filepath = ut.rename_tempfile(
                     workbook_filepath, ''.join(['t_', filename, suffix]))
                 logging.info('Data and dashboard written as {} file in: {}'.format(
                     suffix, workbook_filepath))

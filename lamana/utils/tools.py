@@ -495,6 +495,14 @@ def is_matched(string, pattern=None):
 # IO-related functions
 # DEPRECATE: 0.4.11; use export instead
 # DEPRECATE: verbose; use logging instead
+def rename_tempfile(filepath, filename):
+    '''Return new file path; renames an extant file in-place.'''
+    dirpath = os.path.dirname(filepath)
+    new_filepath = os.path.join(dirpath, filename)
+    new_filepath = get_path(validate=new_filepath)
+    os.rename(filepath, new_filepath)
+    return new_filepath
+
 def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
     '''Convert DataFrame to csv files and write them to a specified directory.
 
@@ -906,14 +914,6 @@ def export(LM, overwrite=False, prefix=None, suffix=None, order=None,
     'temp/t_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
 
     '''
-    def rename_tempfile(filepath, filename):
-        '''Return new file path; renames an extant file in-place.'''
-        dirpath = os.path.dirname(filepath)
-        new_filepath = os.path.join(dirpath, filename)
-        new_filepath = get_path(validate=new_filepath)
-        os.rename(filepath, new_filepath)
-        return new_filepath
-
     # Parse for Filename ------------------------------------------------------
     nplies = LM.nplies
     p = LM.p
