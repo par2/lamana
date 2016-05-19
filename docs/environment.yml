@@ -1,6 +1,9 @@
 name: lamana_docs
 dependencies:
 - python
+- numpy
+- matplotlib
+- pandas
 - pip:
   - nbsphinx==0.2.2
   - ipykernel==4.2.2
