@@ -1,7 +1,6 @@
 name: lamana_docs
 dependencies:
-- sphinx_rtd_theme
 - pip:
-	- nbsphinx==0.2.2
-	- ipykernel==4.2.2
-	- numpydoc==0.5
+  - nbsphinx==0.2.2
+  - ipykernel==4.2.2
+  - numpydoc==0.5
