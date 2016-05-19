@@ -1,5 +1,6 @@
 conda:
     file: docs/environment.yml
 	
+# Add python 3 to the OS environment
 python:
 	version: 3
