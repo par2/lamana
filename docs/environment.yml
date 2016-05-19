@@ -1,10 +1,9 @@
 name: lamana_docs
 dependencies:
-# The following seem needed for sphinx
-- python
+- python                              # speeds up build
 #- numpy
-- matplotlib
-#- pandas
+- matplotlib                          # seems needed for sphinx on rtd
+- pandas
 - pip
   - nbsphinx==0.2.2
   - ipykernel==4.2.2
