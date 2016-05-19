@@ -1,7 +1,7 @@
 name: lamana_docs
 dependencies:
 # The following seem needed for sphinx
-#- python
+- python
 #- numpy
 - matplotlib
 #- pandas
