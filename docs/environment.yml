@@ -1,5 +1,6 @@
 name: lamana_docs
 dependencies:
+- python
 - pip:
   - nbsphinx==0.2.2
   - ipykernel==4.2.2
