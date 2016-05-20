@@ -2,6 +2,7 @@
 '''Test for various DataFrame output.  Uses external csv control files.'''
 
 import os
+import logging
 
 import numpy as np
 ##import pandas as pd
@@ -124,11 +125,14 @@ def test_apply_LaminateModels_cols_dimensions1():
     # Prepare file path.
     # Depends which directory nosetests is rum
     #path = os.getcwd()                                     # use for the test in the correct path
-    path = os.path.join(os.getcwd(), 'lamana', 'tests', 'controls_LT')   # for builds
+    ##path = os.path.join(os.getcwd(), 'lamana', 'tests', 'controls_LT')   # for builds
+    sourcepath = os.path.abspath(os.path.dirname(la.__file__))
+    path = os.path.join(sourcepath, 'tests', 'controls_LT')
     #path = path + r'\lamana\tests\controls_LT'             # for Main Script. Comment out in tests
     #path = path + r'\tests\controls_LT'                    # for test
     #path = os.path.join(os.getcwd(), 'tests', 'controls_LT')          # for test
     #path = path + r'\controls_LT'                          # for test
+    logging.debug('Default path: {}'.format(path))
 
     # Read all files in the path (REF 013)
     for file, filepath in ut.read_csv_dir(path):
@@ -195,11 +199,14 @@ def test_apply_LaminateModels_cols_models1():
     # Prepare file path.
     # Depends which directory nosetests is rum
     #path = os.getcwd()                                     # use for the test in the correct path
-    path = os.path.join(os.getcwd(), 'lamana', 'tests', 'controls_LT')  # for builds
+    ##path = os.path.join(os.getcwd(), 'lamana', 'tests', 'controls_LT')  # for builds
+    sourcepath = os.path.abspath(os.path.dirname(la.__file__))
+    path = os.path.join(sourcepath, 'tests', 'controls_LT')
     #path = path + r'\lamana\tests\controls_LT'             # for Main Script. Comment out in tests
     #path = path + r'\tests\controls_LT'                    # for test
     #path = os.path.join(os.getcwd(), 'tests', 'controls_LT')          # for test
     #path = path + r'\controls_LT'                          # for test
+    logging.debug('Default path: {}'.format(path))
 
     # Read all files in the path (REF 013)
     for file, filepath in ut.read_csv_dir(path):

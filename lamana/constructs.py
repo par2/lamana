@@ -397,10 +397,22 @@ class Laminate(Stack):
     {compressive, tensile} : DataFrame
         Isolated layer stress sides.
 
+    Methods
+    -------
+    to_csv(**kwargs)
+        Exports LaminateModel data and FeatureInput dashboard as separate files.
+    to_xlsx(offset=3, **kwargs)
+        Exports a single file of both LaminateModel data and FeatureInput dashboard.
+
     Raises
     ------
     AttributeError
         If custom attributes could not be set to the `LaminateModel`.
+
+    See Also
+    --------
+    theories.Model : handles user defined Laminate Theory models
+    models : directory containing package models
 
     Examples
     --------
@@ -411,11 +423,6 @@ class Laminate(Stack):
     >>> FeatureInput['Geometry'] = la.input_.Geometry('400-[200]-800')
     >>> la.constructs.Laminate(FeatureInput)
     <lamana LaminateModel object (400.0-[200.0]-800.0)>
-
-    See Also
-    --------
-    theories.Model : handles user defined Laminate Theory models
-    models : directory containing package models
 
     '''
     # TODO: pass kwargs in
@@ -940,7 +947,39 @@ class Laminate(Stack):
         return df
     ###
 
-    # Attributes --------------------------------------------------------------
+    def to_csv(self, **kwargs):
+        '''Write LaminateModel data FeatureInput dashboard as separate files.
+
+        Returns
+        -------
+        tuple
+            Paths for both .csv files.
+
+        See Also
+        --------
+        - `utils.tools.export`: for kwargs and docstring.
+
+        '''
+        data_fpath, dash_fpath = ut.export(self, suffix='.csv', **kwargs)
+        return data_fpath, dash_fpath
+
+    def to_xlsx(self, offset=3, **kwargs):
+        '''Write LaminateModel data FeatureInput dashboard as one file.
+
+        Returns
+        -------
+        tuple
+            Path for .xlsx file; maintained For type consistency.
+
+        See Also
+        --------
+        - `utils.tools.export`: for kwargs and docstring.
+
+        '''
+        (workbook_fpath,) = ut.export(self, suffix='.xlsx', offset=offset, **kwargs)
+        return (workbook_fpath,)
+
+    # Properties --------------------------------------------------------------
     '''Need Laminate info property to display on repr().'''
     @property
     def p(self):
