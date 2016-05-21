@@ -1,46 +1,64 @@
 #------------------------------------------------------------------------------
 # Class-style model
 
-import collections as ct
 import math
+import collections as ct
 
 ##import pandas as pd
 
-#from .theories import Model
 from lamana.theories import BaseModel
 
 
-class Wilson_LT(BaseModel):
-    '''A modified laminate theory for circular biaxial flexure disks,
-    loaded with a flat piston punch on 3-ball support having two distinct
-    materials (polymer and ceramic).'''
+class WilsonLT(BaseModel):
+    '''A custom CLT model.
 
-    '''Accept extra args and kwds here'''
+    A modified laminate theory for circular biaxial flexure disks,
+    loaded with a flat piston punch on 3-ball support having two distinct
+    materials (polymer and ceramic).
+
+    '''
     def __init__(self):
         self.Laminate = None
         self.FeatureInput = None
         self.LaminateModel = None
 
-    #def _use_model_(self, df, FeatureInput, adjusted_z=False):
-    #def update_LaminateModel(self, df, FeatureInput, adjusted_z=False):
-    ##def update_LaminateModel(df, FeatureInput, *args, adjusted_z=False):        # python 3.x
     def _use_model_(self, Laminate, adjusted_z=False):
-        '''Return updated DataFrame and FeatureInput.
+        '''Return a tuple of an updated DataFrame and FeatureInput.
 
-        Variables
-        =========
-        df : DataFrame
-            LaminateModel with IDs and Dimensional Variables.
-        FeatureInut : dict
-            Geometry, laminate parameters and more.  Updates Globals dict for
-            parameters in the dashboard output.
-        adjusted_z: bool; default=False
-            If True, uses z(m)* values instead; different assumption fo internal calc.
+        1. Add LT calculations as new columns to the Laminate DataFrame.
+        2. Add ubiquitous variables to a Global key in the FeatureInput.
+
+        Parameters
+        ----------
+        Laminate : Laminate object
+            The Laminate object prior to applying model calculations.  The
+            DataFrame has geometric calculations only (LFrame).  Laminate
+            attributes are available.
+        adjusted_z: bool; default False, optional
+            If True, use z(m)* values instead; different assumption for internal calc.
+
+        Returns
+        -------
+        tuple
+            The updated calculations and parameters stored in a tuple
+            `(LaminateModel, FeatureInput)``.
+
+            df : DataFrame
+                LaminateModel with IDs and Dimensional Variables.
+            FeatureInut : dict
+                Geometry, laminate parameters and more.  Updates Globals dict for
+                parameters in the dashboard output.
 
         '''
         self.Laminate = Laminate
         df = Laminate.LFrame.copy()
         FeatureInput = Laminate.FeatureInput
+
+        # Author-defined Exception Handling
+        if (FeatureInput['Parameters']['r'] == 0):
+            raise ZeroDivisionError('r=0 is invalid for the log term in the moment eqn.')
+        elif (FeatureInput['Parameters']['a'] == 0):
+            raise ZeroDivisionError('a=0 is invalid for the log term in the moment eqn.')
 
         # Calling functions to calculate Qs and Ds
         df.loc[:,'Q_11'] = self.calc_stiffness(df, FeatureInput['Materials']).q_11
@@ -82,7 +100,7 @@ class Wilson_LT(BaseModel):
         self.FeatureInput = FeatureInput                          # update with Globals
         #print(FeatureInput)
 
-        # Calculate Strains and Stresses and Update DataFrame
+        # Calculate Strains and Stresses then Update DataFrame
         df.loc[:, 'strain_r'] = K_r * df.loc[:, 'Z(m)']
         df.loc[:, 'strain_t'] = K_t * df.loc[:, 'Z(m)']
         df.loc[:, 'stress_r (Pa/N)'] = (
@@ -101,8 +119,7 @@ class Wilson_LT(BaseModel):
 
         return (df, FeatureInput)
 
-    #---------------------------------------------------------------------------
-    ##def calc_stiffness(df, mat_params):
+    # LT Methods --------------------------------------------------------------
     def calc_stiffness(self, df, mat_params):
         '''Return tuple of Series of (Q11, Q12) floats per lamina.'''
         # Iterate to Apply Modulus and Poisson's to correct Material
@@ -115,7 +132,7 @@ class Wilson_LT(BaseModel):
             v = df['Poissons']
         stiffness = ct.namedtuple('stiffness', ['q_11', 'q_12'])
         q_11 = E / (1 - (v**2))
-        q_12 = (v*E) / (1 - (v**2))
+        q_12 = (v * E) / (1 - (v**2))
         return stiffness(q_11, q_12)
 
     def calc_bending(self, df, adj_z=False):

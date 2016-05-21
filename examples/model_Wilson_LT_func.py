@@ -1,30 +1,43 @@
 #------------------------------------------------------------------------------
 # Function-style model
 
-# A modified laminate theory for biaxial flexure disks, flat piston punch,
-# 3 ball support, two materials.
+'''
+A modified laminate theory for biaxial flexure disks, flat piston punch,
+3 ball support, two materials.
+'''
 
-import collections as ct
 import math
+import collections as ct
 
 ##import pandas as pd
 
 
-#def _use_model_(df, FeatureInput, adjusted_z=False):
-#def use_model(df, FeatureInput, adjusted_z=False):
-##def use_model(df, FeatureInput, *args, adjusted_z=False):        # python 3.x
 def _use_model_(Laminate, adjusted_z=False):
-    '''Return updated DataFrame and FeatureInput.
+    '''Return a tuple of an updated DataFrame and FeatureInput.
 
-    Variables
-    =========
-    df : DataFrame
-        LaminateModel with IDs and Dimensional Variables.
-    FeatureInut : dict
-        Geometry, laminate parameters and more.  Updates Globals dict for
-        parameters in the dashboard output.
-    adjusted_z: bool; default=False
-        If True, uses z(m)* values instead; different assumption for internal calc.
+    1. Add LT calculations as new columns to the Laminate DataFrame.
+    2. Add ubiquitous variables to a Global key in the FeatureInput.
+
+    Parameters
+    ----------
+    Laminate : Laminate object
+        The Laminate object prior to applying model calculations.  The
+        DataFrame has geometric calculations only (LFrame).  Laminate
+        attributes are available.
+    adjusted_z: bool; default False, optional
+        If True, use z(m)* values instead; different assumption for internal calc.
+
+    Returns
+    -------
+    tuple
+        The updated calculations and parameters stored in a tuple
+        `(LaminateModel, FeatureInput)``.
+
+        df : DataFrame
+            LaminateModel with IDs and Dimensional Variables.
+        FeatureInut : dict
+            Geometry, laminate parameters and more.  Updates Globals dict for
+            parameters in the dashboard output.
 
     '''
     df = Laminate.LFrame.copy()
@@ -69,7 +82,7 @@ def _use_model_(Laminate, adjusted_z=False):
     FeatureInput['Globals'] = global_params
     #print(FeatureInput)
 
-    # Calculate Strains and Stresses and Update DataFrame
+    # Calculate Strains and Stresses then Update DataFrame
     df.loc[:, 'strain_r'] = K_r * df.loc[:, 'Z(m)']
     df.loc[:, 'strain_t'] = K_t * df.loc[:, 'Z(m)']
     df.loc[:, 'stress_r (Pa/N)'] = (df.loc[:, 'strain_r'] * df.loc[:, 'Q_11']
@@ -85,7 +98,7 @@ def _use_model_(Laminate, adjusted_z=False):
     return (df, FeatureInput)
 
 
-#------------------------------------------------------------------------------
+# LT Functions ----------------------------------------------------------------
 def calc_stiffness(df, mat_params):
     '''Return tuple of Series of (Q11, Q12) floats per lamina.'''
     # Iterate to Apply Modulus and Poisson's to correct Material
