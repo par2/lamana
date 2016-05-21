@@ -4,6 +4,7 @@
 # flake8 constructs.py --ignore=E265,E501,N802,H806
 
 import importlib
+import logging
 
 # TODO: Replace with interactive way to import models
 from lamana.models import *
@@ -65,20 +66,21 @@ def handshake(Laminate, adjusted_z=False):
     This method searches for a special hook method named `_use_model_` in the
     specified model module.  This hook may be written as method within a class
     or written as an independent function offering a choice for users to write
-    models in either class-style (recommended) or function style.  This method
-    simply returns an updated LaminateModel and FeatureInput.
+    models in either class-style (recommended) or function-style.  This hook
+    method simply returns an updated LaminateModel and FeatureInput.
 
-    `handshake()` determines which style by duck typing the module with the provided
-    name located in the `models` directory - a repository for all standard models.
-    Assuming a function first, the hook is sought by invoking `_use_model_()`;
-    if none is found, the exception is caught and a hook named `Model._use_model_`
-    is sought next (as of 0.4.5b1).
+    `handshake()` determines either class- or function-style models by duck typing
+    a module name according to the model name provided in the `Case.apply()`` method.
+    These modules are located in the `models` directory - a repository for all
+    package models.  Assuming a function first, the hook method is sought by
+    calling `_use_model_()`; if none is found, the exception is caught and a hook
+    method named `Model._use_model_` is sought next (as of 0.4.5b1).
 
     Here is the workflow of a model selected by the user and its call in `Laminate`.
-    This assumes the model is developed and located in the standard models directory.
+    This assumes the model is developed and located in the standard .\models directory.
 
     1. User selects a model in `lamana.distributions.Case.apply(model='model_name')`;
-       Model name is stored in the FeatureInput object, passed into `Laminate`.
+       Model name is stored in the FeatureInput object then passed into `Laminate`.
     2. Inside `lamana.constructs.Laminate`,  _update_columns._update_calculations(FI)`
        is called, which initiates LT calculations for the given model.
     3. `theories.handshake(L)` is called and searches for the model name in models dir.
@@ -94,16 +96,15 @@ def handshake(Laminate, adjusted_z=False):
     try:
         # Look for the function
         '''Set up to accept *args'''
-        '''Just need to update LM and FI.  '''
         LaminateModel, FeatureInput = module._use_model_(Laminate, adjusted_z=False)
-        #print('Found a function')
+        #logging.info('Found a function')
     except(AttributeError):
         # Catch exceptions, if no function found, find class
         '''Make smarter to find whatever class has the _use_model hook.'''
         class_name = getattr(module, 'Model')
         my_instance = class_name()
         LaminateModel, FeatureInput = my_instance._use_model_(Laminate, adjusted_z=False)
-        #print('Found a class')
+        #logging.info('Found a class')
 
     # Make sure the passed FeatureInput has Equal attributes
     assert FeatureInput['Parameters']['p'] == Laminate.p
