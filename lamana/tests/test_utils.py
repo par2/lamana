@@ -4,6 +4,8 @@
 
 
 import os
+import sys
+import abc
 import logging
 import tempfile
 import difflib
@@ -927,6 +929,23 @@ def test_natural_sort3():
     actual = [k for k in sorted(dict_.keys(), key=ut.natural_sort)]
     expected = ['2-ply', '3-ply', '10-ply', 'foo-ply']
     nt.assert_equal(actual, expected)
+
+
+def test_utils_tools_withmeta1():
+    '''Verify the meta class is equivalent to python version variations.'''
+    class MyClassC(ut.with_metaclass(abc.ABCMeta)):
+        pass
+
+    if sys.version_info < (3,):
+        class MyClassA(object):
+            __metaclass__ = abc.ABCMeta
+            pass
+        nt.assert_is(type(MyClassA), type(MyClassC))
+
+#     elif sys.version_info >= (3,):
+#         class MyClassB(metaclass=abc.ABCMeta):
+#             pass                                             # can't run in python 2
+#         nt.assert_is(type(MyClassB), type(MyClassC))
 
 
 # Inspection and Hooks --------------------------------------------------------
