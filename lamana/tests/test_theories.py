@@ -161,7 +161,7 @@ def test_theories_matl_order1():
         ['HA', 'PSu', 'HA', 'PSu', 'HA', 'PSu'],
         ['HA', 'PSu', 'HA', 'PSu', 'HA', 'PSu', 'HA'],
         ['HA', 'PSu', 'HA', 'PSu', 'HA', 'PSu', 'HA', 'PSu', 'HA'],
-        # even --------------------------------------
+        # even ----------------------------------------------------------------
         ['HA', 'PSu']                                      # simple to preserve test
     ]
     for case_ in case.values():
@@ -173,3 +173,37 @@ def test_theories_matl_order1():
             nt.assert_equal(actual, expected)
 
 '''Make smart test for for matl order2 with variables dissimilars and other geos.'''
+
+
+# Conversion Tests ------------------------------------------------------------
+# These tests verify the update of Laminate to LaminateModel.
+# The `handshake` function is used to accomplish this.
+# Since 0.4.11, the LFrame and LMFrame objects are housed in the `Laminate` class
+# These objects must be decoupled to properly test this conversion.
+# Until then a pseudo_Laminate object (full LaminateModel) is used to trigger `handshake`.
+class TestHandshake:
+    '''Verify handshake function opeartes correctly.
+
+    This class uses "fixtures" with sample models to test importing.
+    Find the location in the following `Case.apply` methods.
+
+    Modify the fixture as needed to test different imports.
+
+    '''
+    @nt.raises(ImportError)
+    def test_theories_handshake_error1(self):
+        '''Verify no model raises error.'''
+        case = la.distributions.Case(dft.load_params, dft.mat_props)
+        case.apply(dft.geos_standard, model='no_model')
+
+    def test_theories_handshake_hookclass1(self):
+        '''Use fixture to import test hook method; if sucessful, get a Case.'''
+        case = la.distributions.Case(dft.load_params, dft.mat_props)
+        case.apply(dft.geos_standard, model='fixtures.fixture_model_class')
+        nt.assert_is_instance(case, la.distributions.Case)
+
+    def test_theories_handshake_hookfunc1(self):
+        '''Use fixture to import test hook function; if succesful, get a Case.'''
+        case = la.distributions.Case(dft.load_params, dft.mat_props)
+        case.apply(dft.geos_standard, model='fixtures.fixture_model_func')
+        nt.assert_is_instance(case, la.distributions.Case)
