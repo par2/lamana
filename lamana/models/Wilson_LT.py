@@ -13,12 +13,12 @@ from lamana.theories import BaseModel
 from lamana.lt_exceptions import IndeterminateError
 
 
-class Model(BaseModel):
+class Model(BaseModel):                                    # in 0.4.11, can have any name
     '''A modified laminate theory for circular biaxial flexure disks,
     loaded with a flat piston punch on 3-ball support having two distinct
     materials (polymer and ceramic).'''
 
-    '''Accept extra args and kwds here'''
+    # TODO: Accept extra args and kwds here'''
     def __init__(self):
         self.Laminate = None
         self.FeatureInput = None

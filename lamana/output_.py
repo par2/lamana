@@ -159,6 +159,7 @@ from lamana.lt_exceptions import InputError, PlottingError
 
 
 
+# TODO: Replace with config.LAMANA_PALETTES
 # colorblind palette from seaborn; grayscale is web-safe
 LAMANA_PALETTES = dict(
     #bold=['#FC0D00','#FC7700','#018C99','#00C318','#6A07A9','#009797','#CF0069'],
