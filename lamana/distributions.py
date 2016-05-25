@@ -965,7 +965,7 @@ class Cases(ct.MutableMapping):
         #print(set(converted_caselet_))
         return set(converted_caselet_)
 
-    #TODO: Process dicts of caselets (See LPEP 003)
+    # TODO: Process dicts of caselets (See LPEP 003)
 #     ### BETA
 #     def _is_verbose(self, caselet, p):
 #         '''Print verbose mode if True.'''

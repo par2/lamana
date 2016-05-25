@@ -163,7 +163,7 @@ def get_multi_geometry(Frame):
     - get_special_geometry: for getting geo_strings of laminates w/nplies<=4.
 
     '''
-    #TODO: Move to separate function in utils
+    # TODO: Move to separate function in utils
     def chunks(lst, n):
         '''Split up a list into n-sized smaller lists; (REF 018)'''
         for i in range(0, len(lst), n):
@@ -1306,7 +1306,7 @@ def natural_sort(data):
         string_, list_ = data                             # key, value pair
     #print(string_)
 
-    #TODO: Need to complete; doesn't really do any sorting, just sets up the iterator.  Redo.
+    # TODO: Need to complete; doesn't really do any sorting, just sets up the iterator.  Redo.
     return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
 
 
@@ -1320,11 +1320,11 @@ def with_metaclass(meta, *bases):
     >>> class MyClassB(metaclass=Meta): pass               # python 3
 
     >>> # Py 2/3 equivalent metaclasses
-    >>> MyClassC(with_metaclass(Meta, object)): pass
-    >>> MyClassA == MyClassC                               # python 2
+    >>> class MyClassC(with_metaclass(Meta, object)): pass # python 2/3
+    >>> type(MyClassA) is type(MyClassC)                   # python 2
     True
-    >>> MyClassA == MyClassC                               # python 3
+    >>> type(MyClassA) is type(MyClassC)                   # python 3
     True
 
     '''
-    return meta("NewBase", bases, {})
+    return meta('MetaBase', bases, {})

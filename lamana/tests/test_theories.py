@@ -179,8 +179,7 @@ def test_theories_matl_order1():
 # These tests verify the update of Laminate to LaminateModel.
 # The `handshake` function is used to accomplish this.
 # Since 0.4.11, the LFrame and LMFrame objects are housed in the `Laminate` class
-# These objects must be decoupled to properly test this conversion.
-# Until then a pseudo_Laminate object (full LaminateModel) is used to trigger `handshake`.
+# TODO:These objects must be decoupled to properly test this conversion.
 class TestHandshake:
     '''Verify handshake function opeartes correctly.
 

@@ -47,5 +47,5 @@ class PlottingError(Error):
 
 class ModelError(Error):
     '''Associated with model exceptions.'''
-    #TODO: Consider replacing Attribute Error in hook tools and theories.handshake
+    # TODO: Consider replacing Attribute Error in hook tools and theories.handshake
     pass

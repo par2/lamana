@@ -538,7 +538,7 @@ def _distribplot(
         ax.legend(**legend_kw)
     ax.text(**sublabel_kw)                                         # figure sublabel
 
-    #TODO: Refactor for less limited parameter-setting of axes labels.
+    # TODO: Refactor for less limited parameter-setting of axes labels.
     axtitle = kwargs.get('label', '')
     xlabel = kwargs.get('xlabel', x)
     ylabel = kwargs.get('ylabel', y)
