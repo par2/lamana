@@ -7,14 +7,19 @@ import os
 import logging
 import tempfile
 import difflib
-import collections as ct
+##import collections as ct
 
 import nose.tools as nt
 import pandas as pd
 
 import lamana as la
 from lamana.models import Wilson_LT as wlt
+from lamana.models.fixtures import fixture_model_func      # special import for hooks
+from lamana.models.fixtures import fixture_model_class     # special import for hooks
+from lamana.models.fixtures import fixture_model_module_a  # special import for hooks
+from lamana.models.fixtures import fixture_model_module_b  # special import for hooksfrom lamana.utils import config
 from lamana.utils import tools as ut
+from lamana.utils import config
 
 dft = wlt.Defaults()                                       # from inherited class in models; user
 
@@ -922,3 +927,95 @@ def test_natural_sort3():
     actual = [k for k in sorted(dict_.keys(), key=ut.natural_sort)]
     expected = ['2-ply', '3-ply', '10-ply', 'foo-ply']
     nt.assert_equal(actual, expected)
+
+
+# Inspection and Hooks --------------------------------------------------------
+# Favored class tests for scoping
+# Using psudeo "fixtures" to mock bad models for trigger errors
+class TestInspectionTools:
+    '''Verify inspection tools are covered.
+
+    This class uses "fixtures" with sample models to test importing.
+
+    '''
+    class Parent(object):
+        def method():
+            pass
+        pass
+
+    class Child1(Parent):
+        '''Inherits a method'''
+        pass
+
+    class Child2():
+        '''No methods.'''
+        pass
+
+    def test_utils_tools_inspection_isparent1(self):
+        '''Verify class is a parent.'''
+        actual1 = ut.isparent(self.Parent)
+        actual2 = ut.isparent(self.Child1)
+        nt.assert_true(actual1)
+        nt.assert_false(actual2)
+
+    def test_utils_tools_inspection_findclasses1(self):
+        '''Verify classes are present is class-style model; not function-style.'''
+        actual1 = len(ut.find_classes(fixture_model_class)) >= 1
+        actual2 = len(ut.find_classes(fixture_model_func)) >= 1
+        nt.assert_true(actual1)
+        nt.assert_false(actual2)
+
+    def test_utils_tools_inspection_findmethods1(self):
+        '''Verify methods are found in classes.'''
+        actual1 = len(ut.find_methods(self.Parent)) >= 1
+        actual2 = len(ut.find_methods(self.Child1)) >= 1
+        actual3 = len(ut.find_methods(self.Child2)) >= 1
+        nt.assert_true(actual1)
+        nt.assert_true(actual2)
+        nt.assert_false(actual3)
+
+    def test_utils_tools_inspection_findfunctons1(self):
+        '''Verify functions are present is function-style model; not class-style.'''
+        actual1 = len(ut.find_functions(fixture_model_func)) >= 1
+        actual2 = len(ut.find_functions(fixture_model_class)) >= 1
+        nt.assert_true(actual1)
+        nt.assert_false(actual2)
+
+
+class TestHookTools:
+    '''Verify hook tools operate correctly.
+
+    This class uses "fixtures" with sample models to test importing.
+
+    '''
+    # TODO: Remove
+    hookname = config.HOOKNAME
+
+    hook_func_module = fixture_model_func
+    hook_class_module = fixture_model_class
+    non_hook_module = fixture_model_module_a
+    many_hook_module = fixture_model_module_b
+
+    @nt.raises(AttributeError)
+    def test_utils_tools_gethookfunction_error1(self):
+        '''Verify raise error if no hook function found.'''
+        # Assumes no hook functions in the fixture containing hook classes
+        actual = ut.get_hook_function(self.hook_class_module, self.hookname)
+
+    @nt.raises(AttributeError)
+    def test_utils_tools_gethookclass_error1(self):
+        '''Verify raise error if no hook class found.'''
+        # Assumes no hook classes in the fixture containing hook functions
+        actual = ut.get_hook_class(self.hook_func_module, self.hookname)
+
+    @nt.raises(AttributeError)
+    def test_utils_tools_gethookclass_error2(self):
+        '''Verify raise error if no hook class found.'''
+        # Assumes no hook classes in the fixture containing hook functions
+        actual = ut.get_hook_class(self.non_hook_module, self.hookname)
+
+    @nt.raises(AttributeError)
+    def test_utils_tools_gethookclass_error3(self):
+        '''Verify raise error if too many hooks classes found.'''
+        # Assumes no hook classes in the fixture containing hook functions
+        actual = ut.get_hook_class(self.many_hook_module, self.hookname)

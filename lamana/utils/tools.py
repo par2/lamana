@@ -18,6 +18,7 @@ import os
 import re
 import logging
 import tempfile
+import inspect
 import collections as ct
 
 import pandas as pd
@@ -26,6 +27,7 @@ import pandas.util.testing as pdt
 import lamana as la
 
 
+# TODO: Replace with config.EXTENSIONS
 EXTENSIONS = ('.csv', '.xlsx')
 
 
@@ -795,6 +797,7 @@ def get_path(filename=None, prefix=None, suffix=None, overwrite=True,
 
     # Set Root/Source/Default Paths -------------------------------------------
     # The export folder is relative to the root (package) path
+    # TODO: replace with config.DEFAULTPATH
     sourcepath = os.path.abspath(os.path.dirname(la.__file__))
     packagepath = os.path.dirname(sourcepath)
     defaultpath = os.path.join(packagepath, 'export')
@@ -1227,3 +1230,82 @@ def natural_sort(data):
 
     #TODO: Need to complete; doesn't really do any sorting, just sets up the iterator.  Redo.
     return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
+
+
+# Inspection Tools ------------------------------------------------------------
+# These tools are used by `theories.handshake` to search for hook functions
+def isparent(kls):
+    '''Return True is class is a parent.'''
+    return kls.__base__ is object
+
+
+def find_classes(module):
+    '''Return a list of class (name, object) tuples.'''
+    clsmembers = inspect.getmembers(module, inspect.isclass)
+    return clsmembers
+
+def find_methods(kls):
+    '''Return a list of method (name, object) tuples.'''
+    # For unbound methods removed in Python 3
+    mthdmembers = inspect.getmembers(
+        kls, predicate=lambda obj: inspect.isfunction(obj) or inspect.ismethod(obj)
+
+    )                                                      # REF 006
+    return mthdmembers
+
+def find_functions(module):
+    funcmembers = inspect.getmembers(module, inspect.isfunction)
+    return funcmembers
+
+
+# Hook Utils ------------------------------------------------------------------
+# These tools are used by `theories.handshake` to search for hook functions
+def get_hook_function(module, hookname):
+    '''Return the hook function given a module.
+
+    Inspect all functions in a module for one a given a HOOKNAME.  Assumes
+    only one hook per module.
+
+    '''
+    logging.debug("Given hookname: '{}'".format(hookname))
+    functions = [(name, func) for name, func in find_functions(module)
+            if name == hookname]
+    if not len(functions):
+        raise AttributeError('No hook function found.')
+    elif len(functions) != 1:
+        raise AttributeError('Found more than one hook_function in {}'
+                             ' Expected only one per module.'.format(module))
+    _, hook_function = functions[0]
+    logging.debug('Hook function: {}'.format(hook_function))
+
+    return hook_function
+
+
+def get_hook_class(module, hookname):
+    '''Return the class containing the hook method.
+
+    Inspect all classes in a module for a method with a given HOOKNAME. Assumes
+    only one hook per module.  Return the class so that it can be later
+    instantiated for it's hook method.
+
+    '''
+    logging.debug("Given hookname: '{}'".format(hookname))
+    methods = []
+    all_methods = []
+    for name, kls in find_classes(module):
+        #logging.debug(kls)
+        # Need to make sure we not looking in the parent class BaseModel
+        if issubclass(kls, la.theories.BaseModel) and not isparent(kls):
+            logging.debug('Sub-classes of BaseModel: {}'.format(kls))
+            methods = [(name, mthd) for name, mthd in find_methods(kls)
+                if name == hookname]
+            class_obj = kls
+        all_methods.extend(methods)
+    logging.debug("All methods found in module {}: '{}'".format(module, all_methods))
+    if not len(all_methods):
+        raise AttributeError('No hook class found.')
+    elif len(all_methods) != 1:
+        raise AttributeError('Found more than one hook_method in {}'
+                             ' Expected only one per module.'.format(module))
+
+    return class_obj
