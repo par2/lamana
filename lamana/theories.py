@@ -3,8 +3,11 @@
 # BaseModel(): A super class for user-customized models.
 # flake8 constructs.py --ignore=E265,E501,N802,H806
 
+import abc
 import importlib
 import logging
+
+import six
 
 # TODO: Replace with interactive way to import models
 from lamana.models import *
@@ -12,37 +15,54 @@ from lamana.models import *
 from lamana.utils import tools as ut
 
 
+@six.add_metaclass(abc.ABCMeta)
 class BaseModel(object):
     '''Provide attributes for sub-classing custom models.
+
+    Sub-class from here to make a model that interfaces with LamAna.
 
     Notes
     -----
     This class helps centralize common attributes associated with a custom
-    model.  A model is selected in `distributions.apply()` and returned in
+    model.  A model is selected in by the `Case.apply()` method and is applied in
     Phase 3 of `constructs.Laminate()`.  It is idiomatic to subclass `BaseModel`
     when making custom models.
 
+    Uses an abstractmethod to enforce implementation of a hook method.  It also
+    suggests that BaseModel can only be sub-classed, not instantiated.
+
     See Also
     --------
-    distributions.apply(): model selection
+    distributions.Case.apply(): model selection
     constructs.Laminate(): creates LMFrame by merging LT data with LFrame
     theories.handshake(): get updated DataFrame and FeatureInput
 
     '''
     def __init__(self):
-        # TODO: add test to cover sub-classing
         super(BaseModel, self).__init__()
-        '''Change model_name to name.'''
         self.model_name = None
         self.LaminateModel = None
         self.FeatureInput = None
 
     def __repr__(self):
-        return '<{} object>'.format(self.__class__.__name__)
+        return '<{} Model object>'.format(self.__class__.__name__)
 
+    # TODO: Find `_use_model_` more dynamically than forcing to search `Model._use_model`.
+    @abc.abstractmethod
+    def _use_model_():
+        '''Hook method.
 
-# TODO: Find `_use_model_` more dynamically than forcing to search `Model._use_model`.
-#Try to add as a class attribute that comes by subclassing BaseModel.
+        Same name as config.HOOKNAME. This method must be implemented and
+        return the following.
+
+        Returns
+        -------
+        tuple
+            Updated (DataFrame, FeatureInput).
+
+        '''
+        pass
+
 
 def handshake(Laminate, adjusted_z=False):
     '''Return updated LaminateModel and FeatureInput objects.
