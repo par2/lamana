@@ -1193,7 +1193,7 @@ def test_BaseDefaults_helper_convertmatparams_nondict():
     nt.assert_equal(actual, expected)
 
 
-def test_BaseModels_helper_tostandarddict_():
+def test_BaseDefaults_helper_tostandarddict_():
     '''Check helper function converts a general dict to standard form.'''
     params1 = {'matl1': [1.0, 0.1],
                'matl2': [2.0, 0.2],
@@ -1207,7 +1207,7 @@ def test_BaseModels_helper_tostandarddict_():
     nt.assert_equal(actual, expected)
 
 
-def test_BaseModels_helper_getmaterials1():
+def test_BaseDefaults_helper_getmaterials1():
     '''Check helper function extracts and returns list of material from mat_props.'''
     # Should handle quick and standard forms
     quick_form = {
@@ -1230,7 +1230,7 @@ def test_BaseModels_helper_getmaterials1():
 
 
 @nt.raises(TypeError)
-def test_BaseModels_helper_getmaterials2():
+def test_BaseDefaults_helper_getmaterials2():
     '''Check helper function raise TypeError when non-list passed to kwarg.'''
     # Should handle quick and standard forms
     mat_props = {'Modulus': {'HA': 52000000000.0, 'PSu': 2700000000.0},
