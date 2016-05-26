@@ -1063,6 +1063,7 @@ def find_classes(module):
     clsmembers = inspect.getmembers(module, inspect.isclass)
     return clsmembers
 
+
 def find_methods(kls):
     '''Return a list of method (name, object) tuples.'''
     # For unbound methods removed in Python 3
@@ -1071,6 +1072,7 @@ def find_methods(kls):
 
     )                                                      # REF 006
     return mthdmembers
+
 
 def find_functions(module):
     funcmembers = inspect.getmembers(module, inspect.isfunction)
@@ -1112,15 +1114,16 @@ def get_hook_class(module, hookname):
     methods = []
     all_methods = []
     for name, kls in find_classes(module):
-        #logging.debug(kls)
+        logging.debug('Found class: {}'.format(kls))
         # Need to make sure we not looking in the parent class BaseModel
         if issubclass(kls, la.theories.BaseModel) and not isparent(kls):
             logging.debug('Sub-classes of BaseModel: {}'.format(kls))
             methods = [(name, mthd) for name, mthd in find_methods(kls)
                 if name == hookname]
             class_obj = kls
-        all_methods.extend(methods)
-    logging.debug("All methods found in module {}: '{}'".format(module, all_methods))
+            all_methods.extend(methods)
+    logging.debug("All hook methods ({}) found in module {}: '{}'".format(
+        len(all_methods), module, all_methods))
     if not len(all_methods):
         raise AttributeError('No hook class found.')
     elif len(all_methods) != 1:
