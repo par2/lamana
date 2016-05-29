@@ -19,6 +19,7 @@ import re
 import logging
 import tempfile
 import inspect
+import warnings
 import collections as ct
 
 import pandas as pd
@@ -495,7 +496,6 @@ def is_matched(string, pattern=None):
 
 # IO --------------------------------------------------------------------------
 # IO-related functions
-# DEPRECATE: 0.4.11; use export instead
 # DEPRECATE: verbose; use logging instead
 def rename_tempfile(filepath, filename):
     '''Return new file path; renames an extant file in-place.'''
@@ -505,11 +505,12 @@ def rename_tempfile(filepath, filename):
     os.rename(filepath, new_filepath)
     return new_filepath
 
+
 def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
     '''Convert DataFrame to csv files and write them to a specified directory.
 
     .. note:: Deprecate warning LamAna 0.4.11
-              `write_csv` will be removed in LamAna 0.4.12, it is replaced by
+              `write_csv` will be removed in LamAna 0.4.12. It is replaced by
               `export` because the latter extends formats, tempfiles and more.
 
     Parameters
@@ -544,6 +545,10 @@ def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
         Full path of the created file.
 
     '''
+    warnings.warn(
+         '`write_csv` will be removed in LamAna 0.4.12. It is replaced by `export`.',
+        DeprecationWarning
+    )
     # Parse Laminate Properties
     nplies = LM.nplies
     p = LM.p
