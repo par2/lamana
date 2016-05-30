@@ -77,6 +77,10 @@ pip-delete-this-directory.txt
 (cd .git*/
 
 
+# Folders
+# =======
+_archive
+
 # ====================================================
 
 
