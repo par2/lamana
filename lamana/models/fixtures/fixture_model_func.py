@@ -1,9 +1,13 @@
 #------------------------------------------------------------------------------
-# Function-style model
+'''Function-style Model
 
-'''
-A modified laminate theory for biaxial flexure disks, flat piston punch,
-3 ball support, two materials.
+This fixture is used to test the importing of models, handled by the
+`theories.handshake()` module.  Little has changed for function-style models
+as of 0.4.11.
+
+The Wilson_LT model was adapted.  No classes are expected here; there are
+tests against this.
+
 '''
 
 import math

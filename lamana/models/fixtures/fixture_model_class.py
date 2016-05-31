@@ -1,7 +1,19 @@
 #------------------------------------------------------------------------------
-'''A sample class-style, custom model using a modified laminate theory.'''
-# Users can define classes for custom laminate theory models.
-# Additionally, users can define custom defaults.
+'''Class-style Model
+
+This fixture is used to test the importing of models, handled by the
+`theories.handshake()` module.  As of 0.4.11, models can:
+
+- be located in the `lamana.models` folder
+- module and classes can have any pythonic name; hard-coding removed
+- any sub-package can be accessed by the "model" keyword in `Case.apply()`
+- search for the hook-containing class and it's hook method
+
+This module is here to test these aspects as the module is imported.  The Wilson_LT
+model was adapted.  No functions are expected in this module; there are tests
+against this.
+
+'''
 
 import math
 import collections as ct
@@ -13,12 +25,18 @@ from lamana.theories import BaseModel
 from lamana.lt_exceptions import IndeterminateError
 
 
-class Model(BaseModel):                                    # in 0.4.11, can have any name
+# This class lacks a hook method; theories should skip it.
+class DummyModel():
+	pass
+
+
+# The class containing the hook method can have any name.
+class RandomName(BaseModel):
     '''A modified laminate theory for circular biaxial flexure disks,
     loaded with a flat piston punch on 3-ball support having two distinct
     materials (polymer and ceramic).'''
 
-    # TODO: Accept extra args and kwds here'''
+    '''Accept extra args and kwds here'''
     def __init__(self):
         self.Laminate = None
         self.FeatureInput = None

@@ -43,3 +43,9 @@ class IndeterminateError(Error):
 class PlottingError(Error):
     '''Associated with plotting errors.'''
     pass
+
+
+class ModelError(Error):
+    '''Associated with model exceptions.'''
+    # TODO: Consider replacing Attribute Error in hook tools and theories.handshake
+    pass

@@ -8,6 +8,7 @@ import os
 import importlib
 import logging
 import tempfile
+import warnings
 import collections as ct
 import itertools as it
 
@@ -965,7 +966,7 @@ class Cases(ct.MutableMapping):
         #print(set(converted_caselet_))
         return set(converted_caselet_)
 
-    #TODO: Process dicts of caselets (See LPEP 003)
+    # TODO: Process dicts of caselets (See LPEP 003)
 #     ### BETA
 #     def _is_verbose(self, caselet, p):
 #         '''Print verbose mode if True.'''
@@ -1195,6 +1196,10 @@ class Cases(ct.MutableMapping):
             List of pathnames of written files.
 
         '''
+        warnings.warn(
+            '`to_csv` will be removed in LamAna 0.4.12 and will not be replaced',
+            DeprecationWarning
+        )
         # DEPRECATED 0.4.11.dev0
 #        if path is None:
 #            path = os.getcwd()                             # use for the test in the correct path

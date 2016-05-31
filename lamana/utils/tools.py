@@ -18,6 +18,8 @@ import os
 import re
 import logging
 import tempfile
+import inspect
+import warnings
 import collections as ct
 
 import pandas as pd
@@ -26,6 +28,7 @@ import pandas.util.testing as pdt
 import lamana as la
 
 
+# TODO: Replace with config.EXTENSIONS
 EXTENSIONS = ('.csv', '.xlsx')
 
 
@@ -161,7 +164,7 @@ def get_multi_geometry(Frame):
     - get_special_geometry: for getting geo_strings of laminates w/nplies<=4.
 
     '''
-    #TODO: Move to separate function in utils
+    # TODO: Move to separate function in utils
     def chunks(lst, n):
         '''Split up a list into n-sized smaller lists; (REF 018)'''
         for i in range(0, len(lst), n):
@@ -493,7 +496,6 @@ def is_matched(string, pattern=None):
 
 # IO --------------------------------------------------------------------------
 # IO-related functions
-# DEPRECATE: 0.4.11; use export instead
 # DEPRECATE: verbose; use logging instead
 def rename_tempfile(filepath, filename):
     '''Return new file path; renames an extant file in-place.'''
@@ -503,11 +505,12 @@ def rename_tempfile(filepath, filename):
     os.rename(filepath, new_filepath)
     return new_filepath
 
+
 def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
     '''Convert DataFrame to csv files and write them to a specified directory.
 
     .. note:: Deprecate warning LamAna 0.4.11
-              `write_csv` will be removed in LamAna 0.4.12, it is replaced by
+              `write_csv` will be removed in LamAna 0.4.12. It is replaced by
               `export` because the latter extends formats, tempfiles and more.
 
     Parameters
@@ -542,6 +545,10 @@ def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
         Full path of the created file.
 
     '''
+    warnings.warn(
+         '`write_csv` will be removed in LamAna 0.4.12. It is replaced by `export`.',
+        DeprecationWarning
+    )
     # Parse Laminate Properties
     nplies = LM.nplies
     p = LM.p
@@ -795,6 +802,7 @@ def get_path(filename=None, prefix=None, suffix=None, overwrite=True,
 
     # Set Root/Source/Default Paths -------------------------------------------
     # The export folder is relative to the root (package) path
+    # TODO: replace with config.DEFAULTPATH
     sourcepath = os.path.abspath(os.path.dirname(la.__file__))
     packagepath = os.path.dirname(sourcepath)
     defaultpath = os.path.join(packagepath, 'export')
@@ -1048,6 +1056,87 @@ def export(LM, overwrite=False, prefix=None, suffix=None, order=None,
         return (workbook_filepath,)
 
 
+# Inspection Tools ------------------------------------------------------------
+# These tools are used by `theories.handshake` to search for hook functions
+def isparent(kls):
+    '''Return True is class is a parent.'''
+    return kls.__base__ is object
+
+
+def find_classes(module):
+    '''Return a list of class (name, object) tuples.'''
+    clsmembers = inspect.getmembers(module, inspect.isclass)
+    return clsmembers
+
+
+def find_methods(kls):
+    '''Return a list of method (name, object) tuples.'''
+    # For unbound methods removed in Python 3
+    mthdmembers = inspect.getmembers(
+        kls, predicate=lambda obj: inspect.isfunction(obj) or inspect.ismethod(obj)
+
+    )                                                      # REF 006
+    return mthdmembers
+
+
+def find_functions(module):
+    funcmembers = inspect.getmembers(module, inspect.isfunction)
+    return funcmembers
+
+
+# Hook Utils ------------------------------------------------------------------
+# These tools are used by `theories.handshake` to search for hook functions
+def get_hook_function(module, hookname):
+    '''Return the hook function given a module.
+
+    Inspect all functions in a module for one a given a HOOKNAME.  Assumes
+    only one hook per module.
+
+    '''
+    logging.debug("Given hookname: '{}'".format(hookname))
+    functions = [(name, func) for name, func in find_functions(module)
+            if name == hookname]
+    if not len(functions):
+        raise AttributeError('No hook function found.')
+    elif len(functions) != 1:
+        raise AttributeError('Found more than one hook_function in {}'
+                             ' Expected only one per module.'.format(module))
+    _, hook_function = functions[0]
+    logging.debug('Hook function: {}'.format(hook_function))
+
+    return hook_function
+
+
+def get_hook_class(module, hookname):
+    '''Return the class containing the hook method.
+
+    Inspect all classes in a module for a method with a given HOOKNAME. Assumes
+    only one hook per module.  Return the class so that it can be later
+    instantiated for it's hook method.
+
+    '''
+    logging.debug("Given hookname: '{}'".format(hookname))
+    methods = []
+    all_methods = []
+    for name, kls in find_classes(module):
+        logging.debug('Found class: {}'.format(kls))
+        # Need to make sure we not looking in the parent class BaseModel
+        if issubclass(kls, la.theories.BaseModel) and not isparent(kls):
+            logging.debug('Sub-classes of BaseModel: {}'.format(kls))
+            methods = [(name, mthd) for name, mthd in find_methods(kls)
+                if name == hookname]
+            class_obj = kls
+            all_methods.extend(methods)
+    logging.debug("All hook methods ({}) found in module {}: '{}'".format(
+        len(all_methods), module, all_methods))
+    if not len(all_methods):
+        raise AttributeError('No hook class found.')
+    elif len(all_methods) != 1:
+        raise AttributeError('Found more than one hook_method in {}'
+                             ' Expected only one per module.'.format(module))
+
+    return class_obj
+
 # =============================================================================
 # CITED CODE ------------------------------------------------------------------
 # =============================================================================
@@ -1225,5 +1314,25 @@ def natural_sort(data):
         string_, list_ = data                             # key, value pair
     #print(string_)
 
-    #TODO: Need to complete; doesn't really do any sorting, just sets up the iterator.  Redo.
+    # TODO: Need to complete; doesn't really do any sorting, just sets up the iterator.  Redo.
     return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
+
+
+def with_metaclass(meta, *bases):
+    '''Create a base class with a metaclass (REF 054).
+
+    Examples
+    --------
+    >>> class MyClassA(object):
+    ...     ___metaclass__ = Meta                          # python 2
+    >>> class MyClassB(metaclass=Meta): pass               # python 3
+
+    >>> # Py 2/3 equivalent metaclasses
+    >>> class MyClassC(with_metaclass(Meta, object)): pass # python 2/3
+    >>> type(MyClassA) is type(MyClassC)                   # python 2
+    True
+    >>> type(MyClassA) is type(MyClassC)                   # python 3
+    True
+
+    '''
+    return meta('MetaBase', bases, {})
