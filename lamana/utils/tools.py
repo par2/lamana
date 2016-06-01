@@ -948,9 +948,11 @@ def export(LM, overwrite=False, prefix=None, suffix=None, order=None,
             prefix, nplies, p, t_total, geo_string)
 
         # Force-create export directory or path (REF 047)
-        # Send default csv to export directory
+        # Send file to export directory
         defaultpath = get_path()
         if not os.path.exists(defaultpath):
+            # TODO: Make sure this log prints out
+            logging.info('No default export directory found.  Making directory {}'.format(defaultpath))
             os.makedirs(defaultpath)
     else:
         raise NotImplementedError('Custom directory paths are not yet implemented.')
