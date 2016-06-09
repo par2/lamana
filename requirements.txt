@@ -1,11 +1,11 @@
 # Basic installation requirements
 # Leave this file alone unless serious package breakage occurs
 # Experiment using dev_requirements (used in Travis)
-matplotlib==1.5.0
+matplotlib==1.5.1
 nose==1.3.7
 notebook==4.0.6
-numpy==1.10.2
-pandas==0.17.1
+numpy==1.10.4
+pandas==0.18.0
 
 # RTD requirements
 nbsphinx==0.2.2
