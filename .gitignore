@@ -27,6 +27,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+export/
 
 
 # IPython Notebooks
@@ -75,6 +76,10 @@ pip-delete-this-directory.txt
 # ---
 (cd .git*/
 
+
+# Folders
+# =======
+_archive
 
 # ====================================================
 

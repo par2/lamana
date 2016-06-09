@@ -397,10 +397,22 @@ class Laminate(Stack):
     {compressive, tensile} : DataFrame
         Isolated layer stress sides.
 
+    Methods
+    -------
+    to_csv(**kwargs)
+        Exports LaminateModel data and FeatureInput dashboard as separate files.
+    to_xlsx(offset=3, **kwargs)
+        Exports a single file of both LaminateModel data and FeatureInput dashboard.
+
     Raises
     ------
     AttributeError
         If custom attributes could not be set to the `LaminateModel`.
+
+    See Also
+    --------
+    theories.Model : handles user defined Laminate Theory models
+    models : directory containing package models
 
     Examples
     --------
@@ -412,12 +424,8 @@ class Laminate(Stack):
     >>> la.constructs.Laminate(FeatureInput)
     <lamana LaminateModel object (400.0-[200.0]-800.0)>
 
-    See Also
-    --------
-    theories.Model : handles user defined Laminate Theory models
-    models : directory containing package models
-
     '''
+    # TODO: pass kwargs in
     def __init__(self, FeatureInput):
         super(Laminate, self).__init__(FeatureInput)
 
@@ -455,14 +463,21 @@ class Laminate(Stack):
         self._update_columns()                             # Phase 2 & 3
 
         # LaminateModel Attributes
-        if type(self.LMFrame) != list:
-            self.Middle = self.LMFrame[self.LMFrame['type'] == 'middle']
-            self.Inner_i = self.LMFrame[self.LMFrame['type'] == 'inner']
-            self.Outer = self.LMFrame[self.LMFrame['type'] == 'outer']
-            self.compressive = self.LMFrame[self.LMFrame['side'] == 'Comp.']
-            self.tensile = self.LMFrame[self.LMFrame['side'] == 'Tens.']
-        else:
-            raise AttributeError("Unable to set attributes to LMFrame.")
+        # Assumes DataFrames are safelt made by latter instance updates
+        self.Middle = self.LMFrame[self.LMFrame['type'] == 'middle']
+        self.Inner_i = self.LMFrame[self.LMFrame['type'] == 'inner']
+        self.Outer = self.LMFrame[self.LMFrame['type'] == 'outer']
+        self.compressive = self.LMFrame[self.LMFrame['side'] == 'Comp.']
+        self.tensile = self.LMFrame[self.LMFrame['side'] == 'Tens.']
+
+##        if type(self.LMFrame) != list:
+##            self.Middle = self.LMFrame[self.LMFrame['type'] == 'middle']
+##            self.Inner_i = self.LMFrame[self.LMFrame['type'] == 'inner']
+##            self.Outer = self.LMFrame[self.LMFrame['type'] == 'outer']
+##            self.compressive = self.LMFrame[self.LMFrame['side'] == 'Comp.']
+##            self.tensile = self.LMFrame[self.LMFrame['side'] == 'Tens.']
+##        else:
+##            raise AttributeError("Unable to set attributes to LMFrame.")
 
     def __repr__(self):
         return '<lamana LaminateModel object ({}), p={}>'.format(self.Geometry.__str__(),
@@ -781,7 +796,8 @@ class Laminate(Stack):
 
             '''
 
-            '''Need to handle general INDET detection.  Roll-back to `LFrame` if detected.'''
+            # TODO: Need to handle general INDET detection.  Roll-back to `LFrame` if detected.
+            # TODO: No way to pass in kwargs to handshake;
             try:
                 self.LMFrame, self.FeatureInput = theories.handshake(self,
                                                                      adjusted_z=False)
@@ -869,6 +885,8 @@ class Laminate(Stack):
             Passed in modified DataFrame.  CAUTION: Assumes label_ column is
             present.  Also assumes interface and discont. rows are correctly
             populated.
+        p : int
+            Passed in self.p; number of data points.
         column: str
             Column to assign internals.
 
@@ -894,6 +912,7 @@ class Laminate(Stack):
         first = df.groupby('layer').first()                    # make series of intervals
         last = df.groupby('layer').last()
 
+        # TODO: Unsure if this is accessed; check flow to see if this case is triggered
         if p == 1:
             raise ZeroDivisionError('p-1.  Interval cannot be calculated.')
         else:
@@ -928,7 +947,39 @@ class Laminate(Stack):
         return df
     ###
 
-    # Attributes --------------------------------------------------------------
+    def to_csv(self, **kwargs):
+        '''Write LaminateModel data FeatureInput dashboard as separate files.
+
+        Returns
+        -------
+        tuple
+            Paths for both .csv files.
+
+        See Also
+        --------
+        - `utils.tools.export`: for kwargs and docstring.
+
+        '''
+        data_fpath, dash_fpath = ut.export(self, suffix='.csv', **kwargs)
+        return data_fpath, dash_fpath
+
+    def to_xlsx(self, offset=3, **kwargs):
+        '''Write LaminateModel data FeatureInput dashboard as one file.
+
+        Returns
+        -------
+        tuple
+            Path for .xlsx file; maintained For type consistency.
+
+        See Also
+        --------
+        - `utils.tools.export`: for kwargs and docstring.
+
+        '''
+        (workbook_fpath,) = ut.export(self, suffix='.xlsx', offset=offset, **kwargs)
+        return (workbook_fpath,)
+
+    # Properties --------------------------------------------------------------
     '''Need Laminate info property to display on repr().'''
     @property
     def p(self):
@@ -980,21 +1031,32 @@ class Laminate(Stack):
         ...
 
         '''
-        pass
+        pass                                               # pragma: no cover
 
     # Checks ------------------------------------------------------------------
     # Read from DataFrames
     @property
     def is_special(self):
-        '''Return true if nplies < 5; Monolith, Bilayer, Trilayer, 4-ply.'''
+        '''Return True if nplies < 5; Monolith, Bilayer, Trilayer, 4-ply.'''
         return self.nplies < 5
 
+    # TODO: only return pertinent rows
     @property
     def has_discont(self):
-        '''Return True if discontinuity rows are present; generally p>2.'''
+        '''Return Series, True at rows where discontinuities are present.
+
+        Notes
+        -----
+        Generally, disconts are present for laminates with p >= 2 for all nplies.
+        Disconts are not present for monoliths with p = 2.
+
+        '''
         return self.LMFrame['label'].str.contains('discont.')
 
+    # TODO: only return True, not series
     @property
     def has_neutaxis(self):
-        '''Return True if neutral axis row is present; for odd plies.'''
+        '''Return Series, True at row where neutral axis row is present; for odd plies.'''
         return self.LMFrame['label'].str.contains('neut. axis')
+        # TODO: repalce with below
+        #return self.LMFrame['label'].str.contains('neut. axis').any()

@@ -7,10 +7,21 @@ class Error(Exception):
 
 
 class FormatError(Error):
+    '''Associated with geo_string formatting.'''
     pass
 
 
-class KeyError(Error):
+#class ValidationError(Error):
+#    '''Associate with invalid, impossible geo_strings.'''
+#    pass
+
+
+#class KeyError(Error):
+#    pass
+
+
+class InputError(Error):
+    '''Associated with invalid user inputs.'''
     pass
 
 
@@ -19,5 +30,22 @@ class NotImplementedError(Error):
 
 
 class IndeterminateError(Error):
-    '''Associate with INDET exceptions.'''
+    '''Associated with INDET exceptions.
+
+    See Also
+    --------
+    - "More on IndeterminateError" in the documentation.
+
+    '''
+    pass
+
+
+class PlottingError(Error):
+    '''Associated with plotting errors.'''
+    pass
+
+
+class ModelError(Error):
+    '''Associated with model exceptions.'''
+    # TODO: Consider replacing Attribute Error in hook tools and theories.handshake
     pass

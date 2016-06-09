@@ -1,12 +1,15 @@
 #------------------------------------------------------------------------------
 '''Confirm output of general Laminate structure.'''
 # NOTE: Refactoring in 0.4.3c5b led to patching container orders.
+import os
+import logging
 
 import nose.tools as nt
 import pandas as pd
 import numpy as np
 
 import lamana as la
+from lamana.lt_exceptions import IndeterminateError
 from lamana.input_ import BaseDefaults
 from lamana import constructs as con
 from lamana.utils import tools as ut
@@ -1011,20 +1014,65 @@ def test_Laminate_sanity8():
             nt.assert_almost_equals(actual, expected)
 
 
-def test_Laminate_sanity9():
-    '''Check Monoliths, p=1 have positive values.
-    Now using ut.get_frames() for specific case selections.
+# # DEPRECATE: use refactored version that invokes Cases() (0.4.11.dev0)
+# def test_Laminate_sanity9():
+#     '''Check Monoliths, p=1 have positive values.
+
+#     Uses select_frames() to extract a subset of selected cases.
+
+#     '''
+#     cases_selected = ut.select_frames(cases, name='1-ply', ps=[1])
+#     for LMs in cases_selected:
+#         df_numeric = LMs.select_dtypes(include=[np.number])
+#         df = df_numeric
+#         #print(df_numeric)
+#         actual = df_numeric[(df_numeric < 0)]              # catches negative numbers if any
+#         expected = pd.DataFrame(index=df.index, columns=df.columns).fillna(np.nan)
+#         #print(actual)
+#         #print(expected)
+#         ut.assertFrameEqual(actual, expected)
+
+
+def test_Laminate_sanity9_refactored():
+    '''Check Monoliths with p=1 only have positive values.
+
+    Notes
+    -----
+    1. Uses Cases() to extract a subset of selected cases, i.e. Monoliths, p=1.
+       (Triggers exceptions that rollback Laminate; actually yields an LFrame).
+    2. Cases iterates over values, i.e. separate cases.
+    3. Each case is a Monolith of p=1.
+    4. actual is a DataFrame of negative numeric values.  NaN if None found
+    5. expect is a DataFrame with no negative values, i.e. only NaN.
+
     '''
-    cases_selected = ut.get_frames(cases, name='Monolith', ps=[1])
-    for LMs in cases_selected:
-        df_numeric = LMs.select_dtypes(include=[np.number])
-        df = df_numeric
-        #print(df_numeric)
-        actual = df_numeric[(df_numeric < 0)]              # catches negative numbers if any
-        expected = pd.DataFrame(index=df.index, columns=df.columns).fillna(np.nan)
-        print(actual)
-        print(expected)
-        ut.assertFrameEqual(actual, expected)
+    cases_monoliths = la.distributions.Cases(dft.geo_inputs['1-ply'], ps=[1])
+    for case in cases_monoliths:
+        for psuedoLM in case.LMs:
+            df = psuedoLM.LMFrame
+            df_numeric = df.select_dtypes(include=[np.number]) # print number columns
+            # test = df_numeric[(df_numeric > 0)]                # catches positive numbers if any
+            actual = df_numeric[(df_numeric < 0)]              # catches negative numbers if any
+            expected = pd.DataFrame(index=df_numeric.index,
+                                    columns=df_numeric.columns).fillna(np.nan)
+            #print(df)
+            #print(df_numeric)
+            #print(actual)
+            #print(expected)
+            ut.assertFrameEqual(actual, expected)
+
+
+# Test Exception Handling
+@nt.raises(ZeroDivisionError)
+def test_Laminate_internals1():
+    '''Check internal function raises ZeroDivisionError if p = 1 is given to _make_internals.'''
+    # Function needs a DataFrame to work on
+    # Try to feed random DataFrame (LMFrame), random column with p=1
+    case1 = ut.laminator(dft.geo_inputs['1-ply'], ps=[1])
+    for case_ in case1.values():
+        for LM in case_.LMs:
+            df_random = LM.LMFrame
+            la.constructs.Laminate._make_internals(df_random, 1, 'k')
 
 
 # Test attributes
@@ -1048,7 +1096,7 @@ def test_Laminate_attr_max():
             ut.assertSeriesEqual(actual, expected, check_less_precise=True)
 
 
-def test_Laminate_attr_min():
+def test_Laminate_attr_min1():
     '''Check the min attribute and minimum stresses.'''
     for case_ in case.values():
         for LM in case_.LMs:
@@ -1066,6 +1114,15 @@ def test_Laminate_attr_min():
             ut.assertSeriesEqual(actual, expected, check_less_precise=True)
 
 
+def test_Laminate_attr_min2():
+    '''Check the min attribute and minimum stresses returns None if no disconts.'''
+    # Monoliths do not have disconts; will use to trigger the return
+    for case in cases.values():
+        actual = [LM.min_stress for LM in case.LMs if LM.alias == 'Monolith']
+        expected = [None] * len(actual)
+        nt.assert_equal(actual, expected)
+
+
 def test_Laminate_attr_extrema():
     case1 = ut.laminator(dft.geos_full, ps=[5])
     case2 = ut.laminator(dft.geos_full, ps=[2])
@@ -1080,13 +1137,17 @@ def test_Laminate_attr_extrema():
             ut.assertFrameEqual(actual, expected)
 
 
+# TODO: Fix static expected
+# TODO: make cases once, and filter from premade cases to save time
 def test_Laminate_attr_isspecial():
     '''Check the is_special attribute works for different ps.'''
-    expected = [True, True, True, True, True, True, True,
-                False, False, False, False, False, False,
-                False, False, False, False, False]
-
-    # Uses Defaults().geo_all; will grow if more defaults are added
+    expected = [
+        True, True, True, True, True, True, True,
+        False, False, False, False, False, False,
+        False, False, False, False, False
+    ]
+    # Uses Defaults().geos_all
+    # Caution: will grow if more defaults are added; need to amend expected
     for case in cases.values():
         # Make a list for each case by p, then assert
         actual = [LM.is_special for LM in case.LMs]
@@ -1095,9 +1156,82 @@ def test_Laminate_attr_isspecial():
         nt.assert_equal(actual, expected)
 
 
+# TODO: Fix static expected
+def test_Laminate_attr_hasdiscont1():
+    '''Check the has_discont attribute works for different ps; even ply.'''
+    # Disconts exist for p > 2 at interfaces for even and odd plies
+    expected_by_p = [False, True, True, True, True]        # False for p < 2
+    # Make a case of standards for each p
+    cases = ut.laminator(geos=dft.geos_even, ps=[1, 2, 3, 4, 5])
+    # Uses Defaults().geos_standard
+    # NOTE: will grow if more defaults are added; need to amend expected
+    for case, e in zip(cases.values(), expected_by_p):
+        # Make a list of pd.Series for each case by p
+        # All cases should be the same per case; return True only if discont found
+        # Return True if any disconts are found per cases
+        actual = all([LM.has_discont.any() for LM in case.LMs])
+        expected = e                                       # expected for all geos per case
+        #print(actual)
+        nt.assert_equal(actual, expected)
+
+
+def test_Laminate_attr_hasdiscont2():
+    '''Check the has_discont attribute works for different ps; odd ply.'''
+    # Disconts exist for p > 2 at interfaces for even and odd plies
+    expected_by_p = [True, True, True, True]               # False for p < 2
+
+    # Make a case of standards for each p
+    # p = 1 throws IndeterminateError
+    # Monoliths do not have disconts
+    # TODO: use Cases to test all odds but exclude monoliths
+    cases = ut.laminator(geos=dft.geos_standard, ps=[2, 3, 4, 5])
+    # Uses Defaults().geos_standard
+    # NOTE: will grow if more defaults are added; need to amend expected
+    for case, e in zip(cases.values(), expected_by_p):
+        # Make a list of pd.Series for each case by p
+        # All cases should be the same per case; return True only if discont found
+        # Return True if any disconts are found per cases
+        actual = all([LM.has_discont.any() for LM in case.LMs if LM.alias != 'Monolith'])
+        expected = e
+        #print(actual)
+        nt.assert_equal(actual, expected)
+
+
+def test_Laminate_attr_hasneutaxis1():
+    '''Check attribute returns true if neutral axis found; only in odd-plies with odd ps'''
+    expected_by_p = [False, True, False, True]
+    cases = ut.laminator(geos=dft.geos_odd, ps=[2, 3, 4, 5])
+    for case, e in zip(cases.values(), expected_by_p):
+        # any() obviates the ambiguity error from Pandas
+        actual = all([LM.has_neutaxis.any() for LM in case.LMs])
+        expected = e
+        #print(actual)
+        nt.assert_equal(actual, expected)
+
+
+def test_Laminate_attr_hasneutaxis2():
+    '''Check attribute returns False if neutral axis not found; only in even-plies.'''
+    expected_by_p = [False, False, False, False]
+    cases = ut.laminator(geos=dft.geos_even, ps=[2, 3, 4, 5])
+    for case, e in zip(cases.values(), expected_by_p):
+        # any() obviates the ambiguity error from Pandas
+        actual = all([LM.has_neutaxis.any() for LM in case.LMs])
+        expected = e
+        #print(actual)
+        nt.assert_equal(actual, expected)
+
+
+# Test Error Handling
+# TODO: Doesn't seem to catch the Exception; needs work
+#@nt.raises(IndeterminateError)
+#def test_Laminate_indeterminate1():
+#    '''Check IndeterminateError is thrown when p=1 odd-ply is made.'''
+#    ut.laminator(geos=dft.geos_odd, ps=[1])
+
+
 # Test Comparisons
 def test_Laminate_eq1():
-    '''Compare 5-ply to self should be True; testing == of LaminateModels'''
+    '''Compare 5-ply to self should be True; testing == of LaminateModels.'''
     case1 = ut.laminator('400-[200]-800')
     case2 = ut.laminator('400-200-800')
     standard = [LM for case_ in case1.values() for LM in case_.LMs]
@@ -1107,8 +1241,16 @@ def test_Laminate_eq1():
     nt.assert_true(actual)
 
 
+def test_Laminate_eq2():
+    '''Check returns NotImplemented if classes are not equal in __eq__.'''
+    L = la.constructs.Laminate(dft.FeatureInput)
+    actual = L.__eq__(1)                                   # isinstance(1, Cases()) is False
+    expected = NotImplemented
+    nt.assert_equal(actual, expected)
+
+
 def test_Laminate_ne1():
-    '''Compare 5-ply to even plies should be False; testing != of LaminateModels'''
+    '''Compare 5-ply to even plies should be False; testing != of LaminateModels.'''
     case1 = ut.laminator(dft.geos_standard)
     cases1 = ut.laminator(dft.geos_even)
     standard = [LM for case_ in case1.values() for LM in case_.LMs]
@@ -1119,6 +1261,14 @@ def test_Laminate_ne1():
             print(standard[0])
             print(actual)
             nt.assert_true(actual)
+
+
+def test_Laminate_ne2():
+    '''Check returns NotImplemented if classes are not equal in __ne__.'''
+    L = la.constructs.Laminate(dft.FeatureInput)
+    actual = L.__ne__(1)                                   # isinstance(1, Cases()) is False
+    expected = NotImplemented
+    nt.assert_equal(actual, expected)
 
 
 def test_Laminate_compare_sets1():
@@ -1142,6 +1292,62 @@ def test_Laminate_compare_sets1():
     nt.assert_true(set([LM1]) != set([LM3]))
     nt.assert_true(set([LM1]) != set([LM4]))
     nt.assert_equal(len(set([LM1, LM2, LM3, LM4])), 3)
+
+
+class TestLaminateExportMethods():
+    '''Comprise tests for export methods of Laminate; use simple laminate and tempfiles.'''
+    case = ut.laminator('400.0-[200.0]-800.0')[0]
+    LM = case.LMs[0]
+
+    def test_Laminate_mtd_to_csv1(self):
+        '''Verify uses export function; writes temporary file then deletes.'''
+        try:
+            data_fpath, dash_fpath = self.LM.to_csv(temp=True)
+            actual1 = os.path.exists(data_fpath)
+            actual2 = os.path.exists(dash_fpath)
+            nt.assert_true(actual1)
+            nt.assert_true(actual2)
+        finally:
+            os.remove(data_fpath)
+            os.remove(dash_fpath)
+            logging.info('File has been deleted: {}'.format(data_fpath))
+            logging.info('File has been deleted: {}'.format(dash_fpath))
+
+    def test_Laminate_mtd_to_csv2(self):
+        '''Verify returns tuple of 2 paths; writes temporary file then deletes.'''
+        result = self.LM.to_csv(temp=True, delete=True)
+        actual1 = isinstance(result, tuple)
+        actual2 = len(result)
+        actual3 = isinstance(result[1], str)
+        expected = 2
+        nt.assert_true(actual1)
+        nt.assert_equals(actual2, expected)
+        nt.assert_true(actual3)
+        logging.info('File has been deleted: {}'.format(result[0]))
+        logging.info('File has been deleted: {}'.format(result[1]))
+
+    def test_Laminate_mtd_to_xlsx1(self):
+        '''Verify uses export function; writes temporary file then deletes.'''
+        try:
+            (workbook_fpath,) = self.LM.to_xlsx(temp=True)
+            actual = os.path.exists(workbook_fpath)
+            nt.assert_true(actual)
+        finally:
+            os.remove(workbook_fpath)
+            logging.info('File has been deleted: {}'.format(workbook_fpath))
+
+    def test_Laminate_mtd_to_xlsx2(self):
+        '''Verify returns tuple of 1 path; writes temporary file then deletes.'''
+        # Maintains tuple for consistency
+        result = self.LM.to_xlsx(temp=True, delete=True)
+        actual1 = isinstance(result, tuple)
+        actual2 = len(result)
+        actual3 = isinstance(result[0], str)
+        expected = 1
+        nt.assert_true(actual1)
+        nt.assert_equals(actual2, expected)
+        nt.assert_true(actual3)
+        logging.info('File has been deleted: {}'.format(result))
 
 
 '''Make a test where the FeautreInpts are different but df are equal --> fail test.'''

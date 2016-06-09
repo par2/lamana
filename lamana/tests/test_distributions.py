@@ -1,11 +1,12 @@
 #------------------------------------------------------------------------------
 '''Confirm accurate execution of building cases.'''
 
+import os
 import copy
+import logging
 import itertools as it
 
 import nose.tools as nt
-
 import pandas as pd
 
 import lamana as la
@@ -140,23 +141,47 @@ expected4 = [
 # -----------------------------------------------------------------------------
 #  CASE
 # -----------------------------------------------------------------------------
+
+
+# Case Arguments -------------------------------------------------------------
+#  TODO: Convert, organize tests  to LPEP 001.015
 @nt.raises(TypeError)
-def test_emptyCase1():
-    '''If no parameters passed to Case(), raise TypeError'''
+def test_Case_arg_empty1():
+    '''If no parameters passed to Case(), raise TypeError.'''
     case0 = la.distributions.Case()
 
 
-def test_Case_parameters1():
+@nt.raises(TypeError)
+def test_Case_arg_empty2():
+    '''Check raise Exception if not passed load_params; first test.'''
+    case0 = la.distributions.Case(dft.mat_props)
+
+
+@nt.raises(TypeError)
+def test_Case_arg_empty3():
+    '''Check raise Exception if not passed mat_props.'''
+    case0 = la.distributions.Case(dft.load_params)
+
+
+@nt.raises(ValueError)
+def test_Case_mth_apply_arg_empty1():
+    '''Check raise Exception if not passed a geometries.'''
+    case0 = la.distributions.Case(dft.load_params, dft.mat_props)
+    actual = case0.apply()
+
+
+# Case Attributes -------------------------------------------------------------
+def test_Case_attr_parameters1():
     '''Confirm dict inputs (static data).'''
     actual = case1.load_params
     expected = {'P_a': 1, 'R': 0.012, 'a': 0.0075, 'p': 4, 'r': 2e-4}
     nt.assert_equal(actual, expected)
 
+# TODO: Test Series equality of load_params
 
-'''Test load parameters Series equality'''
-# Case attributes
+
 # Using a sample of geometries
-def test_Case_material_order0():
+def test_Case_attr_material_order0():
     '''Check property setter; materials changes the _material attribute.'''
     case2.materials = ['PSu', 'HA']
     actual = case2._materials
@@ -164,7 +189,7 @@ def test_Case_material_order0():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_materials_order1():
+def test_Case_attr_materials_order1():
     '''Check homogenous laminate gives same material.'''
     case2.materials = ['HA']                               # set order
     case2.apply(bdft.geos_sample)
@@ -174,7 +199,7 @@ def test_Case_materials_order1():
         nt.assert_equal(actual, e)
 
 
-def test_Case_materials_order2():
+def test_Case_attr_materials_order2():
     '''Check material setting of biphasic laminate in snapshots.'''
     case2.materials = ['PSu', 'HA']                        # set order
     case2.apply(bdft.geos_sample)
@@ -187,7 +212,7 @@ def test_Case_materials_order2():
         nt.assert_equal(actual2, e)
 
 
-def test_Case_materials_order3():
+def test_Case_attr_materials_order3():
     '''Check order for repeated materials.'''
     case2.materials = ['PSu', 'HA', 'HA']                  # set order
     case2.apply(bdft.geos_sample)
@@ -201,7 +226,7 @@ def test_Case_materials_order3():
     #print(case2.snapshots[-1])
 
 
-def test_Case_materials_order4():
+def test_Case_attr_materials_order4():
     '''Check multi-phase laminate, matl > 2, cycles through list.'''
     case3.materials = ['PSu', 'HA', 'dummy']               # set order
     case3.apply(bdft.geos_sample)
@@ -212,7 +237,7 @@ def test_Case_materials_order4():
 
 
 @nt.raises(NameError)
-def test_Case_materials_order5():
+def test_Case_attr_materials_order5():
     '''Check error is thrown if materials are not found inmat_props.'''
     case2.materials = ['PSu', 'HA', 'dummy']               # set order
     case2.apply(bdft.geos_sample)
@@ -221,7 +246,7 @@ def test_Case_materials_order5():
         nt.assert_equal(actual, e)
 
 
-def test_Case_properties1():
+def test_Case_attr_properties1():
     '''Confirm dict conversion to Dataframe (static data) and values.'''
     d = {
         'Modulus': pd.Series([52e9, 2.7e9], index=['HA', 'PSu']),
@@ -232,7 +257,7 @@ def test_Case_properties1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_properties2():
+def test_Case_attr_properties2():
     '''Check the order of the properties DataFrame when materials is reset.'''
     expected = ['PSu', 'HA']
     case2.materials = expected                             # set order
@@ -242,29 +267,86 @@ def test_Case_properties2():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_compare1():
-    '''Check __eq__, __ne__ of case.'''
-    case1 = la.distributions.Case(dft.load_params, dft.mat_props)
-    case2 = la.distributions.Case(dft.load_params, dft.mat_props)
-    case3 = la.distributions.Case(dft.load_params, dft.mat_props)
-    case1.apply(dft.geos_most)
-    case2.apply(dft.geos_most)
-    case3.apply(dft.geos_standard)
+# Case Special Methods --------------------------------------------------------
+# NOTE: Shift in paradigms, first use of test class to contain variables.
+class TestCaseComparisons():
+    '''Check __eq__ and __ne__ of Case objects. BETA.'''
 
-    expected = case1
-    actual1 = case2
-    actual2 = case3
-    #print(actual1)
-    #print(actual2)
-    nt.assert_equal(actual1, expected)
-    nt.assert_not_equal(actual2, expected)
+    # Instantiate cases for comparison
+    # NOTE: Keep pertinent instantiations contained in a single scope
+    # NOTE: Modifications - add instantiations, simply add self to variable calls.
+    dft = wlt.Defaults()
 
+    case1a = la.distributions.Case(dft.load_params, dft.mat_props)
+    case1b = la.distributions.Case(dft.load_params, dft.mat_props)
+    case1c = la.distributions.Case(dft.load_params, dft.mat_props)
+    case1d = la.distributions.Case(dft.load_params, dft.mat_props)
+    case1e = la.distributions.Case(dft.load_params, dft.mat_props)
+    case1a.apply(dft.geos_all)
+    case1b.apply(dft.geos_all)
+    case1c.apply(dft.geo_inputs['all'])
+    case1d.apply(dft.geos_most)
+    case1e.apply(dft.geos_special)
+
+    def test_Case_spmthd_eq_1(self):
+        '''Check __eq__ between hashable Cases object instances.'''
+        # Compare Cases with single standards
+        nt.assert_equal(self.case1a, self.case1b)
+        nt.assert_equal(self.case1a, self.case1c)
+        nt.assert_equal(self.case1b, self.case1a)
+        nt.assert_equal(self.case1c, self.case1a)
+
+    def test_Case_spmthd_eq_2(self):
+        '''Check __eq__ between hashable Cases object instances.'''
+        # Compare Cases with single standards
+        nt.assert_true(self.case1a == self.case1b)
+        nt.assert_true(self.case1a == self.case1c)
+        nt.assert_true(self.case1b == self.case1a)
+        nt.assert_true(self.case1c == self.case1a)
+
+    def test_Case_spmthd_eq_3(self):
+        '''Check __eq__ between unequal hashable Geometry object instances.'''
+        nt.assert_false(self.case1a == self.case1d)
+        nt.assert_false(self.case1a == self.case1e)
+        nt.assert_false(self.case1d == self.case1a)
+        nt.assert_false(self.case1e == self.case1a)
+
+    def test_Case_spmthd_eq_4(self):
+        '''Check returns NotImplemented if classes are not equal in __eq__.'''
+        # See Also original implementation in test_constructs.py
+        actual = self.case1a.__eq__(1)                     # isinstance(1, Cases()) is False
+        expected = NotImplemented
+        nt.assert_equal(actual, expected)
+
+    def test_Case_spmthd_ne_1(self):
+        '''Check __ne__ between hashable Geometry object instances.'''
+        nt.assert_false(self.case1a != self.case1b)
+        nt.assert_false(self.case1a != self.case1c)
+        nt.assert_false(self.case1b != self.case1a)
+        nt.assert_false(self.case1c != self.case1a)
+
+    def test_Case_spmthd_ne_2(self):
+        '''Check __ne__ between unequal hashable Geometry object instances.'''
+        nt.assert_true(self.case1a != self.case1d)
+        nt.assert_true(self.case1a != self.case1e)
+        nt.assert_true(self.case1d != self.case1a)
+        nt.assert_true(self.case1e != self.case1a)
+
+    def test_Case_spmthd_ne3(self):
+        '''Check returns NotImplemented if classes are not equal in __ne__.'''
+        actual = self.case1a.__ne__(1)                     # isinstance(1, Cases()) is False
+        expected = NotImplemented
+        nt.assert_equal(actual, expected)
+
+
+# Case Methods ----------------------------------------------------------------
+# TODO: Change; too brittle
 # Test Case().apply() properties
 # The following use the same geos
 case1.apply(geos_full)
 
 
-def test_Case_apply_middle1():
+def test_Case_mthd_apply_middle1():
     '''Check output for middle layer.'''
     #case1.apply(geos_full)
     actual = case1.middle
@@ -272,7 +354,7 @@ def test_Case_apply_middle1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_inner1():
+def test_Case_mthd_apply_inner1():
     '''Check output for inner layer.'''
     #case1.apply(geos_full)
     actual = case1.inner
@@ -283,7 +365,7 @@ def test_Case_apply_inner1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_outer1():
+def test_Case_mthd_apply_outer1():
     '''Check output for inner layer.'''
     #case1.apply(geos_full)
     actual = case1.outer
@@ -291,7 +373,7 @@ def test_Case_apply_outer1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_index1():
+def test_Case_mthd_apply_index1():
     '''Check list indexing of the last index.'''
     #case1.apply(geos_full)
     actual = case1.inner[-1]
@@ -299,7 +381,7 @@ def test_Case_apply_index1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_index2():
+def test_Case_mthd_apply_index2():
     '''Check list indexing of the last element.'''
     #case1.apply(geos_full)
     actual = case1.inner[-1][-1]
@@ -307,7 +389,7 @@ def test_Case_apply_index2():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_iterate1():
+def test_Case_mthd_apply_iterate1():
     '''Check iterating indexed list; first element of every inner_i.'''
     #case1.apply(geos_full)
     actual = [first[0] for first in case1.inner]
@@ -315,7 +397,7 @@ def test_Case_apply_iterate1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_iterate2():
+def test_Case_mthd_apply_iterate2():
     '''Check iterating indexed list; operate on last element of every inner_i.'''
     #case1.apply(geos_full)
     actual = [inner_i[-1] / 2.0 for inner_i in case1.total_inner_i]
@@ -323,7 +405,7 @@ def test_Case_apply_iterate2():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_total1():
+def test_Case_mthd_apply_total1():
     '''Calculate total thicknesses (all).'''
     actual = case1.total
     expected = [2000.0, 2000.0, 2000.0, 2000.0, 2000.0,
@@ -331,21 +413,21 @@ def test_Case_apply_total1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_total2():
+def test_Case_mthd_apply_total2():
     '''Calculate total middle layer thicknesses; all.'''
     actual = case1.total_middle
     expected = [2000.0, 0.0, 800.0, 0.0, 800.0, 800.0, 800.0, 800.0, 800.0]
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_total3():
+def test_Case_mthd_apply_total3():
     '''Calculate total inner layer thicknesses; all.'''
     actual = case1.total_inner
     expected = [0.0, 0.0, 0.0, 1000.0, 400.0, 400.0, 400.0, 400.0, 400.0]
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_total4():
+def test_Case_mthd_apply_total4():
     '''Calculate total of each inner_i layer thicknesses; all.'''
     actual = case1.total_inner_i
     expected = [[0.0], [0.0], [0.0], [1000.0], [400.0],
@@ -353,14 +435,14 @@ def test_Case_apply_total4():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_total5():
+def test_Case_mthd_apply_total5():
     '''Calculate total outer layer thicknesses; all.'''
     actual = case1.total_outer
     expected = [0.0, 2000.0, 1200.0, 1000.0, 800.0, 800.0, 800.0, 800.0, 800.0]
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_slice1():
+def test_Case_mthd_apply_slice1():
     '''Check list slicing of total thicknesses.'''
     #case1.apply(geos_full)
     actual = case1.total_outer[4:-1]
@@ -368,7 +450,7 @@ def test_Case_apply_slice1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_unique1():
+def test_Case_mthd_apply_unique1():
     '''Check getting a unique set of LaminateModels when unique=True.'''
     actual = la.distributions.Case(dft.load_params, dft.mat_props)
     actual.apply(['400-[200]-800'])
@@ -377,7 +459,7 @@ def test_Case_apply_unique1():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_unique2():
+def test_Case_mthd_apply_unique2():
     '''Check getting a unique set of LaminateModels when unique=False.'''
     actual = la.distributions.Case(dft.load_params, dft.mat_props)
     actual.apply(['400-[200]-800', '400-[200]-800'])
@@ -387,7 +469,7 @@ def test_Case_apply_unique2():
 
 
 @nt.raises(AssertionError)
-def test_Case_apply_unique3():
+def test_Case_mthd_apply_unique3():
     '''Check exception if comparing inaccurately LaminateModels when unique is False.'''
     actual = la.distributions.Case(dft.load_params, dft.mat_props)
     actual.apply(['400-[200]-800'])                   # wrong actual
@@ -396,7 +478,7 @@ def test_Case_apply_unique3():
     nt.assert_equal(actual, expected)
 
 
-def test_Case_apply_unique4():
+def test_Case_mthd_apply_unique4():
     '''Check unique word skips iterating same geo strings; gives only one.'''
     standards = ['400-200-800', '400-[200]-800',
                  '400-200-800', '400-[200]-800',
@@ -410,7 +492,7 @@ def test_Case_apply_unique4():
 
 
 # Case refactor 0.4.5a1
-def test_Case_apply_reapply():
+def test_Case_mthd_apply_reapply():
     '''Check same result is returned by calling apply more than once.'''
     case1 = la.distributions.Case(dft.load_params, dft.mat_props)
     case1.apply(['400-[200]-800', '400-[200]-800', '100-200-1400'])
@@ -423,9 +505,9 @@ def test_Case_apply_reapply():
     nt.assert_equal(actual, expected)
 
 
-# Laminate Structure ----------------------------------------------------------
-#Test LaminateModels
-def test_Case_apply_Snapshots1():
+# Laminate Structure
+# Test LaminateModels
+def test_Case_prop_snapshots1():
     '''Test the native DataFrame elements and dtypes. Resorts columns.  Uses pandas equals test.'''
     case1.apply(geos_full)
     cols = ['layer', 'matl', 'type', 't(um)']
@@ -444,7 +526,7 @@ def test_Case_apply_Snapshots1():
     ut.assertFrameEqual(actual[cols], expected[cols])
 
 
-def test_Case_apply_LaminateModels1():
+def test_Case_mthd_apply_LaminateModels1():
     '''Test the native DataFrame elements and dtypes. Resorts columns.
     Uses pandas equals() test.  p is even.'''
     case1.apply(geos_full)
@@ -489,6 +571,20 @@ def test_Case_apply_LaminateModels1():
 #     nt.assert_true(bool_test)
     ut.assertFrameEqual(actual, expected)
 
+
+# Case Properties -------------------------------------------------------------
+# TODO: Move
+def test_Case_prop_size1():
+    '''Check size property gives correct number for length of Case object.'''
+    case_ = la.distributions.Case(dft.load_params, dft.mat_props)
+    case_.apply(['400-[200]-800', '400-[100,100]-800', '400-[400]-400'])
+    actual = case_.size
+    expected = 3
+    nt.assert_equal(actual, expected)
+###
+
+
+# TODO: Cleanup; move
 # DataFrames ------------------------------------------------------------------
 # Test p
 '''Building expected DataFrames for tests can be tedious.  The following
@@ -534,7 +630,6 @@ def replicate_values(dict_, dict_keys=[], multiplier=1):
 
 
 def make_dfs(dicts, dict_keys=None, p=1):
-#def make_dfs(dicts, dict_keys=[], p=1):
     '''Call replicate_values() to return a list of custom DataFrames with p
     number of repeated values.
 
@@ -650,7 +745,7 @@ d8 = {
 
 
 #------------------------------------------------------------------------------
-def test_apply_LaminateModels_frames_p1():
+def test_Case_mthd_apply_LaminateModels_frames_p1():
     '''Check built DataFrames have correct p for each Lamina.
 
     Using two functions to build DataFrames: make_dfs() and replicate_values().
@@ -714,7 +809,7 @@ def test_apply_LaminateModels_frames_p1():
 
 
 # Test stress sides
-def test_apply_LaminateModels_side_p1():
+def test_Case_mthd_apply_LaminateModels_side_p1():
     '''Check None is assigned in the middle for LaminateModels with odd rows.'''
     load_params = {
         'R': 12e-3,                                        # specimen radius
@@ -745,7 +840,7 @@ def test_apply_LaminateModels_side_p1():
     nt.assert_equal(actual, expected)
 
 
-def test_apply_LaminateModels_side_p2():
+def test_Case_mthd_apply_LaminateModels_side_p2():
     '''Check None is not in the DataFrame having even rows.'''
     load_params = {
         'R': 12e-3,                                        # specimen radius
@@ -771,7 +866,7 @@ def test_apply_LaminateModels_side_p2():
     nt.assert_equal(actual, expected)
 
 
-def test_apply_LaminateModels_INDET1():
+def test_Case_mthd_apply_LaminateModels_INDET1():
     '''Test INDET in the middle row for p = 1, odd laminates.'''
     load_params = {
         'R': 12e-3,                                        # specimen radius
@@ -802,7 +897,7 @@ def test_apply_LaminateModels_INDET1():
     nt.assert_equal(actual, expected)
 
 
-def test_apply_LaminateModels_INDET2():
+def test_Case_mthd_apply_LaminateModels_INDET2():
     '''Test INDET in the middle rows for p = 1, odd laminates.'''
     load_params = {
         'R': 12e-3,                                        # specimen radius
@@ -833,7 +928,7 @@ def test_apply_LaminateModels_INDET2():
     nt.assert_equal(actual, expected)
 
 
-def test_apply_LaminateModels_None1():
+def test_Case_mthd_apply_LaminateModels_None1():
     '''Check None is assigned in the middle for LaminateModels with odd rows.'''
     load_params = {
         'R': 12e-3,                                        # specimen radius
@@ -864,12 +959,82 @@ def test_apply_LaminateModels_None1():
     nt.assert_equal(actual, expected)
 
 
+class TestCaseExportMethods():
+    '''Comprise tests for export methods of Case; use simple laminate and tempfiles.'''
+    case = la.distributions.Case(load_params, mat_props)
+    case.apply(['400-[200]-800', '400-[400]-400', '400-[100,100]-800'])
+
+    def test_Case_mtd_to_csv1(self):
+        '''Verify number of files written; use tempfiles.'''
+        try:
+            list_of_tupled_paths = self.case.to_csv(temp=True)
+            actual1 = len(list_of_tupled_paths)
+            actual2 = len([dash_fpath
+                           for data_fpath, dash_fpath in list_of_tupled_paths])
+            expected1 = 3                                  # tuples
+            expected2 = 3                                  # dashboards
+            nt.assert_equals(actual1, expected1)
+            nt.assert_equals(actual2, expected2)
+        finally:
+            for data_fpath, dash_fpath in list_of_tupled_paths:
+                os.remove(data_fpath)
+                os.remove(dash_fpath)
+                logging.info('File has been deleted: {}'.format(data_fpath))
+                logging.info('File has been deleted: {}'.format(dash_fpath))
+
+    def test_Case_mtd_to_csv2(self):
+        '''Verify type of to_csv.'''
+        try:
+            result = self.case.to_csv(temp=True)
+            actual1 = isinstance(result, list)
+            actual2 = isinstance(result[0], tuple)
+            nt.assert_true(actual1)
+            nt.assert_true(actual2)
+        finally:
+            for data_fpath, dash_fpath in result:
+                os.remove(data_fpath)
+                os.remove(dash_fpath)
+                logging.info('File has been deleted: {}'.format(data_fpath))
+                logging.info('File has been deleted: {}'.format(dash_fpath))
+
+    def test_Case_mtd_to_xlsx1(self):
+        '''Verify returns 2 sheets per LamainateModel in the same file; half dashboards.'''
+        try:
+            workbook_fpath = self.case.to_xlsx(temp=True)
+            excel_file = pd.ExcelFile(workbook_fpath)
+            actual1 = len(excel_file.sheet_names)
+            actual2 = len([fname for fname in excel_file.sheet_names
+                          if fname.startswith('Dash')])
+            expected1 = 6
+            expected2 = actual1/2.
+            nt.assert_equals(actual1, expected1)
+            nt.assert_equals(actual2, expected2)
+        finally:
+            os.remove(workbook_fpath)
+            logging.info('File has been deleted: {}'.format(workbook_fpath))
+
+    def test_Case_mtd_to_xlsx2(self):
+        '''Verify type of to_xlsx.'''
+        try:
+            result = self.case.to_xlsx(temp=True)
+            actual = isinstance(result, str)
+            nt.assert_true(actual)
+        finally:
+            os.remove(result)
+            logging.info('File has been deleted: {}'.format(result))
+
+
 #------------------------------------------------------------------------------
 # CASES
 #------------------------------------------------------------------------------
+# Setup -----------------------------------------------------------------------
+
 dft = wlt.Defaults()
+# TODO: Why deepcopy?  Why not dft.load_params everywhere?
+# Looks like to change load_params without affecting default dft.load_params
 load_params = copy.deepcopy(dft.load_params)
 #load_params = dft.load_params
+
 
 # Manual and Auto Cases for Attribute Tests
 cases1a = la.distributions.Cases(dft.geo_inputs['5-ply'], ps=[2, 3, 4])
@@ -877,13 +1042,16 @@ cases1b = la.distributions.Cases(dft.geo_inputs['5-ply'], ps=[2, 3, 4])
 #cases1a = Cases(dft.geo_inputs['5-ply'], ps=[2,3,4])     # assumes Defaults
 #cases1b = Cases(dft.geo_inputs['5-ply'], ps=[2,3,4])     # assumes Defaults
 load_params['p'] = 2
+# TODO: Rename; this is a case not cases
 cases1c = la.distributions.Case(load_params, dft.mat_props)
 cases1c.apply(dft.geo_inputs['5-ply'])
+
 
 # Manual Cases for Selection Tests
 cases2a = la.distributions.Cases(dft.geos_special, ps=[2, 3, 4])
 #cases2a = Cases(dft.geos_special, ps=[2,3,4])
 load_params['p'] = 2
+# TODO: Rename following.  These are Case objects, not Cases
 cases2b2 = la.distributions.Case(load_params, dft.mat_props)
 cases2b2.apply(dft.geos_special)
 load_params['p'] = 3
@@ -892,6 +1060,7 @@ cases2b3.apply(dft.geos_special)
 load_params['p'] = 4
 cases2b4 = la.distributions.Case(load_params, dft.mat_props)
 cases2b4.apply(dft.geos_special)
+
 
 # Manual for mixed geometry string inputs
 mix = dft.geos_most + dft.geos_standard                   # 400-[200]-800 common to both
@@ -902,18 +1071,27 @@ cases3b5 = la.distributions.Case(load_params, dft.mat_props)
 cases3b5.apply(mix)
 
 
-def test_Cases_attr_len1():
-    '''Check __len__ of all cases contained in cases.'''
-    actual1 = cases1a.__len__()
-    actual2 = len(cases1a)
-    ps = {case.p for case in cases1a}
-    ncases = len(dft.geo_inputs['5-ply']) * len(ps)
-    expected = ncases
-    nt.assert_equal(actual1, expected)
-    nt.assert_equal(actual2, expected)
+# Manual for standard Cases for comparisons and others
+cases4a = la.distributions.Cases(['400-[200]-800'])
+cases4b = la.distributions.Cases(['400-[200]-800'])
+cases4c = la.distributions.Cases(['400-200-800'])
+cases4d = la.distributions.Cases(['1000-[0]-0'])
+cases4e = la.distributions.Cases(['400-[150,50]-800'])
+
+# Manual fixed length for slicing
+cases5a = la.distributions.Cases(['400-[200]-800', '400-[100,100]-400', '400-[400]-400'])
 
 
-def test_Cases_attr_get1():
+# TESTS -----------------------------------------------------------------------
+# Cases Special Methods -------------------------------------------------------
+@nt.raises(NotImplementedError)
+def test_Cases_spmthd_set1():
+    '''Check __setitem__ is not implemented.'''
+    # Setting to Cases() would be difficult due to the custom dict type; reinstantiation is encouraged.
+    cases1a[2] = 'test'
+
+
+def test_Cases_spmthd_get1():
     '''Check __getitem__ of all cases contained in cases.'''
     actual1 = cases1a.__getitem__(0)
     actual2 = cases1a.get(0)
@@ -924,23 +1102,59 @@ def test_Cases_attr_get1():
     nt.assert_equal(actual3, expected)
 
 
+def test_Cases_spmthd_get2():
+    '''Check __getitem__ handles negative indicies.'''
+    full_range = [case for case in cases5a]
+    actual1 = cases5a[-1]                                  # negative index
+    actual2 = cases5a[-2]                                 # negative index
+    expected1 = full_range[-1]
+    expected2 = full_range[-2]
+    nt.assert_equal(actual1, expected1)
+    nt.assert_equal(actual2, expected2)
+
+
+def test_Cases_spmthd_get3():
+    '''Check __getitem__ of Cases using slice notation.'''
+    #'''Check __getslice__ of Cases object; can use slice notation.'''
+    # NOTE: most implementation is actually in __getitem__
+    actual1 = cases5a[0:2]                                 # range of dict keys
+    actual2 = cases5a[0:3]                                 # full range of dict keys
+    actual3 = cases5a[:]                                   # full range
+    actual4 = cases5a[1:]                                  # start:None
+    actual5 = cases5a[:2]                                  # None:stop
+    actual6 = cases5a[:-1]                                 # None:negative index
+    actual7 = cases5a[:-2]                                 # None:negative index
+    # TODO: Following are negative steps; NotImplemented (0.4.11.dev0)
+    #actual8 = cases5a[0:-1:-2]                             # start:stop:step
+    #actual9 = cases5a[::-1]                                # reverse
+
+    full_range = [case for case in cases5a]
+    expected1 = full_range[0:2]
+    expected2 = full_range[0:3]
+    expected3 = full_range[:]
+    expected4 = full_range[1:]
+    expected5 = full_range[:2]
+    expected6 = full_range[:-1]
+    expected7 = full_range[:-2]
+
+    nt.assert_equal(actual1, expected1)
+    nt.assert_equal(actual2, expected2)
+    nt.assert_equal(actual3, expected3)
+    nt.assert_equal(actual4, expected4)
+    nt.assert_equal(actual5, expected5)
+    nt.assert_equal(actual6, expected6)
+    nt.assert_equal(actual7, expected7)
+
+
 @nt.raises(KeyError)
-def test_Cases_attr_get2():
+def test_Cases_spmthd_get4():
     '''Check __getitem__ of non-item in cases.'''
     actual1 = cases1a[300]
     expected = 'dummy'
     nt.assert_equal(actual1, expected)
 
 
-@nt.raises(NotImplementedError)
-def test_Cases_attr_set1():
-    '''Check __setitem__ is not implemented.'''
-    actual1 = cases1a[2] = 'test'
-    expected = NotImplemented
-    nt.assert_equal(actual1, expected)
-
-
-def test_Cases_attr_del1():
+def test_Cases_spmthd_del1():
     '''Check __del__ of all cases contained in cases.'''
     cases = cases1b
     del cases[1]
@@ -951,6 +1165,146 @@ def test_Cases_attr_del1():
     nt.assert_equal(actual1, expected)
 
 
+##def test_Cases_spmthd_iter1():
+##    '''Check Cases() iterates by values (not keys).'''
+##    actual = [caselet for caselet in cases1a]
+##    expected = [caselet for caselet in cases1a.values()]
+##    nt.assert_equal(actual, expected)
+
+
+def test_Cases_spmthd_len1():
+    '''Check __len__ of all cases contained in cases.'''
+    actual1 = cases1a.__len__()
+    actual2 = len(cases1a)
+    ps = {case.p for case in cases1a}
+    ncases = len(dft.geo_inputs['5-ply']) * len(ps)
+    expected = ncases
+    nt.assert_equal(actual1, expected)
+    nt.assert_equal(actual2, expected)
+
+
+# Instance comparisons; See Also test_input for Geometry comparisons
+def test_Cases_spmthd_eq_1():
+    '''Check __eq__ between hashable Cases object instances.'''
+    # Compare Cases with single standards
+    nt.assert_equal(cases4a, cases4b)
+    nt.assert_equal(cases4a, cases4c)
+    nt.assert_equal(cases4b, cases4a)
+    nt.assert_equal(cases4c, cases4a)
+
+
+def test_Cases_spmthd_eq_2():
+    '''Check __eq__ between hashable Cases object instances.'''
+    # Compare Cases with single standards
+    nt.assert_true(cases4a == cases4b)
+    nt.assert_true(cases4a == cases4c)
+    nt.assert_true(cases4b == cases4a)
+    nt.assert_true(cases4c == cases4a)
+
+
+def test_Cases_spmthd_eq_3():
+    '''Check __eq__ between unequal hashable Geometry object instances.'''
+    nt.assert_false(cases4a == cases4d)
+    nt.assert_false(cases4a == cases4e)
+    nt.assert_false(cases4d == cases4a)
+    nt.assert_false(cases4e == cases4a)
+
+
+def test_Cases_spmthd_eq_4():
+    '''Check returns NotImplemented if classes are not equal in __eq__.'''
+    # See Also original implementation in test_constructs.py
+    actual = cases4a.__eq__(1)                             # isinstance(1, Cases()) is False
+    expected = NotImplemented
+    nt.assert_equal(actual, expected)
+
+
+def test_Cases_spmthd_ne_1():
+    '''Check __ne__ between hashable Geometry object instances.'''
+    nt.assert_false(cases4a != cases4b)
+    nt.assert_false(cases4a != cases4c)
+    nt.assert_false(cases4b != cases4a)
+    nt.assert_false(cases4c != cases4a)
+
+
+def test_Cases_spmthd_ne_2():
+    '''Check __ne__ between unequal hashable Geometry object instances.'''
+    nt.assert_true(cases4a != cases4d)
+    nt.assert_true(cases4a != cases4e)
+    nt.assert_true(cases4d != cases4a)
+    nt.assert_true(cases4e != cases4a)
+
+
+def test_Cases_spmthd_ne_3():
+    '''Check returns NotImplemented if classes are not equal in __ne__.'''
+    actual = cases4a.__ne__(1)                             # isinstance(1, Cases()) is False
+    expected = NotImplemented
+    nt.assert_equal(actual, expected)
+
+
+# String representations
+def test_Cases_spmthd_str1():
+    '''Check Cases.__str__ output.'''
+    geo_strings = ['400-[200]-800', '400-[200]-400S']
+    actual = la.distributions.Cases(geo_strings).__str__()
+    expected = ("{0: <<class 'lamana.distributions.Case'> p=5, size=1>,"
+                " 1: <<class 'lamana.distributions.Case'> p=5, size=1>}")
+    nt.assert_equal(actual, expected)
+
+
+def test_Cases_spmthd_repr1():
+    '''Check Cases.__repr__ output.'''
+    geo_strings = ['400-[200]-800', '400-[200]-400S']
+    representation = la.distributions.Cases(geo_strings).__repr__()
+    # Unable replicate the address of the first entry
+    # e.g. '<lamana.distributions.Cases object at 0x0000000007D65860>'
+    # Thus trimming the actual repr
+    expected = (" {0: <<class 'lamana.distributions.Case'> p=5, size=1>,"
+                " 1: <<class 'lamana.distributions.Case'> p=5, size=1>}")
+    trimmed = representation.split(',')
+    actual = ','.join(trimmed[1:])
+    nt.assert_equal(actual, expected)
+
+
+# Cases Methods ---------------------------------------------------------------
+def test_Cases_mthd_plot():
+    '''Check plot implementation.'''
+    # TODO: Try checking return is an ax instance
+    pass
+
+# DEPRECATE: 0.4.11
+# def test_Cases_mthd_tocsv():
+#     '''Check utils.write_csv is called, file is written to default directory.
+#
+#     Notes
+#     -----
+#     Add files to export, then removes them.  Adapted from test_tools_write1().
+#     Instantiate a Cases object, iterate, call `to_csv` that writes the file.
+#     The read those temporary files.
+#
+#     See Also
+#     --------
+#     - utils.tools.write_csv(): main writer for csv files.
+#     - test_tools_write1(): writes, tests and cleans up temporary files.
+#
+#     '''
+#     try:
+#         # TODO: Add standard case to the module namespace to reduce building.
+#         cases = la.distributions.Cases(['400-200-800'])
+#         # Write files to default output dir
+#         # CAUTION: assumes the order of case.to_csv is the same as Cases.LMs
+#         expected_dfs = cases.frames
+#         filepaths = cases.to_csv(prefix='temp')
+#         for filepath, expected in zip(filepaths, expected_dfs):
+#             # Read a file, get DataFrames
+#             actual = pd.read_csv(filepath, index_col=0)
+#             ut.assertFrameEqual(actual, expected)
+#     finally:
+#         # Remove temporary files
+#         for filepath in filepaths:
+#             os.remove(filepath)
+
+
+# TODO: Move to prop section; brittle, moving causes failures; not apparent why; suspect load_params namespace collision
 def test_Cases_prop_LMs1():
     '''Check viewing inside cases gives correct list.'''
     actual1 = cases1a.LMs
@@ -972,8 +1326,7 @@ def test_Cases_prop_LMs1():
     nt.assert_equal(actual1, expected)
 
 
-# Cases selections
-def test_Cases_prop_select1():
+def test_Cases_mthd_select1():
     '''Check output of select method; single nplies only.'''
     actual = cases2a.select(nplies=4)
     expected = {LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
@@ -981,9 +1334,10 @@ def test_Cases_prop_select1():
     nt.assert_set_equal(actual, expected)
 
 
-def test_Cases_prop_select2():
+def test_Cases_mthd_select2():
     '''Check output of select method; single ps only.'''
     actual = cases2a.select(ps=3)
+    # Using a set expression to filter normal Case objects
     expected = {
         LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
         cases2b4.LMs) if LM.p == 3
@@ -991,7 +1345,7 @@ def test_Cases_prop_select2():
     nt.assert_set_equal(actual, expected)
 
 
-def test_Cases_prop_select3():
+def test_Cases_mthd_select3():
     '''Check output of select method; nplies only.'''
     actual = cases2a.select(nplies=[2, 4])
     expected = {
@@ -1001,40 +1355,42 @@ def test_Cases_prop_select3():
     nt.assert_set_equal(actual, expected)
 
 
-def test_Cases_prop_select4():
+def test_Cases_mthd_select4():
     '''Check output of select method; ps only.'''
     actual = cases2a.select(ps=[2, 4])
     expected = {
-        LM for LM in it.chain(cases2b2.LMs,
-        cases2b3.LMs, cases2b4.LMs) if LM.p in (2, 4)
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if LM.p in (2, 4)
     }
     nt.assert_set_equal(actual, expected)
 
 
-# Cases cross selections
-def test_Cases_prop_crossselect1():
+# Cases `select` Cross-Selections
+def test_Cases_mthd_select_crossselect1():
     '''Check (union) output of select method; single nplies and ps.'''
     actual1 = cases2a.select(nplies=4, ps=3)
     actual2 = cases2a.select(nplies=4, ps=3, how='union')
     expected = {
-        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs, cases2b4.LMs) if (
-        LM.nplies == 4) | (LM.p == 3)
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if (LM.nplies == 4) | (LM.p == 3)
     }
     nt.assert_set_equal(actual1, expected)
     nt.assert_set_equal(actual2, expected)
 
 
-def test_Cases_prop_crossselect2():
+def test_Cases_mthd_select_crossselect2():
     '''Check (intersection) output of select method; single nplies and ps.'''
     actual = cases2a.select(nplies=4, ps=3, how='intersection')
-    expected1 = {LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
-                                       cases2b4.LMs) if (LM.nplies == 4) & (LM.p == 3)}
+    expected1 = {
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if (LM.nplies == 4) & (LM.p == 3)
+    }
     expected2 = {cases2b3.LMs[-1]}
     nt.assert_set_equal(actual, expected1)
     nt.assert_set_equal(actual, expected2)
 
 
-def test_Cases_prop_crossselect3():
+def test_Cases_mthd_select_crossselect3():
     '''Check (difference) output of select method; single nplies and ps.'''
     actual = cases2a.select(nplies=4, ps=3, how='difference')
     expected1 = cases2a.select(ps=3) - cases2a.select(nplies=4)
@@ -1043,44 +1399,44 @@ def test_Cases_prop_crossselect3():
     nt.assert_set_equal(actual, expected2)
 
 
-def test_Cases_prop_crossselect4():
+def test_Cases_mthd_select_crossselect4():
     '''Check (symmetric difference) output of select method; single nplies and ps.'''
     actual = cases2a.select(nplies=4, ps=3, how='symmetric difference')
     expected1 = {
-        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs, cases2b4.LMs) if (
-        LM.nplies == 4) ^ (LM.p == 3)
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if (LM.nplies == 4) ^ (LM.p == 3)
     }
     list_p3 = list(cases2b3.LMs[:-1])                  # copy list
-    list_p3 .append(cases2b2.LMs[-1])
-    list_p3 .append(cases2b4.LMs[-1])
+    list_p3.append(cases2b2.LMs[-1])
+    list_p3.append(cases2b4.LMs[-1])
     expected2 = set(list_p3)
     nt.assert_set_equal(actual, expected1)
     nt.assert_set_equal(actual, expected2)
 
 
-def test_Cases_prop_crossselect5():
+def test_Cases_mthd_select_crossselect5():
     '''Check (union) output of select method; multiple nplies and ps.'''
     actual1 = cases2a.select(nplies=[2, 4], ps=[3, 4])
     actual2 = cases2a.select(nplies=[2, 4], ps=[3, 4], how='union')
     expected = {
-        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs, cases2b4.LMs) if (
-        LM.nplies in (2, 4)) | (LM.p in (3, 4))
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if (LM.nplies in (2, 4)) | (LM.p in (3, 4))
     }
     nt.assert_set_equal(actual1, expected)
     nt.assert_set_equal(actual2, expected)
 
 
-def test_Cases_prop_crossselect6():
+def test_Cases_mthd_select_crossselect6():
     '''Check (intersection) output of select method; multiple nplies and ps.'''
     actual = cases2a.select(nplies=[2, 4], ps=[3, 4], how='intersection')
     expected1 = {
-        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs, cases2b4.LMs) if (
-        LM.nplies in (2, 4)) & (LM.p in (3, 4))
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if (LM.nplies in (2, 4)) & (LM.p in (3, 4))
     }
     nt.assert_set_equal(actual, expected1)
 
 
-def test_Cases_prop_crossselect7():
+def test_Cases_mthd_select_crossselect7():
     '''Check (difference) output of select method; multiple nplies and single ps.'''
     # Subtracts nplies from ps.
     actual = cases2a.select(nplies=[2, 4], ps=3, how='difference')
@@ -1090,16 +1446,29 @@ def test_Cases_prop_crossselect7():
     nt.assert_set_equal(actual, expected2)
 
 
-def test_Cases_prop_crossselect8():
+def test_Cases_mthd_select_crossselect8():
     '''Check (symmetric difference) output of select method; single nplies, multi ps.'''
     actual = cases2a.select(nplies=4, ps=[3, 4], how='symmetric difference')
     expected1 = {
-        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs, cases2b4.LMs) if (
-        LM.nplies == 4) ^ (LM.p in (3, 4))
+        LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
+        cases2b4.LMs) if (LM.nplies == 4) ^ (LM.p in (3, 4))
     }
     nt.assert_set_equal(actual, expected1)
 
 
+# Cases Properties ------------------------------------------------------------
+
+def test_Cases_prop_frames():
+    '''Check frames method outputs DataFrames.  See other detailed Case().frames tests.'''
+    dfs = cases1a.frames
+
+    for df in dfs:
+        actual = isinstance(df, pd.DataFrame)
+        nt.assert_true(actual)
+
+
+# Cases Caselets --------------------------------------------------------------
+# TODO: Move to setup; looks like tests for caselet types; not containers
 # This section is dedicated to Cases() tests primarily from 0.4.4b3
 str_caselets = ['350-400-500', '400-200-800', '400-[200]-800']
 list_caselets = [
@@ -1113,9 +1482,12 @@ case_1.apply(['400-200-800', '400-[200]-800'])
 case_2.apply(['350-400-500', '400-200-800'])
 case_3.apply(['350-400-500', '400-200-800', '400-400-400'])
 case_caselets = [case_1, case_2, case_3]
+invalid_caselets = [1, 1, 1]
 
 
-def test_Cases_caselets1():
+####
+# TODO: Rename/Move.  Caselets are an attribute here, no?  test_Cases_attr_caselets#()
+def test_Cases_arg_caselets1():
     '''Check cases from caselets of geometry strings.'''
     cases = la.distributions.Cases(str_caselets)
     #cases = Cases(str_caselets)
@@ -1132,7 +1504,7 @@ def test_Cases_caselets1():
         nt.assert_equal(a, e)
 
 
-def test_Cases_caselets2():
+def test_Cases_arg_caselets2():
     '''Check cases from caselets of lists of geometry strings.'''
     cases = la.distributions.Cases(list_caselets)
     #cases = Cases(list_caselets)
@@ -1150,7 +1522,7 @@ def test_Cases_caselets2():
         nt.assert_equal(a, e)
 
 
-def test_Cases_caselets3():
+def test_Cases_arg_caselets3():
     '''Check cases from caselets of cases.'''
     cases = la.distributions.Cases(case_caselets)
     #cases = Cases(case_caselets)
@@ -1166,7 +1538,13 @@ def test_Cases_caselets3():
         nt.assert_equal(a, e)
 
 
-def test_Cases_caselets_ps1():
+@nt.raises(TypeError)
+def test_Cases_arg_caselets4():
+    '''Check cases raise error if caselets not a str, list or case. '''
+    cases = la.distributions.Cases(invalid_caselets)
+
+
+def test_Cases_arg_caselets_ps1():
     '''Check strs from caselets form for each ps.'''
     cases = la.distributions.Cases(str_caselets, ps=[4, 5])
     #cases = Cases(str_caselets, ps=[4,5])
@@ -1188,8 +1566,8 @@ def test_Cases_caselets_ps1():
 
 
 #cases = Cases(list_caselets, ps=[2,3,4,5,7,9])
-def test_Cases_caselets_ps2():
-    '''Check cases from string caselets form for each ps.'''
+def test_Cases_arg_caselets_ps2():
+    '''Check cases from string caselets for each ps.'''
     cases = la.distributions.Cases(list_caselets, ps=[4, 5])
     #cases = Cases(list_caselets, ps=[4,5])
     ##actual = cases                                         # unused
@@ -1209,8 +1587,8 @@ def test_Cases_caselets_ps2():
     nt.assert_equal(actual3, expected3)
 
 
-def test_Cases_caselets_ps3():
-    '''Check cases from list caselets form for each ps.'''
+def test_Cases_arg_caselets_ps3():
+    '''Check cases from list caselets for each ps.'''
     cases = la.distributions.Cases(case_caselets, ps=[2, 3, 4, 5, 7, 9])
     #cases = Cases(case_caselets, ps=[2,3,4,5,7,9])
     ##actual = cases                                         # unused
@@ -1230,7 +1608,34 @@ def test_Cases_caselets_ps3():
     nt.assert_equal(actual3, expected3)
 
 
-def test_Cases_keyword_combine1():
+@nt.raises(TypeError)
+def test_Cases_arg_caselets_ps4():
+    '''Check cases from list caselets raises Exceptions if p is non-integer.'''
+    cases = la.distributions.Cases(case_caselets, ps=[2, 3, 'dummy', 5, 7, 9])
+
+
+# Cases default assignments
+##def test_Cases_import1():
+##    '''Check passes if Defaults are not present in user-defined model.'''
+##    cases = la.distributions.Cases(['400-[200]-800'], model='')
+##    pass
+
+
+# TODO: Unsure how to design elegantly w/o fake models modules lacking Defaults; tabled
+##@nt.raises(ImportError)
+##def test_Cases_import2():
+##    '''Check raises ImportError if load_params can't import from defaults.'''
+##    cases = la.distributions.Cases(case_caselets, load_params=None, model='')
+
+
+##@nt.raises(ImportError)
+##def test_Cases_import3():
+##    '''Check raises ImportError if mat_params can't import from defaults.'''
+##    cases = la.distributions.Cases(case_caselets, load_params=dft.load_params, model='')
+
+
+# Cases Keywords --------------------------------------------------------------
+def test_Cases_kw_combine1():
     '''Check caselets of geometry strings combine into a single case.'''
     cases = la.distributions.Cases(str_caselets, combine=True)
     #cases = Cases(str_caselets, combine=True)
@@ -1244,7 +1649,7 @@ def test_Cases_keyword_combine1():
         nt.assert_equal(a, e)
 
 
-def test_Cases_keyword_combine2():
+def test_Cases_kw_combine2():
     '''Check caselets of listed geometry strings combine into a single case.'''
     cases = la.distributions.Cases(list_caselets, combine=True)
     #cases = Cases(list_caselets, combine=True)
@@ -1260,7 +1665,7 @@ def test_Cases_keyword_combine2():
     nt.assert_set_equal(set(actual.LMs), set(expected[0].LMs))
 
 
-def test_Cases_keyword_combine3():
+def test_Cases_kw_combine3():
     '''Check caselets of cases combine into a single case.'''
     cases = la.distributions.Cases(case_caselets, combine=True)
     #cases = Cases(case_caselets, combine=True)
@@ -1279,7 +1684,7 @@ def test_Cases_keyword_combine3():
 
 
 @nt.raises(TypeError)
-def test_Cases_keyword_combine4():
+def test_Cases_kw_combine4():
     '''Check empty caselet throw error.'''
     cases = la.distributions.Cases([], combine=True)
     #cases = Cases([], combine=True)
@@ -1298,7 +1703,7 @@ def test_Cases_keyword_combine4():
         nt.assert_equal(a, e)
 
 
-def test_Cases_keyword_unique1():
+def test_Cases_kw_unique1():
     '''Check unique keyword of string caselets; ignores singles since already unique.'''
     cases = la.distributions.Cases(str_caselets, unique=True)
     #cases = Cases(str_caselets, unique=True)
@@ -1310,7 +1715,7 @@ def test_Cases_keyword_unique1():
     nt.assert_set_equal(actual, expected)
 
 
-def test_Cases_keyword_unique2():
+def test_Cases_kw_unique2():
     '''Check unique keyword of string caselets gives unique cases.'''
     cases = la.distributions.Cases(list_caselets, unique=True)
     #cases = Cases(list_caselets, unique=True)
@@ -1323,7 +1728,7 @@ def test_Cases_keyword_unique2():
     nt.assert_set_equal(actual, expected)
 
 
-def test_Cases_keyword_unique3():
+def test_Cases_kw_unique3():
     '''Check unique keyword of string caselets gives unique cases.'''
     cases = la.distributions.Cases(case_caselets, unique=True)
     #cases = Cases(case_caselets, unique=True)
@@ -1335,7 +1740,7 @@ def test_Cases_keyword_unique3():
     nt.assert_set_equal(actual, expected)
 
 
-def test_Cases_keyword_unique4():
+def test_Cases_kw_unique4():
     '''Check unique/combine keyword of string caselets gives unique cases; unifies singles.'''
     cases = la.distributions.Cases(str_caselets, combine=True, unique=True)
     #cases = Cases(str_caselets, combine=True, unique=True)

@@ -1,11 +1,11 @@
 # -----------------------------------------------------------------------------
 # Copyright (c) P. Robinson II.
 # Distributed under the terms of the Modified BSD License.
-import codecs
 import os
 import re
+import codecs
 
-#TODO: Apparently setuptools "ruins the universe"; be cautious with continued use  
+# NOTE: Apparently setuptools "ruins the universe"; be cautious with continued use
 
 try:
     from setuptools import setup, find_packages
@@ -15,12 +15,12 @@ except ImportError:
 
 # Utility Code ----------------------------------------------------------------
 '''Add to utils'''
-here = os.path.abspath(os.path.dirname(__file__))     # REF 024
+here = os.path.abspath(os.path.dirname(__file__))          # REF 024
 
 
 def read(*parts):
     '''Read the files (REF 024)'''
-    # intentionally *not* adding an encoding option to open, See:
+    # Intentionally *not* adding an encoding option to open, See:
     # https://github.com/pypa/virtualenv/issues/201#issuecomment-3145690
     return codecs.open(os.path.join(here, *parts), 'r').read()
 
@@ -42,14 +42,11 @@ URL = 'https://github.com/par2/lamana'
 setup(
     name=NAME,
     version=VERSION,
-    ##version='0.4.9-dev',                                  ### edit
     description='An extensible Python package for laminate analysis',
     author='P. Robinson II',
     author_email='par2.get@gmail.com',
     url=URL,
-    ##url='https://github.com/par2/lamana',
     download_url='/'.join([URL, 'tarball', VERSION]),
-    ##download_url=''.join(['https://github.com/par2/lamana/tarball/', VERSION]),
     ##download_url='https://github.com/par2/lamana/tarball/0.4.9-dev',
     # Search all sub directories; specifics commented below
     packages=find_packages(),

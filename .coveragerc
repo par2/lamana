@@ -16,3 +16,4 @@ omit =
     lamana/models/example_Wilson_LT_func.py
     lamana/utils/references.py
     lamana/examples/*
+    lamana/setup.py
