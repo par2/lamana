@@ -3,13 +3,13 @@
 # Stack() : an dict of the order laminate layers.
 # Laminate() : pandas objects including laminate dimensions and calculations
 
-
+import logging
 import traceback
 import itertools as it
 import collections as ct
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from lamana import theories
 from lamana.utils import tools as ut
@@ -33,11 +33,30 @@ class Stack(object):
        containing a dict of the stacking order, the number or plies, the
        official stack name and alias.
 
+    FeatureInput is parsed here and attributes are bubbled up through the subclasses.
+
     Parameters
     ----------
-    FeatureInput : dict or Geometry object
+    FeatureInput : dict
         Use `Geometry` key to extract the `GeometryTuple` (converted geometry string)
-        Can directly accept a Geometry object.
+        Can directly accept a Geometry object.  Changed to accept FI only in 0.4.11.
+
+    Attributes
+    ----------
+    Geometry : Geometry object
+        Converted Geometry string.
+    load_params : dict; default None
+        A dict of common loading parameters, sample and support radii, etc.
+    mat_props : dict; default None
+        A dict of materials and properties, i.e. elastic modulus and Poisson's ratio.
+    materials : DataFrame
+        Converted mat_props to pandas object; used for quick display.
+    model : str
+        Specified custom, laminate theory model.
+    StackTuple : namedtuple
+        Contains stack items (see below).
+    {stack_order, nplies, name, alias} : list, str, str, str
+        StackTuple attributes.
 
     Methods
     -------
@@ -55,23 +74,36 @@ class Stack(object):
     namedtuple
         A StackTuple (dict, int, str, str); contains order, nplies, name, alias.
 
+    Notes
+    -----
+    - (0.4.11) object parsing starts here and args bubble up through subclasses
+
     See Also
     --------
     collections.namedtuple : special tuple in the Python Standard Library.
 
     '''
     def __init__(self, FeatureInput):
-        try:
-            # If passed 'Geometry' is actually a dict (FeatureInput)
-            self.Geometry = FeatureInput['Geometry']
-        except(TypeError):
-            '''TEST geometry object'''
-            self.Geometry = FeatureInput                   # if a Geometry object
+        # Parse FeatureInput
+        self.FeatureInput = FeatureInput.copy()                      # for preserving FI in each Case
+        self.Geometry = self.FeatureInput['Geometry']
+        self.load_params = self.FeatureInput['Parameters']
+        self.mat_props = self.FeatureInput['Properties']
+        self.materials = self.FeatureInput['Materials']
+        self.model = self.FeatureInput['Model']
+
+        # Parse Stack Object
+        # TODO: Improve recall
         decoded = self.decode_geometry(self.Geometry)
-        self.unfolded = list(decoded)                      # used in tests
+        self.unfolded = list(decoded)                                # used in tests
         '''Recalled because generator exhausts decoded.  Improve.'''
         decoded = self.decode_geometry(self.Geometry)
-        self.StackTuple = self.identify_geometry(decoded)  # namedtuple of (stack, nplies, name, alias)
+
+        self.StackTuple = self.identify_geometry(decoded)            # namedtuple of (stack, nplies, name, alias)
+        self.stack_order = self.StackTuple.order
+        self.nplies = self.StackTuple.nplies
+        self.name = self.StackTuple.name
+        self.alias = self.StackTuple.alias                           # new in 0.4.3c5a
 
     def decode_geometry(self, Geometry):
         '''Return a generator that decodes the Geometry object.
@@ -307,30 +339,24 @@ class Stack(object):
 # =============================================================================
 # LAMINATES -------------------------------------------------------------------
 # =============================================================================
-# Create LaminateModel objects
+# Create Laminate objects
 
 
 class Laminate(Stack):
-    '''Create a `LaminateModel` object.  Stores several representations.
+    '''Create a `Laminate` object.
 
-    Laminate first inherits from the `Stack` class.  A `FeatureInput` is passed in
-    from a certain "Feature" module and exchanged between constructs and theories
-    modules.
+    Laminate layers are represented as DataFrame rows.  `Laminate` inherits from
+    the `Stack` class.
 
     Native objects:
 
     - `Snapshot` : stack of unique layers (1, 2, ..., n), single rows and ID columns.
     - `LFrame` : snapshot with multiple rows including Dimensional Data.
-    - `LMFrame` : `LFrame` w/Dimensional and Data variables via `theories.Model` data.
 
-    Finally this class build a `LamainateModel` object, which merges the LaminateModel
-    date with the Model data defined by an author in a separate `models` module;
-    models are related to classical laminate theory variables, i.e. `Q11`, `Q12`,
-    `D11`, `D12`, ..., `stress`, `strain`, etc.
-
-    The listed Parameters are "ID Variables".  The Other Parameters are "Dimensional
-    Variables".  There are special variables related to columns in DataFrames,
-    suffixed with trailing underscores.
+    The listed Parameters are "ID Variables" found in `Snapshot`.  The Other
+    Parameters are known as "Dimensional Variables" found in all native objects.
+    These are special variables pertaining to columns in DataFrames; they are
+    suffixed with trailing underscores.   These parameters are NOT arguements.
 
     Parameters
     ----------
@@ -348,12 +374,12 @@ class Laminate(Stack):
     Other Parameters
     ----------------
     label_ : str
-        Type of point; interfacial, internal or discontinuity.
+        Type of point, e.g. interfacial, internal or discontinuity.
     h_ : float
-        Lamina thickness for all lamina except middle layers (half thickness).
+        Lamina thickness for each lamina, except middle layers (half thickness).
     d_ : float
-        Distance from the bottom layer; and shakes with calculations in
-        `theories.Model` and used in testing. Units (m).
+        Distance from the bottom layer; handshakes with calculations in
+        `theories.<Model>` and used in testing. Units (m).
     intf_ : int
         Enumerates an interfaces from tensile side up.
     k_ : float
@@ -367,35 +393,13 @@ class Laminate(Stack):
     ----------
     p
     total
-    max_stress
-    min_stress
-    extrema
     summary
     is_special
     has_discont
     has_neutaxis
-    FeatureInput : dict
-        Passed-in, user-defined object from Case.
-    Geometry : Geometry object
-        Converted Geometry string.
-    load_params : dict; default None
-        A dict of common loading parameters, sample and support radii, etc.
-    mat_props : dict; default None
-        A dict of materials and properties, i.e. elastic modulus and Poisson's ratio.
-    materials : DataFrame
-        Converted mat_props to pandas object; used for quick display.
-    parameters : Series
-        Converted load_params to pandas object; used for quick display.
-    model : str
-        Specified custom, laminate theory model.
-    {stack_order, nplies, name, alias} : list, str, str, str
-        StackTuple attributes.
-    {Snapshot, LFrame, LMFrame} : DataFrame
-        Laminate object.
-    {Middle, Inner_i, Outer} : DataFrame
-        Isolated layer types
-    {compressive, tensile} : DataFrame
-        Isolated layer stress sides.
+    frame
+    {Snapshot, LFrame} : DataFrame
+        Laminate objects.
 
     Methods
     -------
@@ -406,82 +410,44 @@ class Laminate(Stack):
 
     Raises
     ------
-    AttributeError
+    IndeterminateError
         If custom attributes could not be set to the `LaminateModel`.
+        Handled to rollback and return an LFrame.
 
     See Also
     --------
-    theories.Model : handles user defined Laminate Theory models
+    constructs.Stack : base class; initial FeatureInput parser
+    constructs.LaminateModel : child class; full LM object
+    theories.BaseModel : handles user defined Laminate Theory models
+    theories.handshake : gives LFrame data, gets LMFrame back
     models : directory containing package models
 
     Examples
     --------
-    >>> from lamana.models import Wilson_LT as wlt
     >>> import lamana as la
-    >>> dft = wlt.Defaults()
-    >>> FeatureInput = dft.FeatureInput
     >>> FeatureInput['Geometry'] = la.input_.Geometry('400-[200]-800')
     >>> la.constructs.Laminate(FeatureInput)
-    <lamana LaminateModel object (400.0-[200.0]-800.0)>
+    <lamana Laminate object (400.0-[200.0]-800.0)>
 
     '''
-    # TODO: pass kwargs in
     def __init__(self, FeatureInput):
         super(Laminate, self).__init__(FeatureInput)
 
-        # Parse FeatureInput
-        self.FeatureInput = FeatureInput.copy()            # for preserving FI in each Case
-
-        self.Geometry = FeatureInput['Geometry']
-        self.load_params = FeatureInput['Parameters']
-        self.mat_props = FeatureInput['Properties']
-        self.materials = FeatureInput['Materials']
-        self.model = FeatureInput['Model']
-        #print('constructs material attr:', self.materials)
-
-        # Parse Stack Object
-        st = Stack(FeatureInput)
-        self.stack_order = st.StackTuple.order
-        self.nplies = st.StackTuple.nplies
-        self.name = st.StackTuple.name
-        self.alias = st.StackTuple.alias                   # new in 0.4.3c5a
-
         # Laminate Objects
-        self.Snapshot = []                                 # df object; stack
-        self.LFrame = []                                   # df of IDs; formerly Laminate_
-        #self.Model = theories.Model()                      # Model object
-        ##self.Model = None
-        self.LMFrame = []                                  # df object; modded stack
+        self.Snapshot = self._build_snapshot()                       # df object; stack
+        self._primitive = self._build_primitive()                    # phase 1
+        self.LFrame = self._build_LFrame()                           # phase 1; df of IDs; formerly Laminate_
+        self._frame = self.LFrame                                    # general accessor
+
+        # TODO: Temporary.  Remove and change warning to hasattr in handshake
+        self.LMFrame = []                                            # df object; modded stack
 
         self._type_cache = []
-        ##self._dict_trim = {}                              # holder of pandas-less __dict__
-
-        #-----------------------------------------------------------------------
-        # LaminateModel Instance Updates                   # the heart of Laminate()
-        self._build_snapshot()
-        self._build_laminate()                             # Phase 1
-        self._update_columns()                             # Phase 2 & 3
-
-        # LaminateModel Attributes
-        # Assumes DataFrames are safelt made by latter instance updates
-        self.Middle = self.LMFrame[self.LMFrame['type'] == 'middle']
-        self.Inner_i = self.LMFrame[self.LMFrame['type'] == 'inner']
-        self.Outer = self.LMFrame[self.LMFrame['type'] == 'outer']
-        self.compressive = self.LMFrame[self.LMFrame['side'] == 'Comp.']
-        self.tensile = self.LMFrame[self.LMFrame['side'] == 'Tens.']
-
-##        if type(self.LMFrame) != list:
-##            self.Middle = self.LMFrame[self.LMFrame['type'] == 'middle']
-##            self.Inner_i = self.LMFrame[self.LMFrame['type'] == 'inner']
-##            self.Outer = self.LMFrame[self.LMFrame['type'] == 'outer']
-##            self.compressive = self.LMFrame[self.LMFrame['side'] == 'Comp.']
-##            self.tensile = self.LMFrame[self.LMFrame['side'] == 'Tens.']
-##        else:
-##            raise AttributeError("Unable to set attributes to LMFrame.")
 
     def __repr__(self):
-        return '<lamana LaminateModel object ({}), p={}>'.format(self.Geometry.__str__(),
-                                                                 self.p)
+        return '<lamana {} object ({}), p={}>'.format(
+            self.__class__.__name__, self.Geometry.__str__(), self.p
+        )
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -496,7 +462,7 @@ class Laminate(Stack):
 
             # Ignore pandas objects; check rest of __dict__ and build trimmed dicts
             # Important to blacklist the trimmed dict from looping in __dict__
-            blacklisted.append('_dict_trim')          # prevent infinite loop
+            blacklisted.append('_dict_trim')                         # prevent infinite loop
             self._dict_trim = {
                 key: value
                 for key, value in self.__dict__.items()
@@ -520,28 +486,37 @@ class Laminate(Stack):
         The only required property is that objects which compare equal
         have the same hash value (REF 035).  self.__dict__ is unhashable
         due to the inner list.  So a copy is made called _geometry_hash
-        of GeometryTuple with tupled inner instead.'''
+        of GeometryTuple with tupled inner instead.
+
+        '''
         return hash((self.Geometry, self.p))
 
     def _build_snapshot(self):
         '''Build a quick, skeletal view of the stack (Snapshot).
 
-        Assign materials and stress states to self.stack_order.
+        Assign materials and stress states to self.stack_order.  Optimized by
+        concatenation; omits looping.
+
         '''
         stack_extended = Stack.add_materials(self.stack_order, self.materials)
-        #print(stack_extended)
-        self.Snapshot = Stack.stack_to_df(stack_extended)
-        self.Snapshot = Laminate._set_stresses(self.Snapshot)
+        Snapshot = Stack.stack_to_df(stack_extended)
+        # TODO: Dehardcode Laminate
+        return Laminate._set_stresses(Snapshot)
 
     # PHASE 1
-    def _build_laminate(self):
+    def _build_primitive(self):
         '''Build a primitive laminate from a stack.
 
         Build in three steps:
 
-        1. Adopt the Snapshot and extend it with more rows.
-        2. Define Lamina layers by types and multiple rows.
-        3. Glue lamina together to make one DataFrame.
+        1. Adopt the Snapshot and add more rows to each layer.
+        2. Glue lamina together to make one DataFrame.
+        3. Add column of expected stress (`side_`).
+
+        Returns
+        -------
+        DataFrame
+            An extended snapshot; adds p rows per layer.
 
         '''
         df_snap = self.Snapshot.copy()
@@ -554,264 +529,220 @@ class Laminate(Stack):
         df.sort_index(axis=0, inplace=True)
         ##df.sort(axis=0, inplace=True)
         df.reset_index(drop=True, inplace=True)
+        # TODO: dehardcode Lamainate for self.__class__
         df = Laminate._set_stresses(df)
         #print(df)
 
         # Build Laminate with Classes
         layers = df.groupby('layer')
         self._type_cache = layers['type'].unique()
-        self._type_cache.apply(str)                        # converts to str class, not str alone
+        self._type_cache.apply(str)                                  # converts to str class, not str alone
 
-        self.LFrame = df                                   # retains copy of partial Laminate (IDs & Dimensionals)
+        #self.LFrame = df                                             # retains copy of partial Laminate (IDs & Dimensionals)
+        return df
 
-    def _update_columns(self):
-        '''Update LFrame with columns of Dimensional and Data values.'''
+    # PHASE 2
+    def _build_LFrame(self):
+        '''Update Laminate DataFrame with new dimensional columns.
 
-        # PHASE 2
-        def _update_dimensions(LFrame):
-            '''Update Laminate DataFrame with new dimensional columns.
+        This function takes a primitive LFrame (converted Stack) and adds
+        columns: `label`, `h(m)`, `d(m)`, `intf`, `k`, `Z(m)`, `z(m)`, `z(m)*`
+        A number of pandas-like implementations are performed to achieve this,
+        so the coding has a different approach and feel.
 
-            This function takes a primitive LFrame (converted Stack) and adds
-            columns: `label`, `h(m)`, `d(m)`, `intf`, `k`, `Z(m)`, `z(m)`, `z(m)*`
+        '''
+        # For Implementation
+        nplies = self.nplies
+        p = self.p
+        t_total = self.total
+        #print('nplies: {}, p: {}, t_total (m): {}'.format(nplies, p, t_total))
 
-            A number of pandas-like implementations are performed to achieve this.
-            So the coding has a different approach and feel.
+        ##df = self.LFrame.copy()
+        df = self._primitive
 
-            Parameters
-            ----------
-            LFrame : DataFrame
-                A primitive Laminate DateFrame containing ID columns.
+        # WRANGLINGS --------------------------------------------------------------
+        # Indexers ----------------------------------------------------------------
+        # Many dimensional values are determined by index positions.
 
-            '''
-            # For Implementation
-            nplies = self.nplies
-            p = self.p
-            t_total = self.total
-            #print('nplies: {}, p: {}, t_total (m): {}'.format(nplies, p, t_total))
+        # Revised Indexer
+        df['idx'] = df.index                                       # temp. index column for idxmin & idxmax
+        interface_tens = df[df['side'] == 'Tens.'].groupby('layer')['idx'].idxmin()
+        discontinuity_tens = df[(df['side'] == 'Tens.')
+            & (df['type'] != 'middle')].groupby('layer')['idx'].idxmax()
+        discontinuity_comp = df[(df['side'] == 'Comp.')
+            & (df['type'] != 'middle')].groupby('layer')['idx'].idxmin()
+        interface_comp = df[df['side'] == 'Comp.'].groupby('layer')['idx'].idxmax()
+        interface_idx = pd.concat([interface_tens, interface_comp])
+        discont_idx = pd.concat([discontinuity_tens, discontinuity_comp])
+        #print(discontinuity_tens.values)
+        if nplies > 1:
+            pseudomid = [discontinuity_tens.values[-1],
+                         discontinuity_comp.values[0]]               # get disconts indices near neutral axis; for even plies
+        mid_idx = len(df.index) // 2
+        #print('middle index: ', mid_idx)
 
-            df = LFrame.copy()
+        # Indexer dict of outside and inside Indices
+        idxs = {
+            'interfaces': interface_idx.values.tolist(),             # for interfaces
+            'disconts': discont_idx.values.tolist(),                 # for disconts.
+            'middle': mid_idx,                                       # for neut. axis
+            'intfTens': interface_tens.values.tolist(),              # for side_ interfaces
+            'intfComp': interface_comp.values.tolist(),
+            'unboundIntfT': interface_tens.values.tolist()[1:],
+            'unboundIntfC': interface_comp.values.tolist()[:-1],
+            'disTens': discontinuity_tens.values.tolist(),           # for disconts
+            'disComp': discontinuity_comp.values.tolist(),
+        }
 
-            # WRANGLINGS --------------------------------------------------------------
-            # Indexers ----------------------------------------------------------------
-            # Many dimensional values are determined by index positions.
+        # Masks -------------------------------------------------------------------
+        # Interface Mask
+        s = df['idx'].copy()
+        s[:] = False                                                 # convert series to bool values
+        s.loc[idxs['interfaces']] = True
+        mask = s                                                     # boolean mask for interfaces
 
-            # Revised Indexer
-            df['idx'] = df.index                                       # temp. index column for idxmin & idxmax
-            interface_tens = df[df['side'] == 'Tens.'].groupby('layer')['idx'].idxmin()
-            discontinuity_tens = df[(df['side'] == 'Tens.')
-                & (df['type'] != 'middle')].groupby('layer')['idx'].idxmax()
-            discontinuity_comp = df[(df['side'] == 'Comp.')
-                & (df['type'] != 'middle')].groupby('layer')['idx'].idxmin()
-            interface_comp = df[df['side'] == 'Comp.'].groupby('layer')['idx'].idxmax()
-            interface_idx = pd.concat([interface_tens, interface_comp])
-            discont_idx = pd.concat([discontinuity_tens, discontinuity_comp])
-            #print(discontinuity_tens.values)
-            if nplies > 1:
-                pseudomid = [discontinuity_tens.values[-1],
-                             discontinuity_comp.values[0]]               # get disconts indices near neutral axis; for even plies
-            mid_idx = len(df.index) // 2
-            #print('middle index: ', mid_idx)
+        # COLUMNS -----------------------------------------------------------------
+        # label_ ------------------------------------------------------------------
+        # Gives name for point types
+        df['label'] = np.where(mask, 'interface', 'internal')        # yes!; applies values if interface, else internal
+        if p != 1:
+            df.loc[idxs['disconts'], 'label'] = 'discont.'           # yes!; post-fix for disconts.
+        if (p % 2 != 0) & ('middle' in df['type'].values):
+            df.loc[idxs['middle'], 'label'] = 'neut. axis'
+        internal_idx = df[df['label'] == 'internal'].index.tolist()  # additional indexer
+        # '''Add neut. axis in the middle'''
 
-            # Indexer dict of outside and inside Indices
-            idxs = {
-                'interfaces': interface_idx.values.tolist(),             # for interfaces
-                'disconts': discont_idx.values.tolist(),                 # for disconts.
-                'middle': mid_idx,                                       # for neut. axis
-                'intfTens': interface_tens.values.tolist(),              # for side_ interfaces
-                'intfComp': interface_comp.values.tolist(),
-                'unboundIntfT': interface_tens.values.tolist()[1:],
-                'unboundIntfC': interface_comp.values.tolist()[:-1],
-                'disTens': discontinuity_tens.values.tolist(),           # for disconts
-                'disComp': discontinuity_comp.values.tolist(),
-            }
+        # h_ ----------------------------------------------------------------------
+        # Gives the thickness (in m) and height w.r.t to the neut. axis (for middle)
+        df['h(m)'] = df['t(um)'] * 1e-6
+        df.loc[df['type'] == 'middle', 'h(m)'] = df['t(um)'] * 1e-6 / 2.
+        if p != 1:                                                   # at disconts.
+            df.loc[idxs['disTens'], 'h(m)'] = df['h(m)'].shift(-1)
+            df.loc[idxs['disComp'], 'h(m)'] = df['h(m)'].shift(1)
 
-            # Masks -------------------------------------------------------------------
-            # Interface Mask
-            s = df['idx'].copy()
-            s[:] = False                                                 # convert series to bool values
-            s.loc[idxs['interfaces']] = True
-            mask = s                                                     # boolean mask for interfaces
+        # d_ ----------------------------------------------------------------------
+        # Gives the height for interfaces, neutral axes, disconts and internal points
+        # Assign Laminate Surfaces and Neutral Axis to odd p, odd nply laminates
+        df.loc[0, 'd(m)'] = 0                                        # first
+        df.loc[idxs['middle'], 'd(m)'] = t_total / 2.                # middle
+        df.iloc[-1, df.columns.get_loc('d(m)')] = t_total            # last
 
-            # COLUMNS -----------------------------------------------------------------
-            # label_ ------------------------------------------------------------------
-            # Gives name for point types
-            df['label'] = np.where(mask, 'interface', 'internal')        # yes!; applies values if interface, else internal
-            if p != 1:
-                df.loc[idxs['disconts'], 'label'] = 'discont.'           # yes!; post-fix for disconts.
-            if (p % 2 != 0) & ('middle' in df['type'].values):
-                df.loc[idxs['middle'], 'label'] = 'neut. axis'
-            internal_idx = df[df['label'] == 'internal'].index.tolist()  # additional indexer
-            # '''Add neut. axis in the middle'''
+        # Assign Interfaces
+        # Uses cumsum() for selected interfaces thickness to get d
+        innerhTens = df.loc[df['label'] == 'interface',
+            'h(m)'].shift(1)[idxs['unboundIntfT']]                   # shift h down, select inner interfaces
+        df.loc[idxs['unboundIntfT'], 'd(m)'] = 0 + np.cumsum(innerhTens)
+        #print(np.cumsum(innerhTens))
+        innerhComp = df.loc[df['label'] == 'interface',
+            'h(m)'].shift(-1)[idxs['unboundIntfC']]                  # shift h up, select inner interfaces
+        df.loc[idxs['unboundIntfC'],
+            'd(m)'] = t_total - np.cumsum(innerhComp[::-1])[::-1]
+        #print(t_total - np.cumsum(innerhComp[::-1])[::-1])          # inverted cumsum()
 
-            # h_ ----------------------------------------------------------------------
-            # Gives the thickness (in m) and height w.r.t to the neut. axis (for middle)
-            df['h(m)'] = df['t(um)'] * 1e-6
-            df.loc[df['type'] == 'middle', 'h(m)'] = df['t(um)'] * 1e-6 / 2.
-            if p != 1:                                                   # at disconts.
-                df.loc[idxs['disTens'], 'h(m)'] = df['h(m)'].shift(-1)
-                df.loc[idxs['disComp'], 'h(m)'] = df['h(m)'].shift(1)
+        # Assign Other Points
+        if p > 1:                                                    # at disconts.
+            df.loc[idxs['disTens'], 'd(m)'] = df['d(m)'].shift(-1)
+            df.loc[idxs['disComp'], 'd(m)'] = df['d(m)'].shift(1)
+        if p > 2:
+            df = Laminate._make_internals(df, p, column='d(m)')      # at internals
 
-            # d_ ----------------------------------------------------------------------
-            # Gives the height for interfaces, neutral axes, disconts and internal points
-            # Assign Laminate Surfaces and Neutral Axis to odd p, odd nply laminates
-            df.loc[0, 'd(m)'] = 0                                        # first
-            df.loc[idxs['middle'], 'd(m)'] = t_total / 2.                # middle
-            df.iloc[-1, df.columns.get_loc('d(m)')] = t_total            # last
+        # intf_ -------------------------------------------------------------------
+        # Enumerates proximal interfaces; n layer, but n+1 interfaces
+        df['intf'] = df.loc[:, 'layer']
+        df.loc[df['side'] == 'Comp.', 'intf'] += 1
 
-            # Assign Interfaces
-            # Uses cumsum() for selected interfaces thickness to get d
-            innerhTens = df.loc[df['label'] == 'interface',
-                'h(m)'].shift(1)[idxs['unboundIntfT']]                   # shift h down, select inner interfaces
-            df.loc[idxs['unboundIntfT'], 'd(m)'] = 0 + np.cumsum(innerhTens)
-            #print(np.cumsum(innerhTens))
-            innerhComp = df.loc[df['label'] == 'interface',
-                'h(m)'].shift(-1)[idxs['unboundIntfC']]                  # shift h up, select inner interfaces
-            df.loc[idxs['unboundIntfC'],
-                'd(m)'] = t_total - np.cumsum(innerhComp[::-1])[::-1]
-            #print(t_total - np.cumsum(innerhComp[::-1])[::-1])          # inverted cumsum()
+        if (p % 2 != 0) & (nplies % 2 != 0):
+            '''Need an INDET for numeric dtype.  Default to Nan for now'''
+            ##df.loc[df['label'] == 'neut. axis', 'intf'] = 'INDET'
+            df.loc[idxs['middle'], 'intf'] = np.nan                  # using indep. indexer vs. label_
 
-            # Assign Other Points
-            if p > 1:                                                    # at disconts.
-                df.loc[idxs['disTens'], 'd(m)'] = df['d(m)'].shift(-1)
-                df.loc[idxs['disComp'], 'd(m)'] = df['d(m)'].shift(1)
-            if p > 2:
-                df = Laminate._make_internals(df, p, column='d(m)')      # at internals
-                ##df = _make_internals(df, p, column='d(m)')               # at internals
+        # Reset the dtype to float
+        df[['intf']] = df[['intf']].astype(np.float64)
 
-            # intf_ -------------------------------------------------------------------
-            # Enumerates proximal interfaces; n layer, but n+1 interfaces
-            df['intf'] = df.loc[:, 'layer']
-            df.loc[df['side'] == 'Comp.', 'intf'] += 1
+        # k_ ----------------------------------------------------------------------
+        # Normally the layer number, but now tracks the ith fractional level per layer
+        # See definition in (Staab 197), k is is the region between k and k-1 level
+        # Like intf_, k_ is aware of neutral axis
 
-            if (p % 2 != 0) & (nplies % 2 != 0):
-                '''Need an INDET for numeric dtype.  Default to Nan for now'''
-                ##df.loc[df['label'] == 'neut. axis', 'intf'] = 'INDET'
-                df.loc[idxs['middle'], 'intf'] = np.nan                  # using indep. indexer vs. label_
+        # k_ == intf_ (proximal interface)
+        df.loc[df['label'] == 'interface',
+            'k'] = df.loc[df['label'] == 'interface', 'intf']        # at interfaces
 
-            # Reset the dtype to float
-            df[['intf']] = df[['intf']].astype(np.float64)
+        # Interfaces and discontinuities share the same k_
+        if p > 1:                                                    # at disconts.
+            df.loc[idxs['disTens'], 'k'] = df['k'].shift(-1)
+            df.loc[idxs['disComp'], 'k'] = df['k'].shift(1)
 
-            # k_ ----------------------------------------------------------------------
-            # Normally the layer number, but now tracks the ith fractional level per layer
-            # See definition in (Staab 197), k is is the region between k and k-1 level
-            # Like intf_, k_ is aware of neutral axis
-
-            # k_ == intf_ (proximal interface)
-            df.loc[df['label'] == 'interface',
-                'k'] = df.loc[df['label'] == 'interface', 'intf']        # at interfaces
-                ##'k'] = df.loc[df['label'] == 'interface', 'intf']-1      # at interfaces
-
-#             if (p != 1) & (nplies%2 == 0):
-#                 df.loc[pseudomid, 'k'] = (nplies/2.)+1                   # hack for even mids
-#                 #df.loc[pseudomid, 'k'] = nplies/2.                       # replace middle values
-
-            # Interfaces and discontinuities share the same k_
-            if p > 1:                                                    # at disconts.
-                df.loc[idxs['disTens'], 'k'] = df['k'].shift(-1)
-                df.loc[idxs['disComp'], 'k'] = df['k'].shift(1)
-
-                # Even plies have adjacent discontinuities at the neutral axis
-                if nplies % 2 == 0:
-                    df.loc[pseudomid, 'k'] = (nplies / 2.) + 1           # hack for even mids
-                    ##df.loc[pseudomid, 'k'] = nplies / 2.                 # replace middle values
-
-            # Auto calculate internal divisions
-            if p > 2:                                                    # at internals
-                df = Laminate._make_internals(df, p, column='k')
-                ##df = _make_internals(df, p, column='k')
-            '''Need an INDET. for numeric dtype.  Default to Nan for now'''
-            #df.loc[df['label'] == 'neut. axis', 'k'] = 'INDET'
-            #df.loc[df['label'] == 'neut. axis', 'k'] = np.nan
-
-            # Odd plies have nuetral axes
-            if (p % 2 != 0) & (nplies % 2 != 0):                         # using indep. indexer vs. label_
-                df.loc[idxs['middle'], 'k'] = (df['k'].max() + df['k'].min()) / 2.
-                ##df.loc[idxs['middle'], 'k'] = (df['k'].max()-df['k'].min())/2
-                ##df.loc[idxs['middle'], 'k'] = np.nan                   # using indep. indexer vs. label_
-
-            # Z_ ----------------------------------------------------------------------
-            # Distance from ith level to the neutral access
-            middle = t_total / 2.
-            df['Z(m)'] = middle - df['d(m)']
-            if (nplies == 1) & (p == 1):                                 # d_ = t_total here, so must amend
-                df['Z(m)'] = t_total / 2.
-
-            # z_ ----------------------------------------------------------------------
-            # Distance from ith Z-midplane level to the neutral access
-            # Two flavors are implemented for linearly and log-distributed z_ (z(m) and z(m)*)
-            t_mid = df.loc[df['label'] == 'interface', 'h(m)'] / 2.       # for midplane calc.
-            df.loc[(df['label'] == 'interface') & (df['side'] == 'Tens.'),
-                'z(m)'] = df.loc[df['label'] == 'interface',
-                'Z(m)'] - t_mid                                          # at interfaces
-            df.loc[(df['label'] == 'interface') & (df['side'] == 'Comp.'),
-                'z(m)'] = df.loc[df['label'] == 'interface',
-                'Z(m)'] + t_mid                                          # at interfaces
+            # Even plies have adjacent discontinuities at the neutral axis
             if nplies % 2 == 0:
-                df.loc[pseudomid, 'z(m)'] = 0                            # replace middle values
-            if p > 1:                                                    # at disconts.
-                df.loc[idxs['disTens'], 'z(m)'] = df['z(m)'].shift(-1)
-                df.loc[idxs['disComp'], 'z(m)'] = df['z(m)'].shift(1)
-            if p > 2:
-                # Equi-partitioned, Linear Intervals (legacy code); z(m)
-                df = Laminate._make_internals(df, p, column='z(m)')
-                ##df = _make_internals(df, p, column='z(m)')
-            if p % 2 != 0:
-                ##df.loc[df['label'] == 'neut. axis', 'z(m)'] = 0
-                df.loc[idxs['middle'], 'z(m)'] = 0                       # using indep. indexer vs. label_
+                df.loc[pseudomid, 'k'] = (nplies / 2.) + 1           # hack for even mids
+                ##df.loc[pseudomid, 'k'] = nplies / 2.                 # replace middle values
 
-            ####
-            # Non-equi-partitioned Intervals; "Travelling" Midplanes; z(m)*
-            '''Possibly offer user options to use either method'''
-            lastT = df[(df['side'] == 'Tens.') & (df['type'] != 'middle')].groupby('layer')['Z(m)'].last()
-            lastC = df[(df['side'] == 'Comp.') & (df['type'] != 'middle')].groupby('layer')['Z(m)'].first()
+        # Auto calculate internal divisions
+        if p > 2:                                                    # at internals
+            df = Laminate._make_internals(df, p, column='k')
+            ##df = _make_internals(df, p, column='k')
+        '''Need an INDET. for numeric dtype.  Default to Nan for now'''
+        #df.loc[df['label'] == 'neut. axis', 'k'] = 'INDET'
+        #df.loc[df['label'] == 'neut. axis', 'k'] = np.nan
 
-            last = pd.concat([lastT, lastC])
-            last.name = 'lasts'
-            joined = df.join(last, on='layer')
-            joined['z_intervals'] = (joined['Z(m)'] - joined['lasts']) / 2.
-            #print(joined)
-            #print(last)
-            df['z(m)*'] = joined['Z(m)'] - joined['z_intervals']
-            df.loc[df['type'] == 'middle', 'z(m)*'] = df['Z(m)'] / 2.
-            if (p == 1) & (nplies == 1):
-                df.loc[0, 'z(m)*'] = 0
-            ####
-            del df['idx']
+        # Odd plies have nuetral axes
+        if (p % 2 != 0) & (nplies % 2 != 0):                         # using indep. indexer vs. label_
+            df.loc[idxs['middle'], 'k'] = (df['k'].max() + df['k'].min()) / 2.
 
-            sort_columns = ['layer', 'side', 'type', 'matl', 'label', 't(um)',
-                            'h(m)', 'd(m)', 'intf', 'k', 'Z(m)', 'z(m)', 'z(m)*']
-            self.LFrame = ut.set_column_sequence(df, sort_columns)
+        # Z_ ----------------------------------------------------------------------
+        # Distance from ith level to the neutral access
+        middle = t_total / 2.
+        df['Z(m)'] = middle - df['d(m)']
+        if (nplies == 1) & (p == 1):                                 # d_ = t_total here, so must amend
+            df['Z(m)'] = t_total / 2.
 
-        # PHASE 3
-        '''Remove LFrame and FeatureInput'''
-        def _update_calculations():
-            '''Update `LaminateModel` DataFrame and `FeatureInput`.
+        # z_ ----------------------------------------------------------------------
+        # Distance from ith Z-midplane level to the neutral access
+        # Two flavors are implemented for linearly and log-distributed z_ (z(m) and z(m)*)
+        t_mid = df.loc[df['label'] == 'interface', 'h(m)'] / 2.      # for midplane calc.
+        df.loc[(df['label'] == 'interface') & (df['side'] == 'Tens.'),
+            'z(m)'] = df.loc[df['label'] == 'interface',
+            'Z(m)'] - t_mid                                          # at interfaces
+        df.loc[(df['label'] == 'interface') & (df['side'] == 'Comp.'),
+            'z(m)'] = df.loc[df['label'] == 'interface',
+            'Z(m)'] + t_mid                                          # at interfaces
+        if nplies % 2 == 0:
+            df.loc[pseudomid, 'z(m)'] = 0                            # replace middle values
+        if p > 1:                                                    # at disconts.
+            df.loc[idxs['disTens'], 'z(m)'] = df['z(m)'].shift(-1)
+            df.loc[idxs['disComp'], 'z(m)'] = df['z(m)'].shift(1)
+        if p > 2:
+            # Equi-partitioned, Linear Intervals (legacy code); z(m)
+            df = Laminate._make_internals(df, p, column='z(m)')
+            ##df = _make_internals(df, p, column='z(m)')
+        if p % 2 != 0:
+            ##df.loc[df['label'] == 'neut. axis', 'z(m)'] = 0
+            df.loc[idxs['middle'], 'z(m)'] = 0                       # using indep. indexer vs. label_
 
-            - populates stress data calculations from the selected model.
-            - may add Globals dict to `FeatureInput`.
+        ####
+        # Non-equi-partitioned Intervals; "Travelling" Midplanes; z(m)*
+        '''Possibly offer user options to use either method'''
+        lastT = df[(df['side'] == 'Tens.') & (df['type'] != 'middle')].groupby('layer')['Z(m)'].last()
+        lastC = df[(df['side'] == 'Comp.') & (df['type'] != 'middle')].groupby('layer')['Z(m)'].first()
 
-            Tries to update `LaminateModel`. If an exception is raised
-            (on the model side), no update is made, and the Laminate
-            (without Data columns) is set as the default `LFrame`.
+        last = pd.concat([lastT, lastC])
+        last.name = 'lasts'
+        joined = df.join(last, on='layer')
+        joined['z_intervals'] = (joined['Z(m)'] - joined['lasts']) / 2.
+        #print(joined)
+        #print(last)
+        df['z(m)*'] = joined['Z(m)'] - joined['z_intervals']
+        df.loc[df['type'] == 'middle', 'z(m)*'] = df['Z(m)'] / 2.
+        if (p == 1) & (nplies == 1):
+            df.loc[0, 'z(m)*'] = 0
+        ####
+        del df['idx']
 
-            '''
-
-            # TODO: Need to handle general INDET detection.  Roll-back to `LFrame` if detected.
-            # TODO: No way to pass in kwargs to handshake;
-            try:
-                self.LMFrame, self.FeatureInput = theories.handshake(self,
-                                                                     adjusted_z=False)
-
-            except(IndeterminateError) as e:
-                '''Improve selecting exact Exceptions.'''
-                ##if err in (AttributeError, ValueError, ZeroDivisionError):
-                print('The model raised an exception. LaminateModel not updated. LMFrame defaulting to LFrame.')
-                print(traceback.format_exc())
-                self.LMFrame = self.LFrame.copy()
-
-        '''The args are a bit awkward; replace with empty or comment dependencies'''
-        _update_dimensions(self.LFrame)
-        _update_calculations()
+        sort_columns = ['layer', 'side', 'type', 'matl', 'label', 't(um)',
+                        'h(m)', 'd(m)', 'intf', 'k', 'Z(m)', 'z(m)', 'z(m)*']
+        ##self.LFrame = ut.set_column_sequence(df, sort_columns)
+        return ut.set_column_sequence(df, sort_columns)
 
     # Methods+ ----------------------------------------------------------------
     # These methods support Phase 1
@@ -831,10 +762,10 @@ class Laminate(Stack):
         ['O','I','M','I','O']
 
         '''
-        stack_types = [row for row in self.Snapshot['type']]       # control
+        stack_types = [row for row in self.Snapshot['type']]         # control
         #print(stack_types)
-        abbrev = [letters[0][0].upper()                            # use if type_cache is ndarray
-                  for letters in self._type_cache]                 # easier to see
+        abbrev = [letters[0][0].upper()                              # use if type_cache is ndarray
+                  for letters in self._type_cache]                   # easier to see
         assert self._type_cache.tolist() == stack_types, \
             'Lamina mismatch with stack types, \
                   \n {} instead of \n {}'.format(self._type_cache, stack_types)
@@ -842,7 +773,7 @@ class Laminate(Stack):
 
     '''Find way replace staticmethods with class methods.'''
     @classmethod
-    def _set_stresses(cls, df):                                       # == side_()
+    def _set_stresses(cls, df):                                      # == side_()
         '''Return updated DataFrame with stresses per side_ of neutral axis.'''
         #print('Assigning stress states to sides for a given stack.')
         cols = ['layer', 'side', 'matl', 'type', 't(um)']
@@ -860,15 +791,13 @@ class Laminate(Stack):
             df.iloc[half_the_stack, side_loc] = 'INDET'
         # For the neutral axis
         elif n_rows % 2 != 0 and n_rows != 1:
-            df.iloc[half_the_stack, side_loc] = 'None'             # for odd p
+            df.iloc[half_the_stack, side_loc] = 'None'               # for odd p
         # Other plies
         '''Replace with p'''
         if n_rows > 1:
-            df.iloc[:half_the_stack, side_loc] = 'Tens.'           # applies to latest column 'side'
+            df.iloc[:half_the_stack, side_loc] = 'Tens.'             # applies to latest column 'side'
             df.iloc[-half_the_stack:, side_loc] = 'Comp.'
-
-        df = ut.set_column_sequence(df, cols)
-        return df
+        return ut.set_column_sequence(df, cols)
 
     @classmethod
     def _make_internals(cls, df_mod, p, column):
@@ -909,7 +838,7 @@ class Laminate(Stack):
         #print(internal_idx)
 
         # Intervals
-        first = df.groupby('layer').first()                    # make series of intervals
+        first = df.groupby('layer').first()                          # make series of intervals
         last = df.groupby('layer').last()
 
         # TODO: Unsure if this is accessed; check flow to see if this case is triggered
@@ -923,30 +852,31 @@ class Laminate(Stack):
         # Join Column of firsts and intervals to df
         s_first = first[column]
         s_first.name = 'firsts'
-        joined = df.join(s_first, on='layer')                  # x_0; join long df with short s to get equal lengths
-        joined = joined.join(intervals, on='layer')            # join long df with short intervals for internal_sums
+        joined = df.join(s_first, on='layer')                        # x_0; join long df with short s to get equal lengths
+        joined = joined.join(intervals, on='layer')                  # join long df with short intervals for internal_sums
         #print(joined)
 
         '''Interval or internal sums?'''
         # Calc. Interval Sums
         trunc = joined[(joined['label'] != 'interface') & (
-            joined['label'] != 'discont.')]                    # remove firsts and lasts from cumsum
+            joined['label'] != 'discont.')]                          # remove firsts and lasts from cumsum
         ##'''cumsum is not working with groupby in pandas 0.17.1'''
         ##internal_sums = np.cumsum(
-        ##    trunc.groupby('layer')['intervals'])               # delta; apply sigma from algo
-        internal_sums = trunc.groupby('layer')['intervals'].cumsum()  # 0.17.2 work around; backwards compat.
+        ##    trunc.groupby('layer')['intervals'])                   # delta; apply sigma from algo
+        internal_sums = trunc.groupby('layer')['intervals'].cumsum() # 0.17.2 work around; backwards compat.
         #print(clipped)
         #print(internal_sums)
 
         # Apply Internals to df
         df.loc[internal_idx, column] = joined.loc[
-            internal_idx, 'firsts'] + internal_sums            # although shorter, internals added to joined_df by index
+            internal_idx, 'firsts'] + internal_sums                  # although shorter, internals added to joined_df by index
         if p % 2 != 0:
             df.loc[df['label'] == 'neut. axis', column] = df[column].mean()
 
         return df
     ###
 
+    # These methods export data
     def to_csv(self, **kwargs):
         '''Write LaminateModel data FeatureInput dashboard as separate files.
 
@@ -984,40 +914,43 @@ class Laminate(Stack):
     @property
     def p(self):
         '''Return number of rows per layer for a given laminate; default LFrame.'''
-        df = self.LFrame
+        ##df = self.LFrame
+        df = self._primitive
         return df.groupby('layer').size().unique()[0]
 
     @property
     def total(self):
         '''Return the total laminate thickness (in m); default LFrame.'''
-        df = self.LFrame
+        ##df = self.LFrame
+        df = self._primitive
         return df.groupby('layer')['t(um)'].unique().sum()[0] * 1e-6
 
     @property
-    def max_stress(self):
-        '''Return Series view of max principal stresses per layer, ~ p = 1.'''
-        df = self.LMFrame
-        return df.loc[df['label'] == 'interface', 'stress_f (MPa/N)']
+    def frame(self):
+        '''Return the Laminate DataFrame (LFrame).'''
+        return self._frame
 
+    # TODO: only return pertinent rows
     @property
-    def min_stress(self):
-        '''Return Series view of min principal stresses per layer, ~ p = 1.'''
-        df = self.LMFrame
-        if df['label'].str.contains('discont.').any():
-            return df.loc[df['label'] == 'discont.', 'stress_f (MPa/N)']
-        else:
-            print('Only maxima detected.')
-            return None
+    def has_discont(self):
+        '''Return Series, True at rows where discontinuities are present.
 
+        Notes
+        -----
+        Generally, disconts are present for laminates with p >= 2 for all nplies.
+        Disconts are not present for monoliths with p = 2.
+
+        '''
+        return self._frame['label'].str.contains('discont.')
+
+    # TODO: only return pertinent rows
     @property
-    def extrema(self):
-        '''Return DataFrame excluding internals, showing only maxima and minima.'''
-        df = self.LMFrame
-        maxima = (df['label'] == 'interface')
-        minima = (df['label'] == 'discont.')
-        return df.loc[maxima | minima, :]
+    def has_neutaxis(self):
+        '''Return Series, True at row where neutral axis row is present; for odd plies.'''
+        return self._frame['label'].str.contains('neut. axis')
+        # TODO: repalce with below
+        ##return self.LMFrame['label'].str.contains('neut. axis').any()
 
-    '''or name recap'''
     @property
     def summary(self):
         '''Print a summary of Laminate properties.
@@ -1031,7 +964,7 @@ class Laminate(Stack):
         ...
 
         '''
-        pass                                               # pragma: no cover
+        pass                                                         # pragma: no cover
 
     # Checks ------------------------------------------------------------------
     # Read from DataFrames
@@ -1040,23 +973,148 @@ class Laminate(Stack):
         '''Return True if nplies < 5; Monolith, Bilayer, Trilayer, 4-ply.'''
         return self.nplies < 5
 
-    # TODO: only return pertinent rows
-    @property
-    def has_discont(self):
-        '''Return Series, True at rows where discontinuities are present.
 
-        Notes
-        -----
-        Generally, disconts are present for laminates with p >= 2 for all nplies.
-        Disconts are not present for monoliths with p = 2.
+# =============================================================================
+# LaminateModel ---------------------------------------------------------------
+# =============================================================================
+# Create a LaminateModel
+
+
+class LaminateModel(Laminate):
+    '''Create a `LaminateModel` object.
+
+    This class inherits from `Laminate` and `Stack`. A `FeatureInput` is passed
+    in from a particular "Feature" module and exchanged between `constructs` and
+    `theories` modules.
+
+    Native object:
+    - `LMFrame` : `LFrame` w/Dimensional and Data variables via `theories.Model` data.
+
+    Finally this class builds a `LamainateModel` object, merging the Laminate
+    data with the Model data defined by an author in a separate `models` module;
+    model variables relate to classical laminate theory variables, i.e. `Q11`, `Q12`,
+    `D11`, `D12`, ..., `stress`, `strain`, etc.
+
+    Parameters
+    ----------
+    FeatureInput : dict
+        Passed-in, user-defined object from Case.
+
+    Attributes
+    ----------
+    frame
+    extrema
+    max_stress
+    min_stress
+    has_discont
+    has_neutaxis
+    LMFrame : DataFrame
+        Updated DataFrame combined new variables with LFrame variable.
+        The completed LaminateModel object.
+    {Middle, Inner_i, Outer} : DataFrame
+        Isolated layer types
+    {compressive, tensile} : DataFrame
+        Isolated layer stress sides.
+
+    See Also
+    --------
+    constructs.Stack : base class; initial FeatureInput parser
+    constructs.Laminate : parent class; precursor to LM object
+    theories.BaseModel : handles user defined Laminate Theory models
+    theories.handshake : gives LFrame data, gets LMFrame back
+    models : directory containing package models
+
+    Examples
+    --------
+    >>> # From Scratch
+    >>> import lamana as la
+    >>> FeatureInput = {
+            'Geometry': la.input_.Geometry('400.0-[200.0]-800.0'),
+            'Materials': ['HA', 'PSu'],
+            'Model': 'Wilson_LT',
+            'Parameters': {'P_a': 1, 'R': 0.012, 'a': 0.0075, 'p': 5, 'r': 0.0002},
+            'Properties': {'Modulus': {'HA': 52000000000.0, 'PSu': 2700000000.0},
+            'Poissons': {'HA': 0.25, 'PSu': 0.33}}
+        }
+    >>> LaminateModel(FeatureInput)
+    <lamana LaminateModel object (400.0-[200.0]-800.0)>
+
+    >>> # With Defaults
+    >>> import lamana as la
+    >>> from lamana.models import Wilson_LT as wlt
+    >>> dft = wlt.Defaults()
+    >>> LaminateModel(dft.FeatureInput)
+    <lamana LaminateModel object (400.0-[200.0]-800.0)>
+
+    '''
+
+    def __init__(self, FeatureInput, **kwargs):
+        super(LaminateModel, self).__init__(FeatureInput)
+        # Adopts Laminate and Stack attributes also
+        self.LMFrame = self._build_LMFrame(**kwargs)
+        self._frame = self.LMFrame                         # accessor
+
+        # LaminateModel Attributes
+        self.Middle = self.LMFrame[self.LMFrame['type'] == 'middle']
+        self.Inner_i = self.LMFrame[self.LMFrame['type'] == 'inner']
+        self.Outer = self.LMFrame[self.LMFrame['type'] == 'outer']
+        self.compressive = self.LMFrame[self.LMFrame['side'] == 'Comp.']
+        self.tensile = self.LMFrame[self.LMFrame['side'] == 'Tens.']
+
+    # PHASE 3
+    def _build_LMFrame(self, **kwargs):
+        '''Update `LaminateModel` DataFrame and `FeatureInput`.
+
+        - populates stress data calculations from the selected model.
+        - may add extra keys to `FeatureInput`, e.g. 'Globals'
+
+        Tries to update `LaminateModel`. If an exception is raised (on the model
+        side), no update is made, and the Laminate (without Data columns) is set
+        as the default `LFrame`; this is a "rollback."
 
         '''
-        return self.LMFrame['label'].str.contains('discont.')
+        # TODO: Remove; raise Exception if not able;; let Case handle rollback
+        try:
+            # Pass in the pre-updated object
+            LMFrame, self.FeatureInput = theories.handshake(self, **kwargs)
+            return LMFrame
 
-    # TODO: only return True, not series
+        except(IndeterminateError) as e:
+            '''Improve selecting exact Exceptions.'''
+            ##if err in (AttributeError, ValueError, ZeroDivisionError):
+            logging.warn(
+                'The model raised an exception. LaminateModel not updated.'
+                'LMFrame defaulting to LFrame.'
+            )
+            logging.debug(traceback.format_exc())
+            return self.LFrame
+
+    # Properties --------------------------------------------------------------
     @property
-    def has_neutaxis(self):
-        '''Return Series, True at row where neutral axis row is present; for odd plies.'''
-        return self.LMFrame['label'].str.contains('neut. axis')
-        # TODO: repalce with below
-        #return self.LMFrame['label'].str.contains('neut. axis').any()
+    def frame(self):
+        '''Return the Laminate DataFrame (LFrame).'''
+        return self._frame
+
+    @property
+    def extrema(self):
+        '''Return DataFrame excluding internals, showing only maxima and minima.'''
+        df = self._frame
+        maxima = (df['label'] == 'interface')
+        minima = (df['label'] == 'discont.')
+        return df.loc[maxima | minima, :]
+
+    @property
+    def max_stress(self):
+        '''Return Series view of max principal stresses per layer, ~ p = 1.'''
+        df = self._frame
+        return df.loc[df['label'] == 'interface', 'stress_f (MPa/N)']
+
+    @property
+    def min_stress(self):
+        '''Return Series view of min principal stresses per layer, ~ p = 1.'''
+        df = self._frame
+        if df['label'].str.contains('discont.').any():
+            return df.loc[df['label'] == 'discont.', 'stress_f (MPa/N)']
+        else:
+            logging.info('Only maxima detected.')
+            return None
