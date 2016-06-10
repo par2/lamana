@@ -143,6 +143,22 @@ expected4 = [
 # -----------------------------------------------------------------------------
 
 
+class TestCaseTypes():
+    '''Verify the resulting type when called Case is a LaminateModel (or Laminate).'''
+
+    case0 = la.distributions.Case(load_params, mat_props)
+    case0.apply(['400-200-800'])
+
+    def test_Case_type_LaminateModel1(self):                # added 0.4.12-dev0
+        '''Verify the default output Case object is a LaminateModel.'''
+        actual = isinstance(self.case0.LMs[0], la.constructs.LaminateModel)
+        nt.assert_true(actual)
+
+    # TODO: Add tests for type verification for Laminate
+
+    # TODO: Add test for rollback here
+
+
 # Case Arguments -------------------------------------------------------------
 #  TODO: Convert, organize tests  to LPEP 001.015
 @nt.raises(TypeError)
@@ -154,19 +170,19 @@ def test_Case_arg_empty1():
 @nt.raises(TypeError)
 def test_Case_arg_empty2():
     '''Check raise Exception if not passed load_params; first test.'''
-    case0 = la.distributions.Case(dft.mat_props)
+    case0 = la.distributions.Case(mat_props)
 
 
 @nt.raises(TypeError)
 def test_Case_arg_empty3():
     '''Check raise Exception if not passed mat_props.'''
-    case0 = la.distributions.Case(dft.load_params)
+    case0 = la.distributions.Case(load_params)
 
 
 @nt.raises(ValueError)
 def test_Case_mth_apply_arg_empty1():
     '''Check raise Exception if not passed a geometries.'''
-    case0 = la.distributions.Case(dft.load_params, dft.mat_props)
+    case0 = la.distributions.Case(load_params, mat_props)
     actual = case0.apply()
 
 
@@ -1082,8 +1098,10 @@ cases4e = la.distributions.Cases(['400-[150,50]-800'])
 cases5a = la.distributions.Cases(['400-[200]-800', '400-[100,100]-400', '400-[400]-400'])
 
 
+
 # TESTS -----------------------------------------------------------------------
 # Cases Special Methods -------------------------------------------------------
+
 @nt.raises(NotImplementedError)
 def test_Cases_spmthd_set1():
     '''Check __setitem__ is not implemented.'''
