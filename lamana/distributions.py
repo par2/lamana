@@ -299,7 +299,10 @@ class Case(object):
                     #print(FeatureInput)
                     '''Is there a way to save a general FI for the Case?'''
                     # TODO: accept kwargs
-                    yield la.constructs.Laminate(FeatureInput)
+                    #yield la.constructs.Laminate(FeatureInput)
+                    yield la.constructs.LaminateModel(FeatureInput)
+
+                    # TODO: handle laminate rollback here instead
 
             # DEPRECATED AttributeError exception.
         self.LaminateModels = list(get_LaminateModels(geo_strings))
