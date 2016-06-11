@@ -103,7 +103,8 @@ Geos_full2 = [Geo1, Geo2, Geo3, Geo4, Geo5, Geo6, Geo7,
 # Decode Geometries
 def test_Stack_decode_1():
     '''Check decoding and unfolding simple geometries.'''
-    unfolded = [con.Stack(Geo).unfolded for Geo in Geos_simple]
+    ##unfolded = [con.Stack(Geo).unfolded for Geo in Geos_simple]
+    unfolded = [con.Stack(bdft.get_FeatureInput(Geo)).unfolded for Geo in Geos_simple]
     actual = unfolded
     expected = [
         # Monolith
@@ -136,7 +137,8 @@ def test_Stack_decode_1():
 
 def test_Stack_decode_2():
     '''Check decoding and unfolding geometries with [inner_i].'''
-    unfolded = [con.Stack(Geo).unfolded for Geo in Geos_inner]
+    ##unfolded = [con.Stack(Geo).unfolded for Geo in Geos_inner]
+    unfolded = [con.Stack(bdft.get_FeatureInput(Geo)).unfolded for Geo in Geos_inner]
     actual = unfolded
     expected = [
         [(400.0, 'outer')[::-1],
@@ -166,7 +168,8 @@ def test_Stack_decode_2():
 
 def test_Stack_decode_3():
     '''Check decoding and unfolding of more geometries.'''
-    unfolded = [con.Stack(Geo).unfolded for Geo in Geos_full]
+    ##unfolded = [con.Stack(Geo).unfolded for Geo in Geos_full]
+    unfolded = [con.Stack(bdft.get_FeatureInput(Geo)).unfolded for Geo in Geos_full]
     actual = unfolded
     expected = [
         [(0.0, 'outer')[::-1],
@@ -232,7 +235,8 @@ def test_Stack_decode_3():
 
 def test_Stack_decode_4():
     '''Checks decoding and unfolding even more geometries.'''
-    unfolded = [con.Stack(Geo).unfolded for Geo in Geos_full2]
+    ##unfolded = [con.Stack(Geo).unfolded for Geo in Geos_full2]
+    unfolded = [con.Stack(bdft.get_FeatureInput(Geo)).unfolded for Geo in Geos_full2]
     actual = unfolded
     expected = [
         [(0.0, 'outer')[::-1],
@@ -334,7 +338,8 @@ def test_Stack_decode_4():
 
 def test_Stack_decode_5():
     '''Check decoding and unfolding of symmetric geometries.'''
-    unfolded = [con.Stack(Geo).unfolded for Geo in Geos_symmetric]
+    ##unfolded = [con.Stack(Geo).unfolded for Geo in Geos_symmetric]
+    unfolded = [con.Stack(bdft.get_FeatureInput(Geo)).unfolded for Geo in Geos_symmetric]
     actual = unfolded
     expected = [
         [(0.0, 'outer')[::-1],
@@ -370,7 +375,8 @@ def test_Stack_decode_5():
 #stack = {layer_ : [thickness, type_ ], ...}
 def test_Stack_identify1():
     '''Check building dicts for simple geometry.'''
-    stacks = [con.Stack(Geo).StackTuple for Geo in Geos_simple]
+    ##stacks = [con.Stack(Geo).StackTuple for Geo in Geos_simple]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple for Geo in Geos_simple]
     actual = stacks
     expected = [
         ({1: [2000.0, 'middle'][::-1]},
@@ -393,7 +399,8 @@ def test_Stack_identify1():
 
 def test_Stack_identify2():
     '''Check building dicts for inner_i geometry.'''
-    stacks = [con.Stack(Geo).StackTuple for Geo in Geos_inner]
+    ##stacks = [con.Stack(Geo).StackTuple for Geo in Geos_inner]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple for Geo in Geos_inner]
     actual = stacks
     expected = [
         ({1: [400.0, 'outer'][::-1],
@@ -424,7 +431,8 @@ def test_Stack_identify2():
 
 def test_Stack_identify3():
     '''Check building dicts for full  geometry.'''
-    stacks = [con.Stack(Geo).StackTuple for Geo in Geos_full]
+    ##stacks = [con.Stack(Geo).StackTuple for Geo in Geos_full]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple for Geo in Geos_full]
     actual = stacks
     expected = [
         ({1: [2000.0, 'middle'][::-1]},
@@ -481,7 +489,8 @@ def test_Stack_identify3():
 
 def test_Stack_identify4():
     '''Check building dicts for full2 geometry.'''
-    stacks = [con.Stack(Geo).StackTuple for Geo in Geos_full2]
+    ##stacks = [con.Stack(Geo).StackTuple for Geo in Geos_full2]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple for Geo in Geos_full2]
     actual = stacks
     expected = [
         ({1: [2000.0, 'middle'][::-1]},
@@ -574,7 +583,8 @@ def test_Stack_identify4():
 
 def test_Stack_identify5():
     '''Check identifying for symmetric geometry.'''
-    stacks = [con.Stack(Geo).StackTuple for Geo in Geos_symmetric]
+    ##stacks = [con.Stack(Geo).StackTuple for Geo in Geos_symmetric]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple for Geo in Geos_symmetric]
     actual = stacks
     expected = [
         ({1: ['middle', 2000.0]},
@@ -604,7 +614,8 @@ def test_Stack_identify5():
 # Test StackTuples
 def test_Stack_identify6():
     '''Check StackTuple attribute access; stack.'''
-    stacks = [con.Stack(Geo).StackTuple.order for Geo in Geos_simple]
+    ##stacks = [con.Stack(Geo).StackTuple.order for Geo in Geos_simple]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple.order for Geo in Geos_simple]
     actual = stacks                                        # StackTuple attr
     expected = [
         {1: ['middle', 2000.0]},
@@ -623,7 +634,8 @@ def test_Stack_identify6():
 
 def test_Stack_identify7():
     '''Check StackTuple attribute access; nplies.'''
-    stacks = [con.Stack(Geo).StackTuple.nplies for Geo in Geos_simple]
+    ##stacks = [con.Stack(Geo).StackTuple.nplies for Geo in Geos_simple]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple.nplies for Geo in Geos_simple]
     actual = stacks                                        # StackTuple attr
     expected = [1, 2, 3, 4]
     nt.assert_equal(actual, expected)
@@ -631,7 +643,8 @@ def test_Stack_identify7():
 
 def test_Stack_identify8():
     '''Check StackTuple attribute access; name.'''
-    stacks = [con.Stack(Geo).StackTuple.name for Geo in Geos_simple]
+    ##stacks = [con.Stack(Geo).StackTuple.name for Geo in Geos_simple]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple.name for Geo in Geos_simple]
     actual = stacks                                        # StackTuple attr
     expected = ['1-ply', '2-ply', '3-ply', '4-ply']
     nt.assert_equal(actual, expected)
@@ -639,7 +652,8 @@ def test_Stack_identify8():
 
 def test_Stack_identify9():
     '''Check StackTuple attribute access; alias.'''
-    stacks = [con.Stack(Geo).StackTuple.alias for Geo in Geos_full]
+    ##stacks = [con.Stack(Geo).StackTuple.alias for Geo in Geos_full]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple.alias for Geo in Geos_full]
     actual = stacks                                        # StackTuple attr
     expected = [
         'Monolith', 'Bilayer', 'Trilayer', 'Quadlayer', 'Standard',
@@ -657,7 +671,8 @@ def test_Stack_materials1():
     ##model = 'Wilson_LT'                                    # unused
     ##custom_matls = []                                      # unused
     for Geo in Geos_full2:
-        stack_dict = con.Stack(Geo).StackTuple.order
+        ##stack_dict = con.Stack(Geo).StackTuple.order
+        stack_dict = con.Stack(bdft.get_FeatureInput(Geo)).StackTuple.order
 
         ##con.Stack.add_materials(stack_dict, mat_props_df)
         ##con.Stack.add_materials(stack_dict, mat_props)
@@ -773,8 +788,6 @@ def test_Stack_num_outer1():
 #------------------------------------------------------------------------------
 # LAMINATE
 #------------------------------------------------------------------------------
-'''Tests > 1s are here, likely due to calling constructors.'''
-
 # dft = wlt.Defaults()
 # G = la.input_.Geometry
 # constr = la.constructs.Laminate
@@ -788,13 +801,15 @@ def test_Laminate_print1():
 
     #dft = wlt.Defaults()
     ##dft = ut.Defaults()
+    # TODO: replace with get_FeatureInput
     FI = dft.FeatureInput
     FI['Geometry'] = G(geo_input)
     #FI['Geometry'] = G
 
-    actual = constr(FI).__repr__()
+    # TODO: Replace constr with actual name
+    actual = la.constructs.Laminate(FI).__repr__()
     #actual = la.constructs.Laminate(FI).__repr__()
-    expected = '<lamana LaminateModel object (400.0-[200.0]-800.0), p=5>'
+    expected = '<lamana Laminate object (400.0-[200.0]-800.0), p=5>'
     #print(actual, expected)
     #assert actual == expected
     nt.assert_equal(actual, expected)
@@ -811,7 +826,53 @@ def test_Laminate_print2():
     FI['Geometry'] = G(geo_input)
     #FI['Geometry'] = G
 
-    actual = constr(FI).__repr__()
+    actual = la.constructs.Laminate(FI).__repr__()
+    #actual = la.constructs.Laminate(FI).__repr__()
+    expected = '<lamana Laminate object (400.0-[200.0]-400.0S), p=5>'
+    #print(actual, expected)
+    #assert actual == expected
+    nt.assert_equal(actual, expected)
+
+
+#------------------------------------------------------------------------------
+# LAMINATEMODEL
+#------------------------------------------------------------------------------
+'''Tests > 1s are here, likely due to calling constructors.'''
+# Added in 0.4.12
+# Tests for Laminate prints
+def test_LaminateModel_print1():
+    '''Check Laminate.__repr__ output.'''
+    geo_input = '400-[200]-800'
+    #G = la.input_.Geometry(geo_input)
+
+    #dft = wlt.Defaults()
+    ##dft = ut.Defaults()
+    # TODO: replace with get_FeatureInput
+    FI = dft.FeatureInput
+    FI['Geometry'] = G(geo_input)
+    #FI['Geometry'] = G
+
+    # TODO: Replace constr with actual name
+    actual = la.constructs.LaminateModel(FI).__repr__()
+    #actual = la.constructs.Laminate(FI).__repr__()
+    expected = '<lamana LaminateModel object (400.0-[200.0]-800.0), p=5>'
+    #print(actual, expected)
+    #assert actual == expected
+    nt.assert_equal(actual, expected)
+
+
+def test_LaminateModel_print2():
+    '''Check Laminate.__repr__ symmetry output.'''
+    geo_input = '400-[200]-400S'
+    #G = la.input_.Geometry(geo_input)
+
+    #dft = wlt.Defaults()
+    ##dft = ut.Defaults()
+    FI = dft.FeatureInput
+    FI['Geometry'] = G(geo_input)
+    #FI['Geometry'] = G
+
+    actual = la.constructs.LaminateModel(FI).__repr__()
     #actual = la.constructs.Laminate(FI).__repr__()
     expected = '<lamana LaminateModel object (400.0-[200.0]-400.0S), p=5>'
     #print(actual, expected)
@@ -819,6 +880,7 @@ def test_Laminate_print2():
     nt.assert_equal(actual, expected)
 
 
+# TODO: Rename following functions and generalize LM or match object (L or LM)
 # Using laminator -------------------------------------------------------------
 # Tests for Checking that DataFrames Make Sense
 '''CAUTION: many cases will be loaded.  This may lower performance.'''
@@ -1360,6 +1422,7 @@ def test_Laminate_num_middle1():
     '''Check no more than one middle layer Lamina is in a Laminate.'''
     actual = []
     for Geo in Geos_full2:
+        # TODO: change con to constructs
         layers = con.Laminate(
             bdft.get_FeatureInput(
                 Geo,
