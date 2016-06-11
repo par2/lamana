@@ -433,16 +433,17 @@ class Laminate(Stack):
     def __init__(self, FeatureInput):
         super(Laminate, self).__init__(FeatureInput)
 
+        # TODO: Temporary.  Remove and change warning to hasattr in handshake
+        # _type_cache not needed; try deprecate, but somehow remind is available
+        # Reminders
+        self._type_cache = []
+        self.LMFrame = []                                            # df object; modded stack
+
         # Laminate Objects
         self.Snapshot = self._build_snapshot()                       # df object; stack
         self._primitive = self._build_primitive()                    # phase 1
         self.LFrame = self._build_LFrame()                           # phase 1; df of IDs; formerly Laminate_
         self._frame = self.LFrame                                    # general accessor
-
-        # TODO: Temporary.  Remove and change warning to hasattr in handshake
-        self.LMFrame = []                                            # df object; modded stack
-
-        self._type_cache = []
 
     def __repr__(self):
         return '<lamana {} object ({}), p={}>'.format(
@@ -558,6 +559,7 @@ class Laminate(Stack):
         #print('nplies: {}, p: {}, t_total (m): {}'.format(nplies, p, t_total))
 
         ##df = self.LFrame.copy()
+        # NOTE: primitive not copied, so if called, will give an LFrame
         df = self._primitive
 
         # WRANGLINGS --------------------------------------------------------------
@@ -766,6 +768,8 @@ class Laminate(Stack):
         #print(stack_types)
         abbrev = [letters[0][0].upper()                              # use if type_cache is ndarray
                   for letters in self._type_cache]                   # easier to see
+        # TODO: clean up with logging
+        ##print(self._type_cache)
         assert self._type_cache.tolist() == stack_types, \
             'Lamina mismatch with stack types, \
                   \n {} instead of \n {}'.format(self._type_cache, stack_types)
