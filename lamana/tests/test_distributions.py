@@ -980,6 +980,9 @@ class TestCaseExportMethods():
     case = la.distributions.Case(load_params, mat_props)
     case.apply(['400-[200]-800', '400-[400]-400', '400-[100,100]-800'])
 
+    # TODO: Consider adding a wrapper that checks the number of files is the same
+    # before and after each test is run, else give a warning.  This to check no
+    # stray files remain.
     def test_Case_mtd_to_csv1(self):
         '''Verify number of files written; use tempfiles.'''
         try:
@@ -1013,6 +1016,14 @@ class TestCaseExportMethods():
                 logging.info('File has been deleted: {}'.format(data_fpath))
                 logging.info('File has been deleted: {}'.format(dash_fpath))
 
+    def test_Case_mtd_to_csv3(self):
+        '''Verify files are removed if the `delete` keyword is True.'''
+        list_of_tupled_paths = self.case.to_csv(temp=True, delete=True)
+        actual1 = any([os.path.exists(data_fpath) for data_fpath, _ in list_of_tupled_paths])
+        actual2 = any([os.path.exists(dash_fpath) for _, dash_fpath in list_of_tupled_paths])
+        nt.assert_false(actual1)
+        nt.assert_false(actual2)
+
     def test_Case_mtd_to_xlsx1(self):
         '''Verify returns 2 sheets per LamainateModel in the same file; half dashboards.'''
         try:
@@ -1039,6 +1050,11 @@ class TestCaseExportMethods():
             os.remove(result)
             logging.info('File has been deleted: {}'.format(result))
 
+    def test_Case_mtd_to_xlsx3(self):
+        '''Verify files are removed if the `delete` keyword is True.'''
+        workbook_fpath = self.case.to_xlsx(temp=True, delete=True)
+        actual = os.path.exists(workbook_fpath)
+        nt.assert_false(actual)
 
 #------------------------------------------------------------------------------
 # CASES
