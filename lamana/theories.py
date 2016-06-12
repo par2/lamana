@@ -61,7 +61,7 @@ class BaseModel(object):
             Updated (DataFrame, FeatureInput).
 
         '''
-        pass
+        pass                                               # pragma: no cover
 
 
 def handshake(Laminate, adjusted_z=False):
@@ -119,9 +119,9 @@ def handshake(Laminate, adjusted_z=False):
     module = importlib.import_module(modified_name, package='lamana.models')
 
     # Verify Laminate has an empty LMFrame attribute, otherwise Warn
-    if any(getattr(Laminate, 'LMFrame')):
-        logging.warn('A LaminateModel has been passed to `handshake()`.'
-                     ' Expected a pre-updated Laminate object.  Results are unpredictable.')
+    # if any(getattr(Laminate, 'LMFrame')):
+    #     logging.warn('A LaminateModel has been passed to `handshake()`.'
+    #                  ' Expected a pre-updated Laminate object.  Results are unpredictable.')
     try:
         # Look for a hook function
         hook = ut.get_hook_function(module, hookname=HOOKNAME)
