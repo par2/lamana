@@ -11,6 +11,7 @@ omit =
     /home/travis/virtualenv/python3.5.1/lib/python3.5/site-packages/*
     lamana/tests/*
     lamana/models/tests/*
+    lamana/models/fixtures/*
     lamana/lt_exceptions.py
     lamana/models/example_Wilson_LT_class.py
     lamana/models/example_Wilson_LT_func.py
