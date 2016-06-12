@@ -32,7 +32,7 @@ class TestBaseModel():
 
     @nt.raises(TypeError)
     def test_theories_BaseModel_error1():
-        '''Verify TypeError raised if hook method not implemented.'''
+        '''Verify TypeError raised if hook method not implemented; see abstractmethod.'''
         class Model(BaseModel):
             pass
 
