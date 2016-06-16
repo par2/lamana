@@ -64,8 +64,8 @@ class BaseModel(object):
         pass                                               # pragma: no cover
 
 
-def handshake(Laminate, adjusted_z=False):
-    '''Return updated LaminateModel and FeatureInput objects.
+def handshake(precursor, adjusted_z=False):
+    '''Return an updated LaminateModel and FeatureInput objects.
 
     This key method interfaces between Laminate class and a custom model module.
     Model names are related to the laminate theory, e.g. Classical_LT, Wilson_LT.
@@ -74,18 +74,20 @@ def handshake(Laminate, adjusted_z=False):
 
     Parameters
     ----------
-    Laminate : Laminate object
-        The entire pre-updated, `Laminate` object is passed in, giving access
-        to its methods.  `Laminate.LFrame` only has ID and Dimensional columns,
-        so no laminate theory calculations or columns are populated yet.
+    precursor : LaminateModel object
+        A pre-updated `LaminateModel` object is passed in, giving access
+        to the parent `Laminate` class.  The `Laminate.LFrame` only has ID and
+        Dimensional columns, so no laminate theory calculations or columns are
+        populated yet.  This DataFrame is updated and applied to the current
+        `LaminateModel` object.
     adjusted_z : bool, optional; default False
         This option forces the use of the z(m)* column values.  A different
         algorithm was used it calculate the internal values for this variable.
 
     Notes
     -----
-    This method searches for a special hook method named `_use_model_` in the
-    specified model module.  This hook may be written as method within a class
+    This function searches for a special hook method named `_use_model_` in the
+    specified model module.  The hook may be written as method within a class
     or written as an independent function offering a choice for users to write
     models in either class-style (recommended) or function-style.  This hook
     method simply returns an updated LaminateModel and FeatureInput.
@@ -103,25 +105,29 @@ def handshake(Laminate, adjusted_z=False):
     This assumes the model is developed and located in the standard .\models directory.
 
     1. User selects a model in `lamana.distributions.Case.apply(model='model_name')`;
-       Model name is stored in the FeatureInput object then passed into `Laminate`.
-    2. Inside `lamana.constructs.Laminate`,  _update_columns._update_calculations(FI)`
-       is called, which initiates LT calculations for the given model.
-    3. `theories.handshake(L)` is called and searches for the model name in models dir.
+       Model name is stored in the FeatureInput object then passed into
+       `lamana.constructs.LaminateModel`.
+    2. `LaminateModel` inherits from `Laminate` and `Stack` that build
+       DataFrames with dimensional data.  The LMFrame attr is initially None.
+    3. `theories.handshake()` is called and searches for the model name in models dir.
     4. Inside the selected model, the hook method `models._use_model_` is called
        (if function-style) or `models.<model_name>._use_model_` (if class-style)
+    5. The a `LaminateModel.LMFrame` object is either updated or raises an error.
+
+    Raises
+    ------
+    ModelError : If the initial LaminateModel object passed to handshake is not
+                 empty, i.e. has LMFrame != None, then updates are unpredicatable.
 
     '''
     HOOKNAME = '_use_model_'                               # looks for this in custom models
 
     # Find and Import the Model
-    model_name = Laminate.FeatureInput['Model']
+    model_name = precursor.FeatureInput['Model']
     modified_name = ''.join(['.', model_name])             # e.g '.Wilson_LT'
     module = importlib.import_module(modified_name, package='lamana.models')
 
-    # Verify Laminate has an empty LMFrame attribute, otherwise Warn
-    # if any(getattr(Laminate, 'LMFrame')):
-    #     logging.warn('A LaminateModel has been passed to `handshake()`.'
-    #                  ' Expected a pre-updated Laminate object.  Results are unpredictable.')
+    # TODO: add assertion for presursor.LMFrame == Laminate(FI).LMFrame prior to update
     try:
         # Look for a hook function
         hook = ut.get_hook_function(module, hookname=HOOKNAME)
@@ -138,7 +144,7 @@ def handshake(Laminate, adjusted_z=False):
     # TODO: Add following with args
     #LaminateModel, FeatureInput = hook(Laminate, *args, adjusted_z=False, **kwargs)
     # eqiv. LM, FI = module._use_model_()
-    LaminateModel, FeatureInput = hook(Laminate, adjusted_z=False)
+    LaminateModel, FeatureInput = hook(precursor, adjusted_z=False)
 
     # Make sure the passed FeatureInput has Equal attributes
     ##assert FeatureInput['Parameters']['p'] == Laminate.p
