@@ -2,6 +2,7 @@
 '''Confirm output of general Laminate structure.'''
 # NOTE: Refactoring in 0.4.3c5b led to patching container orders.
 import os
+import inspect
 import logging
 
 import nose.tools as nt
@@ -9,7 +10,7 @@ import pandas as pd
 import numpy as np
 
 import lamana as la
-from lamana.lt_exceptions import IndeterminateError
+from lamana.lt_exceptions import IndeterminateError, ModelError
 from lamana.input_ import BaseDefaults
 from lamana import constructs as con
 from lamana.utils import tools as ut
@@ -1203,11 +1204,6 @@ def test_Laminate_compare_sets1():
     LM3 = cases1[0].LMs[2]                                     # 400-[200]-400S
     LM4 = cases2[0].LMs[0]                                     # 0-0-2000
 
-    #assert set([LM1]) == set([LM1])
-    #assert set([LM1]) == set([LM2])
-    #assert set([LM1]) != set([LM3])
-    #assert set([LM1]) != set([LM4])
-
     nt.assert_set_equal(set([LM1, LM2]), set([LM1, LM2]))
     nt.assert_set_equal(set([LM1]), set([LM2]))
     nt.assert_set_equal(set([LM2]), set([LM1]))
@@ -1447,3 +1443,49 @@ class TestLaminateModel():
             actual = [LM.min_stress for LM in case.LMs if LM.alias == 'Monolith']
             expected = [None] * len(actual)
             nt.assert_equal(actual, expected)
+
+#import inspect
+
+class TestDecoupledLaminateModel():
+    '''Contain test from the Decouple Branch.'''
+    # 0.4.12
+    FeatureInput = {
+        'Geometry': la.input_.Geometry('400.0-[200.0]-800.0'),
+        'Materials': ['HA', 'PSu'],
+        'Model': 'Wilson_LT',
+        'Parameters': {'P_a': 1, 'R': 0.012, 'a': 0.0075, 'p': 5, 'r': 0.0002},
+        'Properties': {'Modulus': {'HA': 52000000000.0, 'PSu': 2700000000.0},
+        'Poissons': {'HA': 0.25, 'PSu': 0.33}}
+    }
+
+    S_attrs = [name for name, obj in inspect.getmembers(st) if not name.startswith('__')]
+    L_attrs = [name for name, obj in inspect.getmembers(L) if not name.startswith('__')]
+    LM_attrs = [name for name, obj in inspect.getmembers(LM) if not name.startswith('__')]
+
+    @nt.raises(ModelError)
+    def test_LaminateModel_INDET_error1(self):
+        '''Verify error is raised if p=1; INDET is detected.  LaminateModel not updated.'''
+        FeatureInput = self.FeatureInput.copy()
+        FeatureInput['Parameters']['p'] = 1
+        actual = LaminateModel(FeatureInput)
+
+#     @nt.raises(OSError)
+#     def test_LaminateModel_write_error(self):
+#         # shift working dir
+#         # try to write
+#         # prevent export being written in the wrong place
+#         pass
+
+    def test_LaminateModel_attr_inheritence1(self):
+        '''Verify LaminateModel attrs > Laminate attrs > Stack attrs.'''
+        actual1 = len(self.LM_attrs) > len(self.L_attrs)
+        actual2 = len(self.L_attrs) > len(self.S_attrs)
+        nt.assert_true(actual1)
+        nt.assert_true(actual2)
+
+    def test_LaminateModel_attr_inheritence2(self):
+        '''Verify confirm inherited attrs are subsets.'''
+        actual1 = set(self.S_attrs).issubset(self.L_attrs)
+        actual2 = set(self.L_attrs).issubset(self.LM_attrs)
+        nt.assert_true(actual1)
+        nt.assert_true(actual2)
