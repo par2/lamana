@@ -866,16 +866,13 @@ def test_Laminate_sanity1():
     '''Check the first d_ row is 0.'''
     for case in cases.values():
         for LM in case.LMs:
-     ##for LMs in cases.values():
-     ##    for LM in LMs:
             print(LM)
-            df = LM.LMFrame
+            df = LM.frame
             #print(df)
             if (LM.p % 2 != 0) & (LM.nplies > 1):
                 expected = 0
                 actual = df.loc[0, 'd(m)']
                 #print(actual)
-                #assert actual == expected
                 nt.assert_equal(actual, expected)
 
 
@@ -883,17 +880,14 @@ def test_Laminate_sanity2():
     '''Check the last d_ row equals the total thickness.'''
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
             if LM.p > 1:
-                df = LM.LMFrame
+                df = LM.frame
                 t_total = LM.total
                 print(df)
                 expected = t_total
                 '''Find faster way to get last element.'''
                 actual = df['d(m)'][-1::].values[0]        # get last item
-                print(actual)
-                #assert actual == expected
+                #print(actual)
                 nt.assert_equal(actual, expected)
 
 
@@ -902,11 +896,7 @@ def test_Laminate_sanity3():
     cols = ['label', 't(um)', 'h(m)']
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
             if LM.p > 1:
-                ##df = LM.LMFrame                           # unused
-                #print(df)
                 tensile = LM.tensile.reset_index(drop=True)
                 compressive = LM.compressive[::-1].reset_index(drop=True)
                 #print(tensile[cols])
@@ -915,7 +905,6 @@ def test_Laminate_sanity3():
                 #print(LM.name)
                 print(LM.p)
                 #print(LM.LMFrame)
-                #assert tensile[cols] == compressive[cols]
                 ut.assertFrameEqual(tensile[cols], compressive[cols])
 
 
@@ -924,20 +913,15 @@ def test_Laminate_sanity4():
     cols = ['Z(m)', 'z(m)', 'z(m)*']
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
             if LM.p > 1:
-                ##df = LM.LMFrame                           # unused
-                #print(df)
                 tensile = LM.tensile.reset_index(drop=True)
                 compressive = LM.compressive[::-1].reset_index(drop=True)
                 #print(tensile[cols])
                 #print(-compressive[cols])
-                print(LM.Geometry)
+                #print(LM.Geometry)
                 #print(LM.name)
-                print(LM.p)
-                print(LM.LMFrame)
-                #assert tensile[cols] == compressive[cols]
+                #print(LM.p)
+                #print(LM.frame)
                 ut.assertFrameEqual(tensile[cols], -compressive[cols])
 
 
@@ -946,34 +930,29 @@ def test_Laminate_sanity5():
     cols = ['intf', 'k']
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
             if (LM.name == 'Monolith') & (LM.p < 2):
-                df = LM.LMFrame
+                df = LM.frame
                 df_null = pd.DataFrame(index=df.index, columns=df.columns)
                 expected = df_null.fillna(np.nan)
                 actual = df
                 #print(actual[cols])
                 #print(expected[cols])
-                print(LM.Geometry)
+                #print(LM.Geometry)
                 #print(LM.name)
-                print(LM.p)
+                #print(LM.p)
                 ut.assertFrameEqual(actual[cols], expected[cols])
 
 
 def test_Laminate_sanity6():
     '''Check middle d_ is half the total thickness.'''
-    ##cols = ['t(um)']                                       # unused
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
             if (LM.nplies % 2 != 0) & (LM.p % 2 != 0) & (LM.p > 3):
                 print(LM.Geometry)
                 #print(LM.name)
                 print(LM.p)
                 #print(LM.LMFrame)
-                df = LM.LMFrame
+                df = LM.frame
                 #t_total = df.groupby('layer')['t(um)'].unique().sum()[0] * 1e-6
                 #print(t_total)
                 #print(LM.total)
@@ -995,13 +974,10 @@ def test_Laminate_sanity7():
     cols = ['z(m)']
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
-            #print(LM)
             if LM.nplies % 2 == 0:
                 #print(LM)
                 #print(LM.Geometry)
-                df = LM.LMFrame
+                df = LM.frame
                 # Select middle most indices, should be zero
                 halfidx = len(df.index)//2
                 #print(halfidx)
@@ -1016,36 +992,13 @@ def test_Laminate_sanity8():
     '''Check DataFrame length equals nplies*p.'''
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
-            #print(LM)
-            df = LM.LMFrame
+            df = LM.frame
             actual = df.shape[0]
             length = LM.nplies * LM.p
             expected = length
             #print(actual)
             #print(expected)
-            #assert actual == expected
             nt.assert_almost_equals(actual, expected)
-
-
-# # DEPRECATE: use refactored version that invokes Cases() (0.4.11.dev0)
-# def test_Laminate_sanity9():
-#     '''Check Monoliths, p=1 have positive values.
-
-#     Uses select_frames() to extract a subset of selected cases.
-
-#     '''
-#     cases_selected = ut.select_frames(cases, name='1-ply', ps=[1])
-#     for LMs in cases_selected:
-#         df_numeric = LMs.select_dtypes(include=[np.number])
-#         df = df_numeric
-#         #print(df_numeric)
-#         actual = df_numeric[(df_numeric < 0)]              # catches negative numbers if any
-#         expected = pd.DataFrame(index=df.index, columns=df.columns).fillna(np.nan)
-#         #print(actual)
-#         #print(expected)
-#         ut.assertFrameEqual(actual, expected)
 
 
 def test_Laminate_sanity9_refactored():
@@ -1058,13 +1011,13 @@ def test_Laminate_sanity9_refactored():
     2. Cases iterates over values, i.e. separate cases.
     3. Each case is a Monolith of p=1.
     4. actual is a DataFrame of negative numeric values.  NaN if None found
-    5. expect is a DataFrame with no negative values, i.e. only NaN.
+    5. expected is a DataFrame with no negative values, i.e. only NaN.
 
     '''
     cases_monoliths = la.distributions.Cases(dft.geo_inputs['1-ply'], ps=[1])
     for case in cases_monoliths:
         for psuedoLM in case.LMs:
-            df = psuedoLM.LMFrame
+            df = psuedoLM.frame
             df_numeric = df.select_dtypes(include=[np.number]) # print number columns
             # test = df_numeric[(df_numeric > 0)]                # catches positive numbers if any
             actual = df_numeric[(df_numeric < 0)]              # catches negative numbers if any
@@ -1083,10 +1036,11 @@ def test_Laminate_internals1():
     '''Check internal function raises ZeroDivisionError if p = 1 is given to _make_internals.'''
     # Function needs a DataFrame to work on
     # Try to feed random DataFrame (LMFrame), random column with p=1
+    # Will rollback to Laminate if p=1
     case1 = ut.laminator(dft.geo_inputs['1-ply'], ps=[1])
     for case_ in case1.values():
         for LM in case_.LMs:
-            df_random = LM.LMFrame
+            df_random = LM.frame
             la.constructs.Laminate._make_internals(df_random, 1, 'k')
 
 
@@ -1399,8 +1353,8 @@ class TestLaminateModel():
     # to use bare constructs
     # TODO: Fix use of get_FeatureInput instead
     case = ut.laminator(geos=dft.geos_standard)
-    #cases = ut.laminator(geos=dft.geos_all, ps=[2,3,4,5], verbose=True)
-    cases = ut.laminator(geos=dft.geos_all, ps=[1, 2, 3, 4, 5], verbose=True)
+    cases = ut.laminator(geos=dft.geos_all, ps=[2,3,4,5], verbose=True)
+    ##cases = ut.laminator(geos=dft.geos_all, ps=[1, 2, 3, 4, 5], verbose=True)
 
     # Tests for LaminateModel prints
     def test_LaminateModel_print1(self):
