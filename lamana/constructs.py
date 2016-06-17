@@ -4,7 +4,6 @@
 # Laminate() : pandas objects including laminate dimensions and calculations
 
 import logging
-import traceback
 import itertools as it
 import collections as ct
 
@@ -13,7 +12,7 @@ import pandas as pd
 
 from lamana import theories
 from lamana.utils import tools as ut
-from lamana.lt_exceptions import IndeterminateError
+from lamana.lt_exceptions import IndeterminateError, ModelError
 
 # =============================================================================
 # STACK -----------------------------------------------------------------------
@@ -114,8 +113,8 @@ class Stack(object):
         A `Geometry` object has a .geometry attribute returning a namedtuple of
         laminae thicknesses labeled:
 
-        - ['outer', 'inner', 'middle', 'symmetric']        # symmetry convention
-        - ['outer', 'inner', 'middle']                     # general conventions
+        - ['outer', 'inner', 'middle', 'symmetric']                  # symmetry convention
+        - ['outer', 'inner', 'middle']                               # general conventions
 
         This function makes a generator that checks for symmetry, then iterates
         forward and backward over the Geometry tuple ("unfolding" the tuple).
@@ -148,7 +147,7 @@ class Stack(object):
          ('outer', 400.0)]
 
         '''
-        def get_decoded():                                 # procedure
+        def get_decoded():                                           # procedure
             '''Iterate forward and backward for each type of layer.'''
             # Forward: outer, inner_i, middle ...
             for ltype, thickness in listify_layer(Geometry):
@@ -164,16 +163,16 @@ class Stack(object):
                 for layer_ in process_layer(ltype, thickness, reverse=True):
                     yield layer_
 
-        def listify_layer(Geometry):                       # pure function 1
+        def listify_layer(Geometry):                                 # pure function 1
             '''Return a converted Geometry namedtuple to a list of tuples; pops symmetric entry'''
             layers = list(Geometry.geometry._asdict().items())
-            if Geometry.is_symmetric:                      # clean up last element; see namedtuple of symmetric Geometry
+            if Geometry.is_symmetric:                                # clean up last element; see namedtuple of symmetric Geometry
                 layers.pop()
                 '''Add to verbose mode.'''
                 #print('Symmetry detected in Geometry object.  Conforming to General Convention...')
             return layers
 
-        def process_layer(ltype, thickness, reverse=False):        # pure function 2
+        def process_layer(ltype, thickness, reverse=False):          # pure function 2
             '''Return items from inner_i thickness list and "unfold" Geometry stack.
             Reverse inner_i list if set True.'''
             if isinstance(thickness, list) & (reverse is False):     # parse inner_i list for forward iteration
@@ -245,18 +244,18 @@ class Stack(object):
         }
 
         StackTuple = ct.namedtuple('StackTuple', ['order', 'nplies', 'name', 'alias'])
-        order = ct.defaultdict(list)                       # subs empty {}
+        order = ct.defaultdict(list)                                 # subs empty {}
 
         '''Is there a way to replace this nested counter with something pythonic?'''
-        layer_ = 0                                         # nested counter
+        layer_ = 0                                                   # nested counter
         for (ltype, thickness) in decoded:
             #print(ltype, thickness)
             # Exclude Zero layers from the Stack
             if thickness != 0.0:
-                layer_ += 1                                # updates only for non-zero thickness laminae
-                order[layer_].append(ltype)                # adds tuple elements into the defaultdicts list
-                order[layer_].append(thickness)            # ...
-        nplies = layer_                                    # updates, but last layer_ is retained in nplies
+                layer_ += 1                                          # updates only for non-zero thickness laminae
+                order[layer_].append(ltype)                          # adds tuple elements into the defaultdicts list
+                order[layer_].append(thickness)                      # ...
+        nplies = layer_                                              # updates, but last layer_ is retained in nplies
         name = '{0}{1}'.format(nplies, '-ply')
         if nplies in alias_dict.keys():
             alias = alias_dict[nplies]
@@ -316,8 +315,8 @@ class Stack(object):
             #print('material index:', ind)
             #print('materials:', material)
             clean_values = []
-            clean_values.extend(stack[ind])                # take extant stack
-            clean_values.append(material)                  # add new value
+            clean_values.extend(stack[ind])                          # take extant stack
+            clean_values.append(material)                            # add new value
             stack[ind] = clean_values
 
             if ind == nplies:
@@ -329,12 +328,13 @@ class Stack(object):
     def stack_to_df(cls, stack):
         '''Return a DataFrame of converted stacks with materials (list of dicts).'''
         df = pd.DataFrame(stack).T
-        df.reset_index(level=0, inplace=True)              # reset index; make new column
-        df.columns = ['layer', 'type', 't(um)', 'matl']    # rename columns
+        df.reset_index(level=0, inplace=True)                        # reset index; make new column
+        df.columns = ['layer', 'type', 't(um)', 'matl']              # rename columns
         recolumned = ['layer', 'matl', 'type', 't(um)']
-        df = ut.set_column_sequence(df, recolumned)        # uses ext. f(x)
-        df[['t(um)']] = df[['t(um)']].astype(float)        # reset numeric dtypes
+        df = ut.set_column_sequence(df, recolumned)                  # uses ext. f(x)
+        df[['t(um)']] = df[['t(um)']].astype(float)                  # reset numeric dtypes
         return df
+
 
 # =============================================================================
 # LAMINATES -------------------------------------------------------------------
@@ -433,17 +433,14 @@ class Laminate(Stack):
     def __init__(self, FeatureInput):
         super(Laminate, self).__init__(FeatureInput)
 
-        # TODO: Temporary.  Remove and change warning to hasattr in handshake
-        # _type_cache not needed; try deprecate, but somehow remind is available
-        # Reminders
         self._type_cache = []
-        self.LMFrame = []                                            # df object; modded stack
 
         # Laminate Objects
         self.Snapshot = self._build_snapshot()                       # df object; stack
         self._primitive = self._build_primitive()                    # phase 1
         self.LFrame = self._build_LFrame()                           # phase 1; df of IDs; formerly Laminate_
         self._frame = self.LFrame                                    # general accessor
+
 
     def __repr__(self):
         return '<lamana {} object ({}), p={}>'.format(
@@ -559,7 +556,6 @@ class Laminate(Stack):
         #print('nplies: {}, p: {}, t_total (m): {}'.format(nplies, p, t_total))
 
         ##df = self.LFrame.copy()
-        # NOTE: primitive not copied, so if called, will give an LFrame
         df = self._primitive
 
         # WRANGLINGS --------------------------------------------------------------
@@ -768,8 +764,6 @@ class Laminate(Stack):
         #print(stack_types)
         abbrev = [letters[0][0].upper()                              # use if type_cache is ndarray
                   for letters in self._type_cache]                   # easier to see
-        # TODO: clean up with logging
-        ##print(self._type_cache)
         assert self._type_cache.tolist() == stack_types, \
             'Lamina mismatch with stack types, \
                   \n {} instead of \n {}'.format(self._type_cache, stack_types)
@@ -983,16 +977,19 @@ class Laminate(Stack):
 # =============================================================================
 # Create a LaminateModel
 
+#from lamana import theories
 
 class LaminateModel(Laminate):
-    '''Create a `LaminateModel` object.
+    '''Create a `LaminateModel` object or raise an exception.
 
     This class inherits from `Laminate` and `Stack`. A `FeatureInput` is passed
     in from a particular "Feature" module and exchanged between `constructs` and
     `theories` modules.
 
     Native object:
-    - `LMFrame` : `LFrame` w/Dimensional and Data variables via `theories.Model` data.
+    - `LMFrame` : an `LFrame` with Dimensional and Data variables via
+    `theories.<model>` calculations.  This DataFrame is either updated
+    or not.
 
     Finally this class builds a `LamainateModel` object, merging the Laminate
     data with the Model data defined by an author in a separate `models` module;
@@ -1028,6 +1025,10 @@ class LaminateModel(Laminate):
     theories.handshake : gives LFrame data, gets LMFrame back
     models : directory containing package models
 
+    Raises
+    ------
+    ModelError : for issues applying the updated calculations to LaminateModel
+
     Examples
     --------
     >>> # From Scratch
@@ -1055,6 +1056,7 @@ class LaminateModel(Laminate):
     def __init__(self, FeatureInput, **kwargs):
         super(LaminateModel, self).__init__(FeatureInput)
         # Adopts Laminate and Stack attributes also
+        ##self.LMFrame = None
         self.LMFrame = self._build_LMFrame(**kwargs)
         self._frame = self.LMFrame                         # accessor
 
@@ -1069,29 +1071,22 @@ class LaminateModel(Laminate):
     def _build_LMFrame(self, **kwargs):
         '''Update `LaminateModel` DataFrame and `FeatureInput`.
 
-        - populates stress data calculations from the selected model.
-        - may add extra keys to `FeatureInput`, e.g. 'Globals'
-
         Tries to update `LaminateModel`. If an exception is raised (on the model
         side), no update is made, and the Laminate (without Data columns) is set
         as the default `LFrame`; this is a "rollback."
 
+        - populates stress data calculations from the selected model.
+        - may add extra keys to `FeatureInput`, e.g. 'Globals'
+
         '''
-        # TODO: Remove; raise Exception if not able;; let Case handle rollback
         try:
-            # Pass in the pre-updated object
+            # Pass in the pre-updated LaminateModel object; no LMFrame yet
             LMFrame, self.FeatureInput = theories.handshake(self, **kwargs)
             return LMFrame
-
         except(IndeterminateError) as e:
-            '''Improve selecting exact Exceptions.'''
-            ##if err in (AttributeError, ValueError, ZeroDivisionError):
-            logging.warn(
-                'The model raised an exception. LaminateModel not updated.'
-                'LMFrame defaulting to LFrame.'
+            raise ModelError(
+                'An error was detected while updating {}.'.format(self.__class__.__name__)
             )
-            logging.debug(traceback.format_exc())
-            return self.LFrame
 
     # Properties --------------------------------------------------------------
     @property
