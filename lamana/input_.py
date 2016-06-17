@@ -5,6 +5,7 @@
 # flake8 input_.py --ignore=E265, E501, N803, N806, N802, N813, E133
 
 import re
+import logging
 import itertools as it
 import collections as ct
 
@@ -33,7 +34,7 @@ def tokenize_geostring(geo_string):
     # Prepare string
     geo_string = geo_string.upper()                        # auto uppercase
     geo_string = geo_string.replace(' ','')                # auto whitespace strip
-    
+
     # Return tokens
     tokens = geo_string.split('-')
     return tokens
@@ -706,7 +707,8 @@ class BaseDefaults(object):
         except(KeyError):
             # Un-nested dict (Quick Form), convert, then assign
             # Assumes Quick Form; attempts to convert
-            print('Converting mat_props to Standard Form.')
+            ##print('Converting mat_props to Standard Form...')
+            logging.info('Converting mat_props to Standard Form...')
             dict_prop = cls._to_standard_dict(mat_props)
             #dict_prop = la.distributions.Case._to_standard_dict(mat_props)
         #print(dict_prop)
