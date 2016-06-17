@@ -8,6 +8,7 @@ import os
 import importlib
 import logging
 import tempfile
+import traceback
 import warnings
 import collections as ct
 import itertools as it
@@ -20,6 +21,7 @@ import matplotlib.pyplot as plt
 import lamana as la
 from lamana.input_ import BaseDefaults
 from lamana.utils import tools as ut
+from lamana.lt_exceptions import ModelError
 
 bdft = BaseDefaults()
 
@@ -300,13 +302,18 @@ class Case(object):
                     '''Is there a way to save a general FI for the Case?'''
                     # TODO: accept kwargs
                     #yield la.constructs.Laminate(FeatureInput)
-                    yield la.constructs.LaminateModel(FeatureInput)
-
-                    # TODO: handle laminate rollback here instead
-
-            # DEPRECATED AttributeError exception.
+                    try:
+                        yield la.constructs.LaminateModel(FeatureInput)
+                    except(ModelError) as e:
+                        logging.warn(
+                            'The model raised an exception. LaminateModel not updated.'
+                            ' Rolling back LMFrame to LFrame...'
+                        )
+                        logging.debug(traceback.format_exc())
+                        yield la.constructs.Laminate(FeatureInput)
+        # DEPRECATED AttributeError exception.
         self.LaminateModels = list(get_LaminateModels(geo_strings))
-        print('User input geometries have been converted and set to Case.')
+        logging.info('User input geometries have been converted and set to Case.')
 
     # TODO: get ipython directives working to plot figures from docstrings.
     # TODO: emulate pandas, return an mpl axes instead of None; change test
@@ -505,7 +512,7 @@ class Case(object):
                 ##t_total = LM.total * 1e3                   # (in mm)
                 geo_string = LM.Geometry.string
                 FI = LM.FeatureInput
-                data_df = LM.LMFrame
+                data_df = LM.frame
                 converted_FI = ut.convert_featureinput(FI)
                 reordered_FI = ut.reorder_featureinput(converted_FI, order)
 
@@ -619,7 +626,7 @@ class Case(object):
         # TODO Convert to logging
         #logging.INFO('Accessing frames method in self.__class__.__name__ ...')
         print('Accessing frames method.')
-        return list(LM.LMFrame for LM in self.LaminateModels)
+        return list(LM.frame for LM in self.LaminateModels)
 
     @property
     def LMs(self):
@@ -1232,4 +1239,4 @@ class Cases(ct.MutableMapping):
         #logging.INFO('Accessing frames method in self.__class__.__name__ ...')
         print('Accessing frames method.')
         cases = self
-        return list(LM.LMFrame for case in cases for LM in case.LMs)
+        return list(LM.frame for case in cases for LM in case.LMs)
