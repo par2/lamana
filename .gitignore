@@ -81,6 +81,12 @@ pip-delete-this-directory.txt
 # =======
 _archive
 
+
+# Profiling
+# =========
+*.prof
+pycallgraph*.png
+
 # ====================================================
 
 
