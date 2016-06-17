@@ -866,7 +866,7 @@ def export(L_, overwrite=False, prefix=None, suffix=None, order=None,
         # NOTE: removed default w_ prefix; check the control and other uses to maintain coding
         # TODO: rename legacy files with "l_"
         ###
-        if isinstance(L_, la.constructs.LaminateModel) or hasattr(L_, 'LMFrame'):
+        if hasattr(L_, 'LMFrame'):
             kind = 'laminatemodel'
         else:
             kind = 'laminate'
