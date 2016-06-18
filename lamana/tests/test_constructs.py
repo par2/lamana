@@ -1444,7 +1444,6 @@ class TestLaminateModel():
             expected = [None] * len(actual)
             nt.assert_equal(actual, expected)
 
-#import inspect
 
 class TestDecoupledLaminateModel():
     '''Contain test from the Decouple Branch.'''
@@ -1458,7 +1457,11 @@ class TestDecoupledLaminateModel():
         'Poissons': {'HA': 0.25, 'PSu': 0.33}}
     }
 
-    S_attrs = [name for name, obj in inspect.getmembers(st) if not name.startswith('__')]
+    S = la.constructs.Stack(FeatureInput)
+    L = la.constructs.Laminate(FeatureInput)
+    LM = la.constructs.LaminateModel(FeatureInput)
+
+    S_attrs = [name for name, obj in inspect.getmembers(S) if not name.startswith('__')]
     L_attrs = [name for name, obj in inspect.getmembers(L) if not name.startswith('__')]
     LM_attrs = [name for name, obj in inspect.getmembers(LM) if not name.startswith('__')]
 
@@ -1467,7 +1470,7 @@ class TestDecoupledLaminateModel():
         '''Verify error is raised if p=1; INDET is detected.  LaminateModel not updated.'''
         FeatureInput = self.FeatureInput.copy()
         FeatureInput['Parameters']['p'] = 1
-        actual = LaminateModel(FeatureInput)
+        actual = la.constructs.LaminateModel(FeatureInput)
 
 #     @nt.raises(OSError)
 #     def test_LaminateModel_write_error(self):
