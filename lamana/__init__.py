@@ -1,4 +1,7 @@
 # -----------------------------------------------------------------------------
+'''The main init file that stores the package version number.'''
+# __version__ is used by find_version() in setup.py
+
 import lamana.input_
 import lamana.distributions
 import lamana.constructs
