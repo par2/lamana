@@ -7,9 +7,14 @@
 
 An extensible Python package for laminate analysis
 
+
+![lamana](./docs/_images/demo_plot2.png)
+
+
+
 ## Installation
 
-Install [anaconda](https://www.continuum.io/downloads), then simply run:
+Install [Anaconda](https://www.continuum.io/downloads), then simply run:
 
     > conda install numpy pandas matplolib
     > pip install lamana
