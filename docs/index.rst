@@ -15,24 +15,27 @@ analysis and visualization.
 
 .. sidebar:: What's New in LamAna
 
-   - appveyor builds (support on Windows)
+   - Appveyor builds (support on Windows)
+   - Speed up readthedocs builds
+   - +20% improved coverage
+   - abstractmethods for BaseModel hook method
+   - Dashboards and excel export support
 
-LamAna enables users to **calculate**/**export**/**analyze** and
-**author** custom models based on laminate theory.  *Feature modules*  can be
-used to plot stress distributions, analyze thickessness effects and
+LamAna enables users to **calculate**/**export**/**analyze** data and
+**author** custom models based on laminate theory.  *Feature modules*  are used to plot stress distributions, analyze thickessness effects and
 predict failure trends.
 
 User Benefits
 -------------
 
-The primary benefits to users is an scientific package that:
+The primary benefits to users is an scientific package with these characteristics:
 
--  **Simplicity**: given a model and parameters, analysis begins with
-   three lines of code
--  **Visualization**: plotting and physical representations
--  **Analysis**: fast computational analysis using a Pandas backend
+-  **Simplicity**: given a model and parameters, analysis can start with
+   three simple lines of code
+-  **Visualization**: plotting distributions and physical representations
+-  **Analysis**: fast computational analyses using a Pandas backend
 -  **Extensibility**: anyone with a little Python knowledge can
-   implement custom laminate models
+   implement custom laminate models; otherwise, it is easy to learn
 -  **Speed**: data computed, plotting and exported for dozens of
    configurations within seconds
 
