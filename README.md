@@ -1,17 +1,22 @@
 # LamAna
 
 [![PyPI version](https://badge.fury.io/py/lamana.svg)](https://badge.fury.io/py/lamana)
-[![Travis branch](https://img.shields.io/travis/par2/lamana/develop.svg)](https://github.com/par2/lamana/tree/develop)
-[![AppVeyor branch](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true)](https://ci.appveyor.com/project/par2/lamana)
-[![codecov.io](https://codecov.io/github/par2/lamana/coverage.svg?branch=develop)](https://codecov.io/github/par2/lamana?branch=develop)
-
+[![Travis](https://img.shields.io/travis/par2/lamana/develop.svg)](https://github.com/par2/lamana/tree/master)
+[![AppVeyor](https://ci.appveyor.com/api/projects/status/github/gruntjs/grunt?branch=master&svg=true)](https://ci.appveyor.com/project/par2/lamana)
+[![codecov.io](https://codecov.io/github/par2/lamana/coverage.svg?branch=develop)](https://codecov.io/github/par2/lamana?branch=master)
 
 An extensible Python package for laminate analysis
 
+
+![lamana](./docs/_images/demo_plot2.png)
+
+
+
 ## Installation
 
-Install [anaconda](https://www.continuum.io/downloads), then simply run:
+Install [Anaconda](https://www.continuum.io/downloads), then simply run:
 
-    $ pip install lamana
+    > conda install numpy pandas matplolib
+    > pip install lamana
 
-See the [documentation](https://lamana.readthedocs.org) for alternative installation methods.
+See the [documentation](http://lamana.readthedocs.io/en/stable/installation2.html) for alternative installation methods.
