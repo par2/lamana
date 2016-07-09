@@ -68,7 +68,9 @@ setup(
     install_requires=[
         'matplotlib',
         'pandas',
-        'numpy'
+        'numpy',
+        'openpyxl',
+        'six',
     ],
     keywords=['laminate analysis', 'visualization'],
     license='BSD',

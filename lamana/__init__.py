@@ -11,7 +11,7 @@ import lamana.output_
 
 
 __title__ = 'lamana'
-__version__ = '0.4.12-dev'                                # PEP 440 style
+__version__ = '0.4.12'                                # PEP 440 style
 __author__ = 'P. Robinson II'
 __license__ = 'BSD'
 __copyright__ = 'Copyright 2015, P. Robinson II'
