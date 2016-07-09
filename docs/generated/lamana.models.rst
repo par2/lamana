@@ -1,6 +1,13 @@
 lamana.models package
 =====================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    lamana.models.fixtures
+
 Submodules
 ----------
 

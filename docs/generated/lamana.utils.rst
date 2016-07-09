@@ -4,6 +4,22 @@ lamana.utils package
 Submodules
 ----------
 
+lamana.utils.config module
+--------------------------
+
+.. automodule:: lamana.utils.config
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+lamana.utils.plottools module
+-----------------------------
+
+.. automodule:: lamana.utils.plottools
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 lamana.utils.references module
 ------------------------------
 

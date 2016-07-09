@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
 
     lamana.models
+    lamana.tests
     lamana.utils
 
 Submodules
