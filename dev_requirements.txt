@@ -1,87 +1,69 @@
-alabaster==0.7.7
-Babel==2.2.0
-backports-abc==0.4
-backports.ssl-match-hostname==3.5.0.1
-certifi==2015.11.20.1
-colorama==0.3.6
+# This file includes pins propagated from requirements.txt and its sub-dependencies.
+# This file merged of py27 and py35 frozen requirements.txt files.
+# This file was compared to existing dev_requirements.txt for manual additions.
+# Single plus (#+) indicates manual additions from orig. dev_req.
+# Double plus (#++) indicates py27 additions only.
+# ? Watch, found but potentially outdated or irrelevant; possible deprecation
+# Commented lines are deprecations to avoid breakage in CI
+# NOTE: Manual edits from original are unlinked, thus not updated from req.
+
+alabaster==0.7.8
+Babel==2.3.4
+backports-abc==0.4                                         #++
+backports.shutil-get-terminal-size==1.0.0                  #++
+#backports.ssl-match-hostname==3.5.0.1                     #+ not used in py27 or py35
+certifi==2016.2.28                                         #++
+colorama==0.3.7
+configparser==3.5.0                                        #++
 cycler==0.10.0
-decorator==4.0.9
+decorator==4.0.10
 docutils==0.12
-#functools32==3.2.3.post2                         # backport for Python 2.7 only
+entrypoints==0.2.2
+et-xmlfile==1.0.1
+#functools32==3.2.3.post2                                   #++ backport for python 2.7 only
+imagesize==0.7.1
 ipykernel==4.2.2
-ipython==4.1.1
+ipython==5.0.0
 ipython-genutils==0.1.0
+jdcal==1.2
 Jinja2==2.8
 jsonschema==2.5.1
-jupyter-client==4.1.1
-jupyter-core==4.0.6
+jupyter-client==4.3.0
+jupyter-core==4.1.0
 MarkupSafe==0.23
 matplotlib==1.5.1
-mistune==0.7.1
-nbconvert==4.1.0
+mistune==0.7.3
+nbconvert==4.2.0
 nbformat==4.0.1
 nbsphinx==0.2.2
 nose==1.3.7
-notebook==4.0.6
+notebook==4.2.0
 numpy==1.10.4
 numpydoc==0.5
-openpyxl==2.3.2                                  # for pandas to_excel()
+openpyxl==2.3.2                                            # for pandas to_excel()
 pandas==0.18.0
-path.py==8.1.2
-pickleshare==0.6
-pkginfo==1.2.1
-Pygments==2.1.1
-pyparsing==2.1.0
-python-dateutil==2.4.2
-pytz==2015.7
-pyzmq==15.2.0
-requests==2.9.1
-requests-toolbelt==0.6.0
-runipy==0.1.5
+pathlib2==2.1.0                                            #++
+pickleshare==0.7.3
+#pkginfo==1.2.1                                             #+? not used in py27 or py35
+prompt-toolkit==1.0.3
+Pygments==2.1.3
+pyparsing==2.1.5
+python-dateutil==2.5.3
+pytz==2016.6.1
+pyzmq==15.3.0
+requests==2.9.1                                            #+? needs update to >=2.10.0
+requests-toolbelt==0.6.0                                   #+? needs update to >=0.6.2
+#runipy==0.1.5                                              #+? no longer used
 simplegeneric==0.8.1
-singledispatch==3.4.0.3
+singledispatch==3.4.0.3                                    #++
 six==1.10.0
 snowballstemmer==1.2.1
-Sphinx==1.3.5
-sphinx-rtd-theme==0.1.9
-tornado==4.3
-traitlets==4.1.0
-twine==1.6.5
-wheel==0.24.0
-xlrd==0.9.3                                      # for pandas ExcelFile 
-
-# ======================
-# REQUIREMENTS REFERENCE
-# ======================
-
-# Install requirements
-# ====================
-# matplotlib, nose, notebook, numpy, pandas
-
-# Build requirements
-# ==================
-# cycler, pyparsing, pkginfo, python-dateutil
-# pytz, requests, requests-toolbelt, six
-# wheel, setuptools, twine, pip, conda
-
-# Jupyter requirements
-# ====================
-# decorator, functools32, ipykernel, ipython
-# ipython-genutils, ipywidgets, Jinja2, jsonschema
-# jupyter, jupyter-client, jupyter-console, jupyter-core
-# MarkupSafe, mistune, nbconvert, nbformat, path.py
-# pickleshare, Pygments, pyzmq, qtconsole
-# simplegeneric, singledispatch, tornado, traitlets
-# backports-abc, backports.ssl-match-hostname, certifi
-
-# RTD requirements
-# ================
-# nbsphinx, ipykernel, numpydoc
-
-# Test requirements
-# =================
-# coverage, nose-cov
-
-# Panadas ExcelWriter
-# ===================
-# openpyxl, xlrd
+Sphinx==1.4.5
+sphinx-rtd-theme==0.1.9                                    #+? needs update to >=0.1.10a0
+tornado==4.4
+traitlets==4.2.2
+twine==1.6.5                                               #+? needs update to >=1.7.4
+wcwidth==0.1.7
+wheel==0.24.0                                              #+? needs update to >=0.29.0
+win-unicode-console==0.5
+xlrd==0.9.3                                                # for pandas ExcelFile
