@@ -5,9 +5,10 @@ dependencies:
 - numpy
 - openpyxl
 - six
-- pip                                                      # try unpinned
+- ipykernel                                                # moved to conda 0.4.13-dev
+- sphinx_rtd_theme                                         # added 0.4.13-dev
+- pip:                                                     # unpinned 0.4.13-dev
   - nbsphinx
-  - ipykernel
   - numpydoc
 #  - nbsphinx==0.2.2
 #  - ipykernel==4.2.2

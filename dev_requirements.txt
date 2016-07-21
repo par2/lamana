@@ -59,7 +59,7 @@ singledispatch==3.4.0.3                                    #++
 six==1.10.0
 snowballstemmer==1.2.1
 Sphinx==1.4.5
-sphinx-rtd-theme==0.1.9                                    #+? needs update to >=0.1.10a0
+#sphinx-rtd-theme==0.1.9                                    #+? added in docs yaml; needs update to >=0.1.10a0
 tornado==4.4
 traitlets==4.2.2
 twine==1.6.5                                               #+? needs update to >=1.7.4
