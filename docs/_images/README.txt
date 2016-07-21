@@ -1,2 +1,3 @@
 - Store old, numbered files in _archive
 - Avoid numbering updated files.  Preserves links in notebooks when updating.
+- Use underscores to avoid link breakage in sphinx
