@@ -1,11 +1,14 @@
 name: lamana_docs
 dependencies:
-- matplotlib                          # seems needed for sphinx on rtd
-- pandas                              # speeds up build 
+- matplotlib                                               # seems needed for sphinx on rtd
+- pandas                                                   # speeds up build
 - numpy
 - openpyxl
 - six
-- pip
-  - nbsphinx==0.2.2
-  - ipykernel==4.2.2
-  - numpydoc==0.5
+- pip                                                      # try unpinned
+  - nbsphinx
+  - ipykernel
+  - numpydoc
+#  - nbsphinx==0.2.2
+#  - ipykernel==4.2.2
+#  - numpydoc==0.5
