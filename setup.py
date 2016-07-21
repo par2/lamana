@@ -70,6 +70,7 @@ setup(
         'pandas',
         'numpy',
         'openpyxl',
+        'xlrd',
         'six',
     ],
     keywords=['laminate analysis', 'visualization'],
