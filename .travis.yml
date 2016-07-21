@@ -2,7 +2,7 @@
 # numpy, pandas and matplotlib are required dependencies; care is needed
 # in improving build time and reproducibilty.
 
-sudo: false                                                 # works w/Docker
+sudo: false                                                # works w/Docker
 language: python
 python:
   - "2.7"
@@ -16,7 +16,7 @@ python:
 notifications:
   email: false
 
-# Necessary packages for building numpy; turned off for now sincr added by conda
+# Necessary packages for building numpy; turned off for now since conda adds it
 #cache: apt
 #addons:
 #  apt:
@@ -26,35 +26,34 @@ notifications:
 #    - liblapack-dev
 #    - gfortran
 
-# Setup conda
+# Setup Miniconda
 before_install:
-  # Do this conditionally since it saves downloading time if the version is the same.
+  # Do this conditionally since it saves download time if the version is the same.
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
       wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
     else
       wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
     fi
-    ##- chmod +x miniconda.sh                                # release permissions
-  - bash miniconda.sh -b -p $HOME/miniconda                  # assign conda program to HOME dir
-  - export PATH="$HOME/miniconda/bin:$PATH"                  # enable `conda` command
-  - hash -r                                                  # reset links
-  - conda config --set always_yes yes --set changeps1 no     # say yes to prompts
-  - conda update -q conda                                    # update since mini lags behind conda; say "yes"
+    ##- chmod +x miniconda.sh                              # release permissions
+  - bash miniconda.sh -b -p $HOME/miniconda                # assign conda program to HOME dir
+  - export PATH="$HOME/miniconda/bin:$PATH"                # enable `conda` command
+  - hash -r                                                # reset links
+  - conda config --set always_yes yes --set changeps1 no   # say yes to prompts
+  - conda update -q conda                                  # update since mini lags behind conda; say "yes"
     # Useful for debugging any issues with conda
   - conda info -a
-  # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
+  # The next couple lines fix a crash with multiprocessing on Travis and are not specific to  Miniconda
   ##- rm -rf /dev/shm
   ##- ln -s /run/shm /dev/shm
 
 install:
-  # Pre-building major dependencies with conda (much faster and easier)
-  # Ensure pip and nose will install within the conda env
+  # Pre-build major dependencies with conda (much faster and easier)
+  # Ensure `pip` and `nose` will install within the conda env
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas
   - source activate test-environment
   - pip install coverage codecov nose-cov                  # code coverage; see other projects on how to install w/Miniconda
   ##- python setup.py install
-  # Note: `pip` used inplace of `conda`; reason uncertain (REF 003)
-  # Uses conda's pip on Travis' pip
+  # Uses conda's `pip` instead of Travis' `pip`
   - pip install -r dev_requirements.txt                    # pre-install pinned dependencies
   - pip install .                                          # install source and build/install wheels
   #- "pip install wheel"
@@ -62,7 +61,7 @@ install:
   #- "pip install dist/*.whl"
   - pip list
 
-# Command to run tests
+# Commands to run tests and coverage
 script:
   - nosetests --with-cov --cov lamana
   - ls -al
@@ -70,7 +69,7 @@ script:
   - coverage xml
   - which coverage
 
-# Code Coverage
+# Interact with codecov
 after_success:
   - codecov
 
