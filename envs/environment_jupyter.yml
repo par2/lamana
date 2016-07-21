@@ -1,9 +1,11 @@
 # This file is used to generate a conda environment with minimal dependencies
-# Only jupyter dependencies are included, and the correspoingin python version.
-# Due to backports, absolute pinning is impossible.  So update this file Only as needed.
+# Only `ipykernel` dependencies are included, and the correspoing python version.
+# Due to backports, absolute pinning is impossible.
+# This is a psuedo-pinned file, so update this file only as needed.
 
 # Anaconda 4.2 includes nb_conda_kernels, which auto-installs kernelspecs
-# `conda env update -f environment_jupyter.yaml` make the env and kernalspec
+# Type `conda env update -f environment_jupyter.yaml` to make the env and kernalspec
+# Type `conda env remove -n nbregtest` to remove both
 
 name: nbregtest
 dependencies:
