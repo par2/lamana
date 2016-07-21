@@ -2,6 +2,8 @@
 # Based on default env (curr. Python 2 dependencies)
 # See dev_requirements for frozen deps (used in Travis)
 # Employing the Development Cycle Workflow (0.4.12)
+# Update during Pre-Dev Phase to last successful, unpinned dependency versions
+# Then only add as needed during Development Phase.
 
 # Critical dependencies
 matplotlib==1.5.1
@@ -16,7 +18,7 @@ ipykernel==4.2.2
 numpydoc==0.5
 
 # Pandas requirements
-openpyxl==2.3.2                                   # for pandas to_excel()
+openpyxl==2.3.2                                            # for pandas to_excel()
 
 # Py2/3
-six==1.10.0                                       # metaclass requirements
+six==1.10.0                                                # metaclass requirements

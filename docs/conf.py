@@ -42,7 +42,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
     'sphinx.ext.autosummary',
-	'sphinx.ext.napoleon',
+    'sphinx.ext.napoleon',
     'nbsphinx',
     #'numpydoc',
 ]

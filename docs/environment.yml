@@ -1,5 +1,6 @@
 name: lamana_docs
 dependencies:
+- python=3.5                                               # was installing py27
 - matplotlib                                               # seems needed for sphinx on rtd
 - pandas                                                   # speeds up build
 - numpy
