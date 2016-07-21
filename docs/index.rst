@@ -15,11 +15,8 @@ analysis and visualization.
 
 .. sidebar:: What's New in LamAna
 
-   - Appveyor builds (support on Windows)
-   - Speed up readthedocs builds
-   - +20% improved coverage
-   - abstractmethods for BaseModel hook method
-   - Dashboards and excel export support
+   - Developer Release Cycle Workflow
+   - Shippable (CI for unpinned builds)
 
 LamAna enables users to **calculate**/**export**/**analyze** data and
 **author** custom models based on laminate theory.  *Feature modules*  are used to plot stress distributions, analyze thickessness effects and
