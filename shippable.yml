@@ -3,7 +3,7 @@
 # dev_requirements.txt is removed and dependencies install  from `setup.py`
 # The lastet python version is also tested
 
-sudo: false                                                # works w/Docker
+#sudo: false                                                # works w/Docker
 language: python
 python:
   - "2.7"
@@ -13,9 +13,6 @@ python:
   - "3.5"
   - "3.6-dev"
 
-notifications:
-  email: false
-
 # Setup Miniconda
 before_install:
   # Do this conditionally since it saves download time if the version is the same.
@@ -24,52 +21,26 @@ before_install:
     else
       wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
     fi
-    ##- chmod +x miniconda.sh                              # release permissions
+  ##- chmod +x miniconda.sh                                  # release permissions
   - bash miniconda.sh -b -p $HOME/miniconda                # assign conda program to HOME dir
   - export PATH="$HOME/miniconda/bin:$PATH"                # enable `conda` command
   - hash -r                                                # reset links
   - conda config --set always_yes yes --set changeps1 no   # say yes to prompts
   - conda update -q conda                                  # update since mini lags behind conda; say "yes"
-    # Useful for debugging any issues with conda
+  # Useful for debugging any issues with conda
   - conda info -a
-  # The next couple lines fix a crash with multiprocessing on Travis and are not specific to  Miniconda
-  ##- rm -rf /dev/shm
-  ##- ln -s /run/shm /dev/shm
+
 
 install:
-  # Pre-build major dependencies with conda (much faster and easier)
-  # Ensure `pip` and `nose` will install within the conda env
   - conda create -q -n test-environment2 python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas
   - source activate test-environment2
-  ##- pip install coverage codecov nose-cov                  # code coverage; see other projects on how to install w/Miniconda
-  ##- python setup.py install
-  # Uses conda's `pip` instead of Travis' `pip`
-  ##- pip install -r dev_requirements.txt                    # pre-install pinned dependencies
   - pip install .                                          # install source and build/install wheels
-  #- "pip install wheel"
-  #- "python setup.py bdist_wheel"
-  #- "pip install dist/*.whl"
   - pip list
 
-# Commands to run tests
-# coverage on travis is sufficient and not needed here
 script:
   ##- nosetests --with-cov --cov lamana
   - nosetests lamana
   - ls -al
-  ##- coverage combine
-  ##- coverage xml
-  ##- which coverage
-
-# Interact with codecov
-##after_success:
-  ##- codecov
-
-# Whitelist
-#branches:
-#  only:
-#    - master
-#    - develop
 
 
 # References
@@ -80,3 +51,5 @@ script:
 # (004) Example yaml                        https://github.com/lmjohns3/theanets/blob/master/.travis.yml
 # (005) Example 2 yaml                      http://samueljackson.me/2015/12/12/better-python-travis-config.html
 # (006) Sample codecov w/miniconda          https://github.com/JIC-CSB/jicbioimage.illustrate/blob/master/.travis.yml#L31
+# (007) Shippable yaml config               http://docs.shippable.com/ci_configure/
+# (008) Reads Travis-style                  https://github.com/shippableSamples/sample-python-datastore-appengine/blob/master/shippable.yml
