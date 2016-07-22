@@ -34,8 +34,9 @@ before_install:
 install:
   # Attempt to pull dependencies only from setup.py
 
-  - conda create -q -f -n test-environment2 python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas
+  - conda create -q -n --update test-environment2 python=$TRAVIS_PYTHON_VERSION numpy matplotlib pandas
   - source activate test-environment2
+  - conda install pip nose
   - conda list
   - pip install .                                          # install source and build/install wheels
   - pip list
@@ -56,3 +57,4 @@ script:
 # (006) Sample codecov w/miniconda          https://github.com/JIC-CSB/jicbioimage.illustrate/blob/master/.travis.yml#L31
 # (007) Shippable yaml config               http://docs.shippable.com/ci_configure/
 # (008) Reads Travis-style                  https://github.com/shippableSamples/sample-python-datastore-appengine/blob/master/shippable.yml
+# (009) Flag force install                  https://stackoverflow.com/questions/22597206/broken-matplotlib-installation-conda-update-did-not-work
