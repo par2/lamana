@@ -34,7 +34,7 @@ before_install:
 install:
   # Attempt to pull dependencies only from setup.py
 
-  - conda create -q -n --update-deps test-environment2 python=$TRAVIS_PYTHON_VERSION numpy matplotlib pandas
+  - conda create -q -n test-environment2 --update-deps python=$TRAVIS_PYTHON_VERSION numpy matplotlib pandas
   - source activate test-environment2
   - conda install pip nose
   - conda list
