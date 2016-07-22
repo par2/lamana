@@ -30,13 +30,13 @@ before_install:
   - conda update -q conda                                  # update since mini lags behind conda; say "yes"
   # Useful for debugging any issues with conda
   - conda info -a
-  - conda list
 
 install:
   # Attempt to pull dependencies only from setup.py
 
   - conda create -q -n test-environment2 python=$TRAVIS_PYTHON_VERSION pip nose #numpy matplotlib pandas
   - source activate test-environment2
+  - conda list
   - pip install .                                          # install source and build/install wheels
   - pip list
 
