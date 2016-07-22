@@ -72,11 +72,11 @@ script:
 after_success:
   - codecov
 
-# Whitelist
-#branches:
-#  only:
+ Whitelist
+branches:
+  only:
 #    - master
-#    - develop
+    - develop
 
 
 # References
