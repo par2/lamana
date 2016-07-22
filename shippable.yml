@@ -1,5 +1,5 @@
 # This following script is modified from .travis.yml for a Linux based system
-# This yaml is designed to build using the latest unpinned dependencies.
+# This yaml is designed to build using the latest versions (unpinned) of dependencies.
 # dev_requirements.txt is removed and dependencies install  from `setup.py`
 # The lastet python version is also tested
 
@@ -33,16 +33,14 @@ before_install:
 
 install:
   # Attempt to pull dependencies only from setup.py
-
-  - conda create -q -n test-environment2 python=$TRAVIS_PYTHON_VERSION numpy matplotlib pandas
+  
+  - conda create -q -n test-environment2 python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas
   - source activate test-environment2
-  - conda install pip nose
   - conda list
-  - pip install -U .                                       # install source and build/install wheels
+  - pip install -U .                                       # update-deps to latest version if needed; fixed py33 bug that failed in install latet
   - pip list
 
 script:
-  ##- nosetests --with-cov --cov lamana
   - nosetests lamana
   - ls -al
 
