@@ -34,7 +34,7 @@ before_install:
 install:
   # Attempt to pull dependencies only from setup.py
 
-  - conda create -q -n test-environment2 python=$TRAVIS_PYTHON_VERSION pip nose #numpy matplotlib pandas
+  - conda create -f -n test-environment2 python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas
   - source activate test-environment2
   - conda list
   - pip install .                                          # install source and build/install wheels
