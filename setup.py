@@ -66,9 +66,9 @@ setup(
     # Install latest dependencies; "hands-off" approach
     # Invoke `-r requirements.txt` to install pinned dependencies; "hands-on" approach
     install_requires=[
+        'numpy',
         'matplotlib',
         'pandas',
-        'numpy',
         'openpyxl',
         'xlrd',
         'six',
