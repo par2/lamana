@@ -53,6 +53,7 @@ install:
   - "conda create -q -n test-environment python=%PYTHON_VERSION% pip nose numpy matplotlib pandas"
   - activate test-environment
   #- pip install coverage
+  - conda list
   - pip install -r dev_requirements.txt                    # pre-install pinned dependencies
   - pip install .                                          # install source and build/install wheels
   #- pip install wheel

@@ -54,6 +54,7 @@ install:
   - source activate test-environment
   - pip install coverage codecov nose-cov                  # code coverage; see other projects on how to install w/Miniconda
   ##- python setup.py install
+  - conda list
   # Uses conda's `pip` instead of Travis' `pip`
   - pip install -r dev_requirements.txt                    # pre-install pinned dependencies
   - pip install .                                          # install source and build/install wheels
