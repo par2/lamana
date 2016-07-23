@@ -1,5 +1,5 @@
 # This following script is modified from .travis.yml for a Linux based system
-# This yaml is designed to build using the latest unpinned dependencies.
+# This yaml is designed to build using the latest versions (unpinned) of dependencies.
 # dev_requirements.txt is removed and dependencies install  from `setup.py`
 # The lastet python version is also tested
 
@@ -7,11 +7,16 @@
 language: python
 python:
   - "2.7"
-  - "2.7.11"
-  - "3.3"
+  - "2.7.12"
+  - "3.3"                                                    # unknown bug at begining of dev cycle; wait for excel writers to be solved
   - "3.4"
   - "3.5"
-  - "3.6-dev"
+  - "3.5.2"
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
 
 # Setup Miniconda
 before_install:
@@ -30,15 +35,18 @@ before_install:
   # Useful for debugging any issues with conda
   - conda info -a
 
-
 install:
+  # Attempt to pull dependencies only from setup.py
+
   - conda create -q -n test-environment2 python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas
   - source activate test-environment2
-  - pip install .                                          # install source and build/install wheels
+  - conda list
+  - pip install -U .                                       # update-deps to latest version if needed; fixed py33 bug that failed in install latet
   - pip list
+  # NOTE: the upgrade flag on pip forces updates on deps; this takes a very long time
+
 
 script:
-  ##- nosetests --with-cov --cov lamana
   - nosetests lamana
   - ls -al
 
@@ -53,3 +61,4 @@ script:
 # (006) Sample codecov w/miniconda          https://github.com/JIC-CSB/jicbioimage.illustrate/blob/master/.travis.yml#L31
 # (007) Shippable yaml config               http://docs.shippable.com/ci_configure/
 # (008) Reads Travis-style                  https://github.com/shippableSamples/sample-python-datastore-appengine/blob/master/shippable.yml
+# (009) Flag force install                  https://stackoverflow.com/questions/22597206/broken-matplotlib-installation-conda-update-did-not-work

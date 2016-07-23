@@ -87,9 +87,10 @@ artifacts:
 # configuration for "master" branch
 # build in Release mode and deploy locally
 #-
-#  branches:
-#    only:
-#      - master
+# branches:
+#   only:
+#     - master
+#     - develop
 
 #  configuration: Release
 #  deploy:
