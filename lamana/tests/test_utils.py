@@ -184,29 +184,46 @@ class TestExport():
 
     # Setup -------------------------------------------------------------------
     # TODO: Make a Fixture
-    case = ut.laminator(dft.geos_standard)[0]
-    LM = case.LMs[0]
-    FI = LM.FeatureInput
+    # case = ut.laminator(dft.geos_standard)[0]
+    # LM = case.LMs[0]
+    # FI = LM.FeatureInput
+    L = la.constructs.Laminate(dft.FeatureInput)
+    LM = la.constructs.LaminateModel(dft.FeatureInput)
 
     # Path Munging
     temp_dirpath = tempfile.gettempdir()
-    csv_fpath = os.path.join(
+    csv_fpath_L = os.path.join(
         temp_dirpath, 't_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
     )
-    csv_dash_fpath = os.path.join(
+    csv_dash_fpath_L = os.path.join(
         temp_dirpath, 't_dash_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
     )
-    xlsx_fpath = os.path.join(
+    xlsx_fpath_L = os.path.join(
         temp_dirpath, 't_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.xlsx'
+    )
+    csv_fpath_LM = os.path.join(
+        temp_dirpath, 't_laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+    )
+    csv_dash_fpath_LM = os.path.join(
+        temp_dirpath, 't_dash_laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+    )
+    xlsx_fpath_LM = os.path.join(
+        temp_dirpath, 't_laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0.xlsx'
     )
 
     # Pre-clean directory
-    if os.path.exists(csv_fpath):
-        os.remove(csv_fpath)
-    if os.path.exists(csv_dash_fpath):
-        os.remove(csv_dash_fpath)
-    if os.path.exists(xlsx_fpath):
-        os.remove(xlsx_fpath)
+    if os.path.exists(csv_fpath_L):
+        os.remove(csv_fpath_L)
+    if os.path.exists(csv_dash_fpath_L):
+        os.remove(csv_dash_fpath_L)
+    if os.path.exists(xlsx_fpath_L):
+        os.remove(xlsx_fpath_L)
+    if os.path.exists(csv_fpath_LM):
+        os.remove(csv_fpath_LM)
+    if os.path.exists(csv_dash_fpath_LM):
+        os.remove(csv_dash_fpath_LM)
+    if os.path.exists(xlsx_fpath_LM):
+        os.remove(xlsx_fpath_LM)
 
     # Tests -------------------------------------------------------------------
     # .csv files
@@ -230,7 +247,25 @@ class TestExport():
             logging.info('File has been deleted: {}'.format(dash_fpath))
 
     def test_export_csv_temp2(self):
-        '''Verify write csv files; named tempfile.'''
+        '''Verify write csv files for Laminates; named tempfile.'''
+        try:
+            # Write named tempfiles, verify, then remove
+            data_fpath, dash_fpath = ut.export(
+                self.L, overwrite=True, suffix='.csv', temp=True, keepname=True,
+                delete=False
+            )
+            actual1, actual2 = data_fpath, dash_fpath
+            expected1, expected2 = self.csv_fpath_L, self.csv_dash_fpath_L
+            nt.assert_equals(actual1, expected1)
+            nt.assert_equals(actual2, expected2)
+        finally:
+            os.remove(data_fpath)
+            os.remove(dash_fpath)
+            logging.info('File has been deleted: {}'.format(data_fpath))
+            logging.info('File has been deleted: {}'.format(dash_fpath))
+
+    def test_export_csv_temp3(self):
+        '''Verify write csv files for LamimateModels; named tempfile.'''
         try:
             # Write named tempfiles, verify, then remove
             data_fpath, dash_fpath = ut.export(
@@ -238,7 +273,7 @@ class TestExport():
                 delete=False
             )
             actual1, actual2 = data_fpath, dash_fpath
-            expected1, expected2 = self.csv_fpath, self.csv_dash_fpath
+            expected1, expected2 = self.csv_fpath_LM, self.csv_dash_fpath_LM
             nt.assert_equals(actual1, expected1)
             nt.assert_equals(actual2, expected2)
         finally:
@@ -283,7 +318,7 @@ class TestExport():
         '''
         fname_list = []
         try:
-            baseline = self.csv_fpath
+            baseline = self.csv_fpath_LM
             for i in range(3):
                 # Increment filepath after first loop
                 data_fpath, dash_fpath = ut.export(
@@ -326,7 +361,22 @@ class TestExport():
             logging.info('File has been deleted: {}'.format(workbook_fpath))
 
     def test_export_xlsx_temp2(self):
-        '''Verify write xslx files; named tempfile.'''
+        '''Verify write xslx files for Laminate; named tempfile.'''
+        try:
+            # Write named tempfiles, verify, then remove
+            workbook_fpath, = ut.export(
+                self.L, overwrite=True, suffix='.xlsx', temp=True, keepname=True,
+                delete=False
+            )
+            actual1 = workbook_fpath
+            expected1 = self.xlsx_fpath_L
+            nt.assert_equals(actual1, expected1)
+        finally:
+            os.remove(workbook_fpath)
+            logging.info('File has been deleted: {}'.format(workbook_fpath))
+
+    def test_export_xlsx_temp3(self):
+        '''Verify write xslx files for LaminateModels; named tempfile.'''
         try:
             # Write named tempfiles, verify, then remove
             workbook_fpath, = ut.export(
@@ -334,10 +384,10 @@ class TestExport():
                 delete=False
             )
             actual1 = workbook_fpath
-            expected1 = self.xlsx_fpath
+            expected1 = self.xlsx_fpath_LM
             nt.assert_equals(actual1, expected1)
         finally:
-            os.remove(self.xlsx_fpath)
+            os.remove(workbook_fpath)
             logging.info('File has been deleted: {}'.format(workbook_fpath))
 
     def test_export_xlsx_temp_del1(self):
@@ -372,7 +422,7 @@ class TestExport():
         '''
         fname_list = []
         try:
-            baseline = self.xlsx_fpath
+            baseline = self.xlsx_fpath_LM
             for i in range(3):
                 # Increment filepath after first loop
                 workbook_fpath, = ut.export(
@@ -930,17 +980,17 @@ def test_natural_sort3():
     expected = ['2-ply', '3-ply', '10-ply', 'foo-ply']
     nt.assert_equal(actual, expected)
 
-
-def test_utils_tools_withmeta1():
-    '''Verify the meta class is equivalent to python version variations.'''
-    class MyClassC(ut.with_metaclass(abc.ABCMeta)):
-        pass
-
-    if sys.version_info < (3,):
-        class MyClassA(object):
-            __metaclass__ = abc.ABCMeta
-            pass
-        nt.assert_is(type(MyClassA), type(MyClassC))
+# Deprecate 0._.12
+# def test_utils_tools_withmeta1():
+#     '''Verify the meta class is equivalent to python version variations.'''
+#     class MyClassC(ut.with_metaclass(abc.ABCMeta)):
+#         pass
+#
+#     if sys.version_info < (3,):
+#         class MyClassA(object):
+#             __metaclass__ = abc.ABCMeta
+#             pass
+#         nt.assert_is(type(MyClassA), type(MyClassC))
 
 #     elif sys.version_info >= (3,):
 #         class MyClassB(metaclass=abc.ABCMeta):

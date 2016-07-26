@@ -143,6 +143,22 @@ expected4 = [
 # -----------------------------------------------------------------------------
 
 
+class TestCaseTypes():
+    '''Verify the resulting type when called Case is a LaminateModel (or Laminate).'''
+
+    case0 = la.distributions.Case(load_params, mat_props)
+    case0.apply(['400-200-800'])
+
+    def test_Case_type_LaminateModel1(self):                # added 0.4.12-dev0
+        '''Verify the default output Case object is a LaminateModel.'''
+        actual = isinstance(self.case0.LMs[0], la.constructs.LaminateModel)
+        nt.assert_true(actual)
+
+    # TODO: Add tests for type verification for Laminate
+
+    # TODO: Add test for rollback here
+
+
 # Case Arguments -------------------------------------------------------------
 #  TODO: Convert, organize tests  to LPEP 001.015
 @nt.raises(TypeError)
@@ -154,19 +170,19 @@ def test_Case_arg_empty1():
 @nt.raises(TypeError)
 def test_Case_arg_empty2():
     '''Check raise Exception if not passed load_params; first test.'''
-    case0 = la.distributions.Case(dft.mat_props)
+    case0 = la.distributions.Case(mat_props)
 
 
 @nt.raises(TypeError)
 def test_Case_arg_empty3():
     '''Check raise Exception if not passed mat_props.'''
-    case0 = la.distributions.Case(dft.load_params)
+    case0 = la.distributions.Case(load_params)
 
 
 @nt.raises(ValueError)
 def test_Case_mth_apply_arg_empty1():
     '''Check raise Exception if not passed a geometries.'''
-    case0 = la.distributions.Case(dft.load_params, dft.mat_props)
+    case0 = la.distributions.Case(load_params, mat_props)
     actual = case0.apply()
 
 
@@ -964,6 +980,9 @@ class TestCaseExportMethods():
     case = la.distributions.Case(load_params, mat_props)
     case.apply(['400-[200]-800', '400-[400]-400', '400-[100,100]-800'])
 
+    # TODO: Consider adding a wrapper that checks the number of files is the same
+    # before and after each test is run, else give a warning.  This to check no
+    # stray files remain.
     def test_Case_mtd_to_csv1(self):
         '''Verify number of files written; use tempfiles.'''
         try:
@@ -997,6 +1016,14 @@ class TestCaseExportMethods():
                 logging.info('File has been deleted: {}'.format(data_fpath))
                 logging.info('File has been deleted: {}'.format(dash_fpath))
 
+    def test_Case_mtd_to_csv3(self):
+        '''Verify files are removed if the `delete` keyword is True.'''
+        list_of_tupled_paths = self.case.to_csv(temp=True, delete=True)
+        actual1 = any([os.path.exists(data_fpath) for data_fpath, _ in list_of_tupled_paths])
+        actual2 = any([os.path.exists(dash_fpath) for _, dash_fpath in list_of_tupled_paths])
+        nt.assert_false(actual1)
+        nt.assert_false(actual2)
+
     def test_Case_mtd_to_xlsx1(self):
         '''Verify returns 2 sheets per LamainateModel in the same file; half dashboards.'''
         try:
@@ -1023,6 +1050,11 @@ class TestCaseExportMethods():
             os.remove(result)
             logging.info('File has been deleted: {}'.format(result))
 
+    def test_Case_mtd_to_xlsx3(self):
+        '''Verify files are removed if the `delete` keyword is True.'''
+        workbook_fpath = self.case.to_xlsx(temp=True, delete=True)
+        actual = os.path.exists(workbook_fpath)
+        nt.assert_false(actual)
 
 #------------------------------------------------------------------------------
 # CASES
@@ -1082,8 +1114,10 @@ cases4e = la.distributions.Cases(['400-[150,50]-800'])
 cases5a = la.distributions.Cases(['400-[200]-800', '400-[100,100]-400', '400-[400]-400'])
 
 
+
 # TESTS -----------------------------------------------------------------------
 # Cases Special Methods -------------------------------------------------------
+
 @nt.raises(NotImplementedError)
 def test_Cases_spmthd_set1():
     '''Check __setitem__ is not implemented.'''

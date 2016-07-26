@@ -8,6 +8,7 @@ import os
 import importlib
 import logging
 import tempfile
+import traceback
 import warnings
 import collections as ct
 import itertools as it
@@ -20,6 +21,7 @@ import matplotlib.pyplot as plt
 import lamana as la
 from lamana.input_ import BaseDefaults
 from lamana.utils import tools as ut
+from lamana.lt_exceptions import ModelError
 
 bdft = BaseDefaults()
 
@@ -299,11 +301,19 @@ class Case(object):
                     #print(FeatureInput)
                     '''Is there a way to save a general FI for the Case?'''
                     # TODO: accept kwargs
-                    yield la.constructs.Laminate(FeatureInput)
-
-            # DEPRECATED AttributeError exception.
+                    #yield la.constructs.Laminate(FeatureInput)
+                    try:
+                        yield la.constructs.LaminateModel(FeatureInput)
+                    except(ModelError) as e:
+                        logging.warn(
+                            'The model raised an exception. LaminateModel not updated.'
+                            ' Rolling back LMFrame to LFrame...'
+                        )
+                        logging.debug(traceback.format_exc())
+                        yield la.constructs.Laminate(FeatureInput)
+        # DEPRECATED AttributeError exception.
         self.LaminateModels = list(get_LaminateModels(geo_strings))
-        print('User input geometries have been converted and set to Case.')
+        logging.info('User input geometries have been converted and set to Case.')
 
     # TODO: get ipython directives working to plot figures from docstrings.
     # TODO: emulate pandas, return an mpl axes instead of None; change test
@@ -502,7 +512,7 @@ class Case(object):
                 ##t_total = LM.total * 1e3                   # (in mm)
                 geo_string = LM.Geometry.string
                 FI = LM.FeatureInput
-                data_df = LM.LMFrame
+                data_df = LM.frame
                 converted_FI = ut.convert_featureinput(FI)
                 reordered_FI = ut.reorder_featureinput(converted_FI, order)
 
@@ -527,12 +537,12 @@ class Case(object):
             if temp and keepname:
                 workbook_filepath = ut.rename_tempfile(
                     workbook_filepath, ''.join(['t_', filename, suffix]))
-                logging.info('Data and dashboard written as {} file in: {}'.format(
+                logging.debug('Data and dashboard written as {} file in: {}'.format(
                     suffix, workbook_filepath))
         finally:
             if delete:
                 os.remove(workbook_filepath)
-                logging.info('File has been deleted: {}'.format(workbook_filepath))
+                logging.debug('File has been deleted: {}'.format(workbook_filepath))
             pass
 
         return workbook_filepath
@@ -547,13 +557,15 @@ class Case(object):
             If a trying to set a name not already in the materials list.
 
         '''
-        print('Getting materials...')
+        ##print('Getting materials...')
+        logging.info('Getting materials...')
         return self._materials
 
     @materials.setter
     def materials(self, list_order):
         '''Reset materials order with a list. Change properties index.'''
-        print('Overriding materials order...')
+        ##print('Overriding materials order...')
+        logging.info('Overriding materials order...')
         if set(list_order).issubset(self.mat_props['Modulus'].keys()):
             self._materials = list_order
             self.properties = self.set_properties(list_order)
@@ -607,7 +619,8 @@ class Case(object):
         applied.  Gives a quick view of the stack (as if p = 1).
 
         '''
-        print('Accessing snapshot method.')
+        ##print('Accessing snapshot method.')
+        logging.debug('Accessing snapshot method.')
         return list(LM.Snapshot for LM in self.LaminateModels)
 
     @property
@@ -615,8 +628,9 @@ class Case(object):
         '''Return a list of LaminateModel DataFrames (LMFrames) `Laminate()` class.'''
         # TODO Convert to logging
         #logging.INFO('Accessing frames method in self.__class__.__name__ ...')
-        print('Accessing frames method.')
-        return list(LM.LMFrame for LM in self.LaminateModels)
+        ##print('Accessing frames method.')
+        logging.debug('Accessing frames method.')
+        return list(LM.frame for LM in self.LaminateModels)
 
     @property
     def LMs(self):
@@ -772,14 +786,14 @@ class Cases(ct.MutableMapping):
 
         # Auto import ; given a model, import defaults from models.<model_name>.Defaults()
         try:
-            '''Implement passed in loction of custom models via default_path kw.'''
+            '''Implement passed in location of custom models via default_path kw.'''
             modified_name = ''.join(['.', self.model])     # '.Wilson_LT'
             module = importlib.import_module(modified_name, package='lamana.models')
             dft = module.Defaults()                        # triggers handling parameters
-            # TODO: Add logging.INFO('Using model {}'.format(self.model))
+            logging.debug('Using model {}'.format(self.model))
         except (ImportError):
-            print('User-defined Defaults not found.')
-            # TODO: Add logging.INFO('User-defined Defaults not found.')
+            ##print('User-defined Defaults not found.')
+            logging.warn('User-defined Defaults not found.')
             pass
 
         # Try to set defaults from auto imports, else set whats passed in.
@@ -855,7 +869,8 @@ class Cases(ct.MutableMapping):
             # Hack for now for converting any geo_string in caselets to gen_conven.
             # Move input handling of Cases to input_
             # logging.DEBUG('Caselets not using `combine`.')
-            print('Caselets not using `combine`.')
+            ##print('Caselets not using `combine`.')
+            logging.info('Caselets not using `combine`.')
             # Try to convert all strings
             if isinstance(caselets, list):
                 try:
@@ -951,8 +966,12 @@ class Cases(ct.MutableMapping):
 
         '''
         if isinstance(caselet_, str):
-            print('Single geometry string detected. unique not applied.'
-                  ' See combine=True keyword.')
+            ##print('Single geometry string detected. unique not applied.'
+            ##      ' See combine=True keyword.')
+            logging.info(
+                'Single geometry string detected. unique not applied.'
+                ' See combine=True keyword.'
+            )
             return caselet_
         elif isinstance(caselet_, la.distributions.Case):
             # Extract the list of geometry strings from the case
@@ -982,8 +1001,10 @@ class Cases(ct.MutableMapping):
 
     def __setitem__(self, key, value):
         # As the dict type is custom, setting to a Cases() object is prohibited.
-        raise NotImplementedError('Setting to a Cases() object is prohibited.'
-                                  ' Please reinstantiate Cases() instead.')
+        raise NotImplementedError(
+            'Setting to a Cases() object is prohibited.'
+            ' Please reinstantiate Cases() instead.'
+        )
 
     def __getitem__(self, key):
         ##if isinstance(key, int) and key == -1:
@@ -1141,8 +1162,12 @@ class Cases(ct.MutableMapping):
             #print(caselets)
             '''Add to warning'''
             '''Brittle kw passing if kwargs change; search for general alternative.'''
-            print('One caselet detected.  The Cases() class is designed to plot '
-                  'more than one case. Consider using the Case() class.')
+            ##print('One caselet detected.  The Cases() class is designed to plot '
+            ##      'more than one case. Consider using the Case() class.')
+            logging.info(
+                'One caselet detected.  The Cases() class is designed to plot '
+                'more than one case. Consider using the Case() class.'
+            )
             case = caselets[0]
             ax = case.plot(
                 halfplot=halfplot, normalized=normalized, extrema=extrema,
@@ -1226,7 +1251,7 @@ class Cases(ct.MutableMapping):
 
         '''
         # TODO: Add logging here and in Case()
-        #logging.INFO('Accessing frames method in self.__class__.__name__ ...')
-        print('Accessing frames method.')
+        ##print('Accessing frames method.')
+        logging.debug('Accessing frames method in self.__class__.__name__ ...')
         cases = self
-        return list(LM.LMFrame for case in cases for LM in case.LMs)
+        return list(LM.frame for case in cases for LM in case.LMs)

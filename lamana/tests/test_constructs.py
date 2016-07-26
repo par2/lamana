@@ -2,6 +2,7 @@
 '''Confirm output of general Laminate structure.'''
 # NOTE: Refactoring in 0.4.3c5b led to patching container orders.
 import os
+import inspect
 import logging
 
 import nose.tools as nt
@@ -9,7 +10,7 @@ import pandas as pd
 import numpy as np
 
 import lamana as la
-from lamana.lt_exceptions import IndeterminateError
+from lamana.lt_exceptions import IndeterminateError, ModelError
 from lamana.input_ import BaseDefaults
 from lamana import constructs as con
 from lamana.utils import tools as ut
@@ -103,7 +104,8 @@ Geos_full2 = [Geo1, Geo2, Geo3, Geo4, Geo5, Geo6, Geo7,
 # Decode Geometries
 def test_Stack_decode_1():
     '''Check decoding and unfolding simple geometries.'''
-    unfolded = [con.Stack(Geo).unfolded for Geo in Geos_simple]
+    ##unfolded = [con.Stack(Geo).unfolded for Geo in Geos_simple]
+    unfolded = [con.Stack(bdft.get_FeatureInput(Geo)).unfolded for Geo in Geos_simple]
     actual = unfolded
     expected = [
         # Monolith
@@ -136,7 +138,8 @@ def test_Stack_decode_1():
 
 def test_Stack_decode_2():
     '''Check decoding and unfolding geometries with [inner_i].'''
-    unfolded = [con.Stack(Geo).unfolded for Geo in Geos_inner]
+    ##unfolded = [con.Stack(Geo).unfolded for Geo in Geos_inner]
+    unfolded = [con.Stack(bdft.get_FeatureInput(Geo)).unfolded for Geo in Geos_inner]
     actual = unfolded
     expected = [
         [(400.0, 'outer')[::-1],
@@ -166,7 +169,8 @@ def test_Stack_decode_2():
 
 def test_Stack_decode_3():
     '''Check decoding and unfolding of more geometries.'''
-    unfolded = [con.Stack(Geo).unfolded for Geo in Geos_full]
+    ##unfolded = [con.Stack(Geo).unfolded for Geo in Geos_full]
+    unfolded = [con.Stack(bdft.get_FeatureInput(Geo)).unfolded for Geo in Geos_full]
     actual = unfolded
     expected = [
         [(0.0, 'outer')[::-1],
@@ -232,7 +236,8 @@ def test_Stack_decode_3():
 
 def test_Stack_decode_4():
     '''Checks decoding and unfolding even more geometries.'''
-    unfolded = [con.Stack(Geo).unfolded for Geo in Geos_full2]
+    ##unfolded = [con.Stack(Geo).unfolded for Geo in Geos_full2]
+    unfolded = [con.Stack(bdft.get_FeatureInput(Geo)).unfolded for Geo in Geos_full2]
     actual = unfolded
     expected = [
         [(0.0, 'outer')[::-1],
@@ -334,7 +339,8 @@ def test_Stack_decode_4():
 
 def test_Stack_decode_5():
     '''Check decoding and unfolding of symmetric geometries.'''
-    unfolded = [con.Stack(Geo).unfolded for Geo in Geos_symmetric]
+    ##unfolded = [con.Stack(Geo).unfolded for Geo in Geos_symmetric]
+    unfolded = [con.Stack(bdft.get_FeatureInput(Geo)).unfolded for Geo in Geos_symmetric]
     actual = unfolded
     expected = [
         [(0.0, 'outer')[::-1],
@@ -370,7 +376,8 @@ def test_Stack_decode_5():
 #stack = {layer_ : [thickness, type_ ], ...}
 def test_Stack_identify1():
     '''Check building dicts for simple geometry.'''
-    stacks = [con.Stack(Geo).StackTuple for Geo in Geos_simple]
+    ##stacks = [con.Stack(Geo).StackTuple for Geo in Geos_simple]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple for Geo in Geos_simple]
     actual = stacks
     expected = [
         ({1: [2000.0, 'middle'][::-1]},
@@ -393,7 +400,8 @@ def test_Stack_identify1():
 
 def test_Stack_identify2():
     '''Check building dicts for inner_i geometry.'''
-    stacks = [con.Stack(Geo).StackTuple for Geo in Geos_inner]
+    ##stacks = [con.Stack(Geo).StackTuple for Geo in Geos_inner]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple for Geo in Geos_inner]
     actual = stacks
     expected = [
         ({1: [400.0, 'outer'][::-1],
@@ -424,7 +432,8 @@ def test_Stack_identify2():
 
 def test_Stack_identify3():
     '''Check building dicts for full  geometry.'''
-    stacks = [con.Stack(Geo).StackTuple for Geo in Geos_full]
+    ##stacks = [con.Stack(Geo).StackTuple for Geo in Geos_full]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple for Geo in Geos_full]
     actual = stacks
     expected = [
         ({1: [2000.0, 'middle'][::-1]},
@@ -481,7 +490,8 @@ def test_Stack_identify3():
 
 def test_Stack_identify4():
     '''Check building dicts for full2 geometry.'''
-    stacks = [con.Stack(Geo).StackTuple for Geo in Geos_full2]
+    ##stacks = [con.Stack(Geo).StackTuple for Geo in Geos_full2]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple for Geo in Geos_full2]
     actual = stacks
     expected = [
         ({1: [2000.0, 'middle'][::-1]},
@@ -574,7 +584,8 @@ def test_Stack_identify4():
 
 def test_Stack_identify5():
     '''Check identifying for symmetric geometry.'''
-    stacks = [con.Stack(Geo).StackTuple for Geo in Geos_symmetric]
+    ##stacks = [con.Stack(Geo).StackTuple for Geo in Geos_symmetric]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple for Geo in Geos_symmetric]
     actual = stacks
     expected = [
         ({1: ['middle', 2000.0]},
@@ -604,7 +615,8 @@ def test_Stack_identify5():
 # Test StackTuples
 def test_Stack_identify6():
     '''Check StackTuple attribute access; stack.'''
-    stacks = [con.Stack(Geo).StackTuple.order for Geo in Geos_simple]
+    ##stacks = [con.Stack(Geo).StackTuple.order for Geo in Geos_simple]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple.order for Geo in Geos_simple]
     actual = stacks                                        # StackTuple attr
     expected = [
         {1: ['middle', 2000.0]},
@@ -623,7 +635,8 @@ def test_Stack_identify6():
 
 def test_Stack_identify7():
     '''Check StackTuple attribute access; nplies.'''
-    stacks = [con.Stack(Geo).StackTuple.nplies for Geo in Geos_simple]
+    ##stacks = [con.Stack(Geo).StackTuple.nplies for Geo in Geos_simple]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple.nplies for Geo in Geos_simple]
     actual = stacks                                        # StackTuple attr
     expected = [1, 2, 3, 4]
     nt.assert_equal(actual, expected)
@@ -631,7 +644,8 @@ def test_Stack_identify7():
 
 def test_Stack_identify8():
     '''Check StackTuple attribute access; name.'''
-    stacks = [con.Stack(Geo).StackTuple.name for Geo in Geos_simple]
+    ##stacks = [con.Stack(Geo).StackTuple.name for Geo in Geos_simple]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple.name for Geo in Geos_simple]
     actual = stacks                                        # StackTuple attr
     expected = ['1-ply', '2-ply', '3-ply', '4-ply']
     nt.assert_equal(actual, expected)
@@ -639,7 +653,8 @@ def test_Stack_identify8():
 
 def test_Stack_identify9():
     '''Check StackTuple attribute access; alias.'''
-    stacks = [con.Stack(Geo).StackTuple.alias for Geo in Geos_full]
+    ##stacks = [con.Stack(Geo).StackTuple.alias for Geo in Geos_full]
+    stacks = [con.Stack(bdft.get_FeatureInput(Geo)).StackTuple.alias for Geo in Geos_full]
     actual = stacks                                        # StackTuple attr
     expected = [
         'Monolith', 'Bilayer', 'Trilayer', 'Quadlayer', 'Standard',
@@ -657,7 +672,8 @@ def test_Stack_materials1():
     ##model = 'Wilson_LT'                                    # unused
     ##custom_matls = []                                      # unused
     for Geo in Geos_full2:
-        stack_dict = con.Stack(Geo).StackTuple.order
+        ##stack_dict = con.Stack(Geo).StackTuple.order
+        stack_dict = con.Stack(bdft.get_FeatureInput(Geo)).StackTuple.order
 
         ##con.Stack.add_materials(stack_dict, mat_props_df)
         ##con.Stack.add_materials(stack_dict, mat_props)
@@ -773,8 +789,6 @@ def test_Stack_num_outer1():
 #------------------------------------------------------------------------------
 # LAMINATE
 #------------------------------------------------------------------------------
-'''Tests > 1s are here, likely due to calling constructors.'''
-
 # dft = wlt.Defaults()
 # G = la.input_.Geometry
 # constr = la.constructs.Laminate
@@ -788,13 +802,15 @@ def test_Laminate_print1():
 
     #dft = wlt.Defaults()
     ##dft = ut.Defaults()
+    # TODO: replace with get_FeatureInput
     FI = dft.FeatureInput
     FI['Geometry'] = G(geo_input)
     #FI['Geometry'] = G
 
-    actual = constr(FI).__repr__()
+    # TODO: Replace constr with actual name
+    actual = la.constructs.Laminate(FI).__repr__()
     #actual = la.constructs.Laminate(FI).__repr__()
-    expected = '<lamana LaminateModel object (400.0-[200.0]-800.0), p=5>'
+    expected = '<lamana Laminate object (400.0-[200.0]-800.0), p=5>'
     #print(actual, expected)
     #assert actual == expected
     nt.assert_equal(actual, expected)
@@ -811,16 +827,16 @@ def test_Laminate_print2():
     FI['Geometry'] = G(geo_input)
     #FI['Geometry'] = G
 
-    actual = constr(FI).__repr__()
+    actual = la.constructs.Laminate(FI).__repr__()
     #actual = la.constructs.Laminate(FI).__repr__()
-    expected = '<lamana LaminateModel object (400.0-[200.0]-400.0S), p=5>'
+    expected = '<lamana Laminate object (400.0-[200.0]-400.0S), p=5>'
     #print(actual, expected)
     #assert actual == expected
     nt.assert_equal(actual, expected)
 
-
-# Using laminator -------------------------------------------------------------
-# Tests for Checking that DataFrames Make Sense
+###
+# TODO: Rename following functions and generalize LM or match object (L or LM)
+# Tests for Checking that DataFrames Make Sense -------------------------------
 '''CAUTION: many cases will be loaded.  This may lower performance.'''
 '''Decide to extend laminator for all tests or deprecate.'''
 
@@ -851,16 +867,13 @@ def test_Laminate_sanity1():
     '''Check the first d_ row is 0.'''
     for case in cases.values():
         for LM in case.LMs:
-     ##for LMs in cases.values():
-     ##    for LM in LMs:
             print(LM)
-            df = LM.LMFrame
+            df = LM.frame
             #print(df)
             if (LM.p % 2 != 0) & (LM.nplies > 1):
                 expected = 0
                 actual = df.loc[0, 'd(m)']
                 #print(actual)
-                #assert actual == expected
                 nt.assert_equal(actual, expected)
 
 
@@ -868,17 +881,14 @@ def test_Laminate_sanity2():
     '''Check the last d_ row equals the total thickness.'''
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
             if LM.p > 1:
-                df = LM.LMFrame
+                df = LM.frame
                 t_total = LM.total
                 print(df)
                 expected = t_total
                 '''Find faster way to get last element.'''
                 actual = df['d(m)'][-1::].values[0]        # get last item
-                print(actual)
-                #assert actual == expected
+                #print(actual)
                 nt.assert_equal(actual, expected)
 
 
@@ -887,11 +897,7 @@ def test_Laminate_sanity3():
     cols = ['label', 't(um)', 'h(m)']
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
             if LM.p > 1:
-                ##df = LM.LMFrame                           # unused
-                #print(df)
                 tensile = LM.tensile.reset_index(drop=True)
                 compressive = LM.compressive[::-1].reset_index(drop=True)
                 #print(tensile[cols])
@@ -900,7 +906,6 @@ def test_Laminate_sanity3():
                 #print(LM.name)
                 print(LM.p)
                 #print(LM.LMFrame)
-                #assert tensile[cols] == compressive[cols]
                 ut.assertFrameEqual(tensile[cols], compressive[cols])
 
 
@@ -909,20 +914,15 @@ def test_Laminate_sanity4():
     cols = ['Z(m)', 'z(m)', 'z(m)*']
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
             if LM.p > 1:
-                ##df = LM.LMFrame                           # unused
-                #print(df)
                 tensile = LM.tensile.reset_index(drop=True)
                 compressive = LM.compressive[::-1].reset_index(drop=True)
                 #print(tensile[cols])
                 #print(-compressive[cols])
-                print(LM.Geometry)
+                #print(LM.Geometry)
                 #print(LM.name)
-                print(LM.p)
-                print(LM.LMFrame)
-                #assert tensile[cols] == compressive[cols]
+                #print(LM.p)
+                #print(LM.frame)
                 ut.assertFrameEqual(tensile[cols], -compressive[cols])
 
 
@@ -931,34 +931,29 @@ def test_Laminate_sanity5():
     cols = ['intf', 'k']
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
             if (LM.name == 'Monolith') & (LM.p < 2):
-                df = LM.LMFrame
+                df = LM.frame
                 df_null = pd.DataFrame(index=df.index, columns=df.columns)
                 expected = df_null.fillna(np.nan)
                 actual = df
                 #print(actual[cols])
                 #print(expected[cols])
-                print(LM.Geometry)
+                #print(LM.Geometry)
                 #print(LM.name)
-                print(LM.p)
+                #print(LM.p)
                 ut.assertFrameEqual(actual[cols], expected[cols])
 
 
 def test_Laminate_sanity6():
     '''Check middle d_ is half the total thickness.'''
-    ##cols = ['t(um)']                                       # unused
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
             if (LM.nplies % 2 != 0) & (LM.p % 2 != 0) & (LM.p > 3):
                 print(LM.Geometry)
                 #print(LM.name)
                 print(LM.p)
                 #print(LM.LMFrame)
-                df = LM.LMFrame
+                df = LM.frame
                 #t_total = df.groupby('layer')['t(um)'].unique().sum()[0] * 1e-6
                 #print(t_total)
                 #print(LM.total)
@@ -980,13 +975,10 @@ def test_Laminate_sanity7():
     cols = ['z(m)']
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
-            #print(LM)
             if LM.nplies % 2 == 0:
                 #print(LM)
                 #print(LM.Geometry)
-                df = LM.LMFrame
+                df = LM.frame
                 # Select middle most indices, should be zero
                 halfidx = len(df.index)//2
                 #print(halfidx)
@@ -1001,36 +993,13 @@ def test_Laminate_sanity8():
     '''Check DataFrame length equals nplies*p.'''
     for case in cases.values():
         for LM in case.LMs:
-##     for LMs in cases.values():
-##         for LM in LMs:
-            #print(LM)
-            df = LM.LMFrame
+            df = LM.frame
             actual = df.shape[0]
             length = LM.nplies * LM.p
             expected = length
             #print(actual)
             #print(expected)
-            #assert actual == expected
             nt.assert_almost_equals(actual, expected)
-
-
-# # DEPRECATE: use refactored version that invokes Cases() (0.4.11.dev0)
-# def test_Laminate_sanity9():
-#     '''Check Monoliths, p=1 have positive values.
-
-#     Uses select_frames() to extract a subset of selected cases.
-
-#     '''
-#     cases_selected = ut.select_frames(cases, name='1-ply', ps=[1])
-#     for LMs in cases_selected:
-#         df_numeric = LMs.select_dtypes(include=[np.number])
-#         df = df_numeric
-#         #print(df_numeric)
-#         actual = df_numeric[(df_numeric < 0)]              # catches negative numbers if any
-#         expected = pd.DataFrame(index=df.index, columns=df.columns).fillna(np.nan)
-#         #print(actual)
-#         #print(expected)
-#         ut.assertFrameEqual(actual, expected)
 
 
 def test_Laminate_sanity9_refactored():
@@ -1043,13 +1012,13 @@ def test_Laminate_sanity9_refactored():
     2. Cases iterates over values, i.e. separate cases.
     3. Each case is a Monolith of p=1.
     4. actual is a DataFrame of negative numeric values.  NaN if None found
-    5. expect is a DataFrame with no negative values, i.e. only NaN.
+    5. expected is a DataFrame with no negative values, i.e. only NaN.
 
     '''
     cases_monoliths = la.distributions.Cases(dft.geo_inputs['1-ply'], ps=[1])
     for case in cases_monoliths:
         for psuedoLM in case.LMs:
-            df = psuedoLM.LMFrame
+            df = psuedoLM.frame
             df_numeric = df.select_dtypes(include=[np.number]) # print number columns
             # test = df_numeric[(df_numeric > 0)]                # catches positive numbers if any
             actual = df_numeric[(df_numeric < 0)]              # catches negative numbers if any
@@ -1060,7 +1029,7 @@ def test_Laminate_sanity9_refactored():
             #print(actual)
             #print(expected)
             ut.assertFrameEqual(actual, expected)
-
+###
 
 # Test Exception Handling
 @nt.raises(ZeroDivisionError)
@@ -1068,96 +1037,33 @@ def test_Laminate_internals1():
     '''Check internal function raises ZeroDivisionError if p = 1 is given to _make_internals.'''
     # Function needs a DataFrame to work on
     # Try to feed random DataFrame (LMFrame), random column with p=1
+    # Will rollback to Laminate if p=1
     case1 = ut.laminator(dft.geo_inputs['1-ply'], ps=[1])
     for case_ in case1.values():
         for LM in case_.LMs:
-            df_random = LM.LMFrame
+            df_random = LM.frame
             la.constructs.Laminate._make_internals(df_random, 1, 'k')
 
 
-# Test attributes
-def test_Laminate_attr_max():
-    '''Check the max attribute and maximum stresses.'''
-    for case_ in case.values():
-        for LM in case_.LMs:
-            actual = LM.max_stress
-            d = {
-                0: 0.378731,
-                5: 0.012915,
-                10: 0.151492,
-                14: -0.151492,
-                19: -0.012915,
-                24: -0.378731,
-            }
-            s = pd.Series(d)
-            s.name = 'stress_f (MPa/N)'
-            expected = s
-            #assert actual.all() == expected.all()
-            ut.assertSeriesEqual(actual, expected, check_less_precise=True)
-
-
-def test_Laminate_attr_min1():
-    '''Check the min attribute and minimum stresses.'''
-    for case_ in case.values():
-        for LM in case_.LMs:
-            actual = LM.min_stress
-            d = {
-                4: 0.227238,
-                9: 0.008610,
-                15: -0.008610,
-                20: -0.227238,
-            }
-            s = pd.Series(d)
-            s.name = 'stress_f (MPa/N)'
-            expected = s
-            #assert actual.all() == expected.all()
-            ut.assertSeriesEqual(actual, expected, check_less_precise=True)
-
-
-def test_Laminate_attr_min2():
-    '''Check the min attribute and minimum stresses returns None if no disconts.'''
-    # Monoliths do not have disconts; will use to trigger the return
-    for case in cases.values():
-        actual = [LM.min_stress for LM in case.LMs if LM.alias == 'Monolith']
-        expected = [None] * len(actual)
-        nt.assert_equal(actual, expected)
-
-
-def test_Laminate_attr_extrema():
-    case1 = ut.laminator(dft.geos_full, ps=[5])
-    case2 = ut.laminator(dft.geos_full, ps=[2])
-
-    for case_full, case_trimmed in zip(case1.values(), case2.values()):
-        for LM_full, LM_trimmed in zip(case_full.LMs, case_trimmed.LMs):
-            actual = LM_full.extrema
-            actual.reset_index(drop=True, inplace=True)
-            expected = LM_trimmed.LMFrame
-            #print(actual)
-            #print(expected)
-            ut.assertFrameEqual(actual, expected)
-
-
+# Test properties
 # TODO: Fix static expected
 # TODO: make cases once, and filter from premade cases to save time
-def test_Laminate_attr_isspecial():
-    '''Check the is_special attribute works for different ps.'''
-    expected = [
-        True, True, True, True, True, True, True,
-        False, False, False, False, False, False,
-        False, False, False, False, False
-    ]
-    # Uses Defaults().geos_all
-    # Caution: will grow if more defaults are added; need to amend expected
-    for case in cases.values():
-        # Make a list for each case by p, then assert
-        actual = [LM.is_special for LM in case.LMs]
-        #print(actual)
-        #assert actual == expected
-        nt.assert_equal(actual, expected)
+# TODO: Add or move total and p properties to this section from elsewhere
+# Test properties
+def test_Laminate_prop_frame():
+    '''Check returns DataFrame.'''
+    geo_input = '400-[200]-400S'
+    #FI = bdft.get_FeatureInput(G(geo_input))
+    FI = dft.FeatureInput
+    FI['Geometry'] = G(geo_input)
+
+    L = la.constructs.Laminate(FI)
+    actual = isinstance(L.frame, pd.DataFrame)
+    nt.assert_true(actual)
 
 
 # TODO: Fix static expected
-def test_Laminate_attr_hasdiscont1():
+def test_Laminate_prop_hasdiscont1():
     '''Check the has_discont attribute works for different ps; even ply.'''
     # Disconts exist for p > 2 at interfaces for even and odd plies
     expected_by_p = [False, True, True, True, True]        # False for p < 2
@@ -1175,7 +1081,7 @@ def test_Laminate_attr_hasdiscont1():
         nt.assert_equal(actual, expected)
 
 
-def test_Laminate_attr_hasdiscont2():
+def test_Laminate_prop_hasdiscont2():
     '''Check the has_discont attribute works for different ps; odd ply.'''
     # Disconts exist for p > 2 at interfaces for even and odd plies
     expected_by_p = [True, True, True, True]               # False for p < 2
@@ -1197,7 +1103,7 @@ def test_Laminate_attr_hasdiscont2():
         nt.assert_equal(actual, expected)
 
 
-def test_Laminate_attr_hasneutaxis1():
+def test_Laminate_prop_hasneutaxis1():
     '''Check attribute returns true if neutral axis found; only in odd-plies with odd ps'''
     expected_by_p = [False, True, False, True]
     cases = ut.laminator(geos=dft.geos_odd, ps=[2, 3, 4, 5])
@@ -1209,7 +1115,7 @@ def test_Laminate_attr_hasneutaxis1():
         nt.assert_equal(actual, expected)
 
 
-def test_Laminate_attr_hasneutaxis2():
+def test_Laminate_prop_hasneutaxis2():
     '''Check attribute returns False if neutral axis not found; only in even-plies.'''
     expected_by_p = [False, False, False, False]
     cases = ut.laminator(geos=dft.geos_even, ps=[2, 3, 4, 5])
@@ -1218,6 +1124,23 @@ def test_Laminate_attr_hasneutaxis2():
         actual = all([LM.has_neutaxis.any() for LM in case.LMs])
         expected = e
         #print(actual)
+        nt.assert_equal(actual, expected)
+
+
+def test_Laminate_prop_isspecial():
+    '''Check the is_special attribute works for different ps.'''
+    expected = [
+        True, True, True, True, True, True, True,
+        False, False, False, False, False, False,
+        False, False, False, False, False
+    ]
+    # Uses Defaults().geos_all
+    # Caution: will grow if more defaults are added; need to amend expected
+    for case in cases.values():
+        # Make a list for each case by p, then assert
+        actual = [LM.is_special for LM in case.LMs]
+        #print(actual)
+        #assert actual == expected
         nt.assert_equal(actual, expected)
 
 
@@ -1280,11 +1203,6 @@ def test_Laminate_compare_sets1():
     LM2 = cases1[0].LMs[1]                                     # 400-[200]-800
     LM3 = cases1[0].LMs[2]                                     # 400-[200]-400S
     LM4 = cases2[0].LMs[0]                                     # 0-0-2000
-
-    #assert set([LM1]) == set([LM1])
-    #assert set([LM1]) == set([LM2])
-    #assert set([LM1]) != set([LM3])
-    #assert set([LM1]) != set([LM4])
 
     nt.assert_set_equal(set([LM1, LM2]), set([LM1, LM2]))
     nt.assert_set_equal(set([LM1]), set([LM2]))
@@ -1360,6 +1278,7 @@ def test_Laminate_num_middle1():
     '''Check no more than one middle layer Lamina is in a Laminate.'''
     actual = []
     for Geo in Geos_full2:
+        # TODO: change con to constructs
         layers = con.Laminate(
             bdft.get_FeatureInput(
                 Geo,
@@ -1416,3 +1335,160 @@ def test_Laminate_laminae_order1():
         ['O', 'I', 'I', 'M', 'I', 'I', 'O'],
     ]
     nt.assert_equal(actual, expected)
+
+
+#------------------------------------------------------------------------------
+# LAMINATEMODEL
+#------------------------------------------------------------------------------
+'''Tests > 1s are here, likely due to calling constructors.'''
+# Added in 0.4.12; modified from previous Laminate test
+class TestLaminateModel():
+    '''Contain LaminateModel related tests.'''
+
+    # TODO: some tests are relying on laminator for multicases; consider replacing
+    # to use bare constructs
+    # TODO: Fix use of get_FeatureInput instead
+    case = ut.laminator(geos=dft.geos_standard)
+    cases = ut.laminator(geos=dft.geos_all, ps=[2,3,4,5], verbose=True)
+    ##cases = ut.laminator(geos=dft.geos_all, ps=[1, 2, 3, 4, 5], verbose=True)
+
+    # Tests for LaminateModel prints
+    def test_LaminateModel_print1(self):
+        '''Check Laminate.__repr__ output.'''
+        geo_input = '400-[200]-800'
+        #FI = self.bdft.get_FeatureInput(G(geo_input))
+        FI = dft.FeatureInput
+        FI['Geometry'] = G(geo_input)
+
+        actual = la.constructs.LaminateModel(FI).__repr__()
+        expected = '<lamana LaminateModel object (400.0-[200.0]-800.0), p=5>'
+        nt.assert_equal(actual, expected)
+
+    def test_LaminateModel_print2(self):
+        '''Check Laminate.__repr__ symmetry output.'''
+        geo_input = '400-[200]-400S'
+        #FI = self.bdft.get_FeatureInput(G(geo_input))
+        FI = dft.FeatureInput
+        FI['Geometry'] = G(geo_input)
+
+        actual = la.constructs.LaminateModel(FI).__repr__()
+        expected = '<lamana LaminateModel object (400.0-[200.0]-400.0S), p=5>'
+        nt.assert_equal(actual, expected)
+
+    # Test properties
+    def test_LaminateModel_prop_frame(self):
+        '''Check returns DataFrame.'''
+        geo_input = '400-[200]-400S'
+        #FI = self.bdft.get_FeatureInput(G(geo_input))
+        FI = dft.FeatureInput
+        FI['Geometry'] = G(geo_input)
+
+        LM = la.constructs.LaminateModel(FI)
+        actual = isinstance(LM.frame, pd.DataFrame)
+        nt.assert_true(actual)
+
+    def test_LaminateModel_prop_extrema(self):
+        case1 = ut.laminator(dft.geos_full, ps=[5])
+        case2 = ut.laminator(dft.geos_full, ps=[2])
+
+        for case_full, case_trimmed in zip(case1.values(), case2.values()):
+            for LM_full, LM_trimmed in zip(case_full.LMs, case_trimmed.LMs):
+                actual = LM_full.extrema
+                actual.reset_index(drop=True, inplace=True)
+                expected = LM_trimmed.LMFrame
+                #print(actual)
+                #print(expected)
+                ut.assertFrameEqual(actual, expected)
+
+    def test_LaminateModel_prop_max(self):
+        '''Check the max attribute and maximum stresses.'''
+        for case_ in self.case.values():
+            for LM in case_.LMs:
+                actual = LM.max_stress
+                d = {
+                    0: 0.378731,
+                    5: 0.012915,
+                    10: 0.151492,
+                    14: -0.151492,
+                    19: -0.012915,
+                    24: -0.378731,
+                }
+                s = pd.Series(d)
+                s.name = 'stress_f (MPa/N)'
+                expected = s
+                #assert actual.all() == expected.all()
+                ut.assertSeriesEqual(actual, expected, check_less_precise=True)
+
+    def test_LaminateModel_prop_min1(self):
+        '''Check the min attribute and minimum stresses.'''
+        for case_ in self.case.values():
+            for LM in case_.LMs:
+                actual = LM.min_stress
+                d = {
+                    4: 0.227238,
+                    9: 0.008610,
+                    15: -0.008610,
+                    20: -0.227238,
+                }
+                s = pd.Series(d)
+                s.name = 'stress_f (MPa/N)'
+                expected = s
+                #assert actual.all() == expected.all()
+                ut.assertSeriesEqual(actual, expected, check_less_precise=True)
+
+    def test_LaminateModel_prop_min2(self):
+        '''Check the min attribute and minimum stresses returns None if no disconts.'''
+        # Monoliths do not have disconts; will use to trigger the return
+        for case in self.cases.values():
+            actual = [LM.min_stress for LM in case.LMs if LM.alias == 'Monolith']
+            expected = [None] * len(actual)
+            nt.assert_equal(actual, expected)
+
+
+class TestDecoupledLaminateModel():
+    '''Contain test from the Decouple Branch.'''
+    # 0.4.12
+    FeatureInput = {
+        'Geometry': la.input_.Geometry('400.0-[200.0]-800.0'),
+        'Materials': ['HA', 'PSu'],
+        'Model': 'Wilson_LT',
+        'Parameters': {'P_a': 1, 'R': 0.012, 'a': 0.0075, 'p': 5, 'r': 0.0002},
+        'Properties': {'Modulus': {'HA': 52000000000.0, 'PSu': 2700000000.0},
+        'Poissons': {'HA': 0.25, 'PSu': 0.33}}
+    }
+
+    S = la.constructs.Stack(FeatureInput)
+    L = la.constructs.Laminate(FeatureInput)
+    LM = la.constructs.LaminateModel(FeatureInput)
+
+    S_attrs = [name for name, obj in inspect.getmembers(S) if not name.startswith('__')]
+    L_attrs = [name for name, obj in inspect.getmembers(L) if not name.startswith('__')]
+    LM_attrs = [name for name, obj in inspect.getmembers(LM) if not name.startswith('__')]
+
+    @nt.raises(ModelError)
+    def test_LaminateModel_INDET_error1(self):
+        '''Verify error is raised if p=1; INDET is detected.  LaminateModel not updated.'''
+        FeatureInput = self.FeatureInput.copy()
+        FeatureInput['Parameters']['p'] = 1
+        actual = la.constructs.LaminateModel(FeatureInput)
+
+#     @nt.raises(OSError)
+#     def test_LaminateModel_write_error(self):
+#         # shift working dir
+#         # try to write
+#         # prevent export being written in the wrong place
+#         pass
+
+    def test_LaminateModel_attr_inheritence1(self):
+        '''Verify LaminateModel attrs > Laminate attrs > Stack attrs.'''
+        actual1 = len(self.LM_attrs) > len(self.L_attrs)
+        actual2 = len(self.L_attrs) > len(self.S_attrs)
+        nt.assert_true(actual1)
+        nt.assert_true(actual2)
+
+    def test_LaminateModel_attr_inheritence2(self):
+        '''Verify confirm inherited attrs are subsets.'''
+        actual1 = set(self.S_attrs).issubset(self.L_attrs)
+        actual2 = set(self.L_attrs).issubset(self.LM_attrs)
+        nt.assert_true(actual1)
+        nt.assert_true(actual2)

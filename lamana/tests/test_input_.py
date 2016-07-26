@@ -653,6 +653,7 @@ def test_Geo_print4():
 def test_BaseDefaults_getFeatureInput1():
     '''Confirm get_FeatureInput gives proper values.'''
     G = la.input_.Geometry
+    # NOTE: why do we need mat_praps?
     mat_props = {
         'Modulus': {'HA': 5.2e10, 'PSu': 2.7e9},
         'Poissons': {'HA': 0.25, 'PSu': 0.33}

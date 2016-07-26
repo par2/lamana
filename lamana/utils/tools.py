@@ -26,10 +26,11 @@ import pandas as pd
 import pandas.util.testing as pdt
 
 import lamana as la
+# TODO: just import extensions? from config import EXTENSIONS as conf.EXTENSIONS
+from lamana.utils import config
 
-
-# TODO: Replace with config.EXTENSIONS
-EXTENSIONS = ('.csv', '.xlsx')
+# # TODO: Replace with config.EXTENSIONS
+# EXTENSIONS = ('.csv', '.xlsx')
 
 
 # TODO: Add deprecation warning
@@ -506,107 +507,7 @@ def rename_tempfile(filepath, filename):
     return new_filepath
 
 
-def write_csv(LM, path=None, verbose=True, overwrite=False, prefix=None):
-    '''Convert DataFrame to csv files and write them to a specified directory.
-
-    .. note:: Deprecate warning LamAna 0.4.11
-              `write_csv` will be removed in LamAna 0.4.12. It is replaced by
-              `export` because the latter extends formats, tempfiles and more.
-
-    Parameters
-    ----------
-    LM : DataFrame
-        LaminateModel containing data calculations and attributes.
-    path : str, optional; default "lamana/export" directory
-        Directory path to store resulting csv files.
-    verbose : bool; default True
-        Print additional information during the writing process.
-    overwrite : bool; default False
-        Save over files with the same name.  Prevents file incrementation
-        and excess files after cyclic calls.
-    prefix : str; default None
-        Add a prefix to the file name; good for temporary files.
-        - '' : legacy
-        - 'w': written
-        - 'r': redone; altered from legacy
-        - 'temp': temporary
-
-    Notes
-    -----
-    Writes csv file of data contained in LM (a DataFrame) to a given or default
-    path.  Contents are written into an "export" directory.
-
-    It is decided in 0.4.11.dev0 to set default paths here; a global approach
-    to handling all uses of this function from any module.
-
-    Returns
-    -------
-    str
-        Full path of the created file.
-
-    '''
-    warnings.warn(
-         '`write_csv` will be removed in LamAna 0.4.12. It is replaced by `export`.',
-        DeprecationWarning
-    )
-    # Parse Laminate Properties
-    nplies = LM.nplies
-    p = LM.p
-    # TODO: Fix units
-    t_total = LM.total * 1e3                               # (in mm)
-    geometry = LM.Geometry.string
-    df = LM.LMFrame
-
-    # Send default csv to export directory
-    if path is None:
-        # TODO: write file paths pythonically; use abspath()
-        path = os.getcwd()                                 # use for the test in the correct path
-        ##path = path + r'\lamana\tests\controls_LT'         # for Main Script. Comment out in tests
-        ##path = ''.join([path, r'\lamana\output'])
-        dirpath = ''.join([path, r'\export'])              # \export in root dir
-    else:                                                  # pragma: no cover
-        dirpath = path
-
-    # Filename
-    if prefix is None:                                      # pragma: no cover
-        prefix = r'w'                                       # for written by lamana
-
-    prefix = ''.join([prefix, '_'])
-
-    # Prepend files with 'w' for "written" by the package
-    filename = r'\{}laminate_{}ply_p{}_t{:.1f}_{}'.format(
-        prefix, nplies, p, t_total, geometry
-    )
-    suffix = r'.csv'
-    fullpath = ''.join([dirpath, filename, suffix])
-    #print(path)
-
-    # Force create  export directory or path (REF 047)
-    if not os.path.exists(dirpath):
-        os.makedirs(dirpath)
-
-    # Check for duplicates before writing; overwrite protection
-    if not overwrite:
-        # Read dir if file exists.  Append counter to path name if exists.
-        counter = 1
-        while os.path.isfile(fullpath):
-            print('Overwrite protection: File exists.  Incrementing file...')
-            increment = ''.join(['(', str(counter), ')'])
-            fullpath = ''.join([dirpath, filename, increment, suffix])
-            counter += 1
-
-    # Write DataFrame to csv file
-    if verbose:
-        #print('Writing DataFrame to csv in:', fullpath)
-        logging.info('Writing DataFrame to csv in: {}'.format(fullpath))
-
-    df.to_csv(fullpath)
-    return fullpath
-
-
 # TODO: Add write functions from controls.py here
-
-
 def convert_featureinput(FI):
     '''Return FeaureInput dict with converted values to Dataframes.
 
@@ -624,26 +525,30 @@ def convert_featureinput(FI):
     dd = ct.defaultdict(list)
     for k, v in FI.items():
         if isinstance(v, dict):
-            logging.debug('{0} {1} -> df'.format(k, type(v)))
             try:
                 # if dict of dicts
                 dd[k] = pd.DataFrame(v).T
             except(ValueError):
                 # if regular dict, put in a list
                 dd[k] = pd.DataFrame([v], index=[k]).T
+            finally:
+                logging.debug('{0} {1} -> df'.format(k, type(v)))
         elif isinstance(v, list):
-            logging.debug('{0} {1} -> df'.format(k, type(v)))
             dd[k] = pd.DataFrame(v, columns=[k])
+            logging.debug('{0} {1} -> df'.format(k, type(v)))
         elif isinstance(v, str):
-            logging.debug('{0} {1} -> df'.format(k, type(v)))
             dd[k] = pd.DataFrame({'': {k: v}})
-        elif isinstance(v, la.input_.Geometry):
             logging.debug('{0} {1} -> df'.format(k, type(v)))
+        elif isinstance(v, la.input_.Geometry):
             v = v.string                                       # get geo_string
             dd[k] = pd.DataFrame({'': {k: v}})
-        elif isinstance(v, pd.DataFrame):                      # sometimes materials is df
             logging.debug('{0} {1} -> df'.format(k, type(v)))
+        elif isinstance(v, pd.DataFrame):                      # sometimes materials is df
             dd[k] = v
+            logging.debug('{0} {1} -> df'.format(k, type(v)))
+        elif not v:                                            # empty container
+            dd[k] = pd.DataFrame()
+            logging.debug('{0} {1} -> empty df'.format(k, v))
         else:
             logging.debug('{0} -> Skipped'.format(type(v)))    # pragma: no cover
 
@@ -657,7 +562,7 @@ def reorder_featureinput(d, keys=None):
     ----------
     d : dict
         Any dict; expects a FeatureInput.
-    keys : list of strings, deafult None
+    keys : list of strings, default None
         Order of keys of a FeatureInput.
 
     Examples
@@ -698,9 +603,10 @@ def reorder_featureinput(d, keys=None):
 
     od = ct.OrderedDict()
     for key in keys:
-        od[key] = d[key]
+        if key in d:                                       # skip Globals in Laminate.FeaturInput
+            od[key] = d[key]
 
-    # If keys is shorter the FI.keys(), tag on the missing keys
+    # If keys is shorter than FI.keys(), tag on the missing keys
     for k in d.keys():
         if k not in od:
             od[k] = d[k]
@@ -750,6 +656,10 @@ def get_path(filename=None, prefix=None, suffix=None, overwrite=True,
     * basename = prefix + filename + suffix
     * filename = base name - suffix - prefix
 
+    Raises
+    ------
+    OSError : verify working directory starts at the package root prior writing.
+
     Returns
     -------
     str
@@ -796,15 +706,20 @@ def get_path(filename=None, prefix=None, suffix=None, overwrite=True,
     if suffix is None:
         suffix = ''
     elif suffix.endswith('csv'):
-        suffix = EXTENSIONS[0]
+        suffix = config.EXTENSIONS[0]
     elif suffix.endswith('xlsx'):
-        suffix = EXTENSIONS[1]
+        suffix = config.EXTENSIONS[1]
 
     # Set Root/Source/Default Paths -------------------------------------------
     # The export folder is relative to the root (package) path
     # TODO: replace with config.DEFAULTPATH
     sourcepath = os.path.abspath(os.path.dirname(la.__file__))
     packagepath = os.path.dirname(sourcepath)
+    if not os.path.isfile(os.path.join(packagepath, 'setup.py')):
+        raise OSError(
+            'Package root path location is not correct: {}'
+            ' Verify working directory is ./lamana.'.format(packagepath)
+        )
     defaultpath = os.path.join(packagepath, 'export')
 
     dirpath = defaultpath
@@ -835,7 +750,7 @@ def get_path(filename=None, prefix=None, suffix=None, overwrite=True,
     return dirpath
 
 
-def export(LM, overwrite=False, prefix=None, suffix=None, order=None,
+def export(L_, overwrite=False, prefix=None, suffix=None, order=None,
            offset=3, dirpath=None, temp=False, keepname=True, delete=False):
     '''Write LaminateModels and FeatureInput to files; return a tuple of paths.
 
@@ -845,8 +760,8 @@ def export(LM, overwrite=False, prefix=None, suffix=None, order=None,
 
     Parameters
     ----------
-    LM : DataFrame
-        LaminateModel containing data calculations and attributes.
+    L_ : Laminate-like object
+        Laminate or subclass containing attributes and calculations.
     overwrite : bool; default False
         Save over files with the same name.  Prevents file incrementation
         and excess files after cyclic calls.
@@ -898,44 +813,52 @@ def export(LM, overwrite=False, prefix=None, suffix=None, order=None,
     - OK  Works even when files exist in the directory.
     - OK  Auto creates "\export" directory if none exists.
     - OK  Renames temporary files by default.
+    - OK  Support Laminate and LaminateModel objects
     - X   Supports custom directory paths.
 
     Examples
     --------
+    >>> from lamana.utils import tools as ut
     >>> case = ut.laminator('400.0-[200.0]-800.0')[0]
     >>> LM = case.LMs[0]
     >>> export(LM)
-    '~/lamana/export/laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.xlsx'
+    '~/lamana/export/laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0.xlsx'
 
     >>> # Overwrite Protection
     >>> export(LM, overwrite=False)
-    '~/lamana/export/laminate_5ply_p5_t2.0_400.0-[200.0]-800.0(1).xlsx'
+    '~/lamana/export/laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0(1).xlsx'
 
     >>> # Optional .csv Format
     >>> export(LM, suffix='.csv')
-    '~/lamana/export/dash_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
-    '~/lamana/export/laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+    '~/lamana/export/dash_laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+    '~/lamana/export/laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
 
     >>> # Optional Temporary Files
     >>> export(LM, suffix='.csv', temp=True)
-    'temp/t_dash_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
-    'temp/t_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+    'temp/t_dash_laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+    'temp/t_laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+
+    >>> # Supports Laminate objects too
+    >>> from lamana.models import Wilson_LT as wlt
+    >>> dft = wlt.Defaults()
+    >>> L = la.constructs.Laminate(dft.FeatureInput)
+    >>> export(L)
+    '~/lamana/export/dash_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.xlsx'
 
     '''
     # Parse for Filename ------------------------------------------------------
-    nplies = LM.nplies
-    p = LM.p
+    nplies = L_.nplies
+    p = L_.p
     # TODO: Fix units
-    t_total = LM.total * 1e3                               # (in mm)
-    geo_string = LM.Geometry.string
-    FI = LM.FeatureInput
-    ##df = LM.LMFrame
+    t_total = L_.total * 1e3                               # (in mm)
+    geo_string = L_.Geometry.string
+    FI = L_.FeatureInput
 
     # Path Munge --------------------------------------------------------------
     if prefix is None:
         prefix = ''
     if suffix is None:
-        suffix = EXTENSIONS[1]                             # .xlsx
+        suffix = config.EXTENSIONS[1]                      # .xlsx
 
     if dirpath is None:
         ###
@@ -943,16 +866,21 @@ def export(LM, overwrite=False, prefix=None, suffix=None, order=None,
         # NOTE: removed default w_ prefix; check the control and other uses to maintain coding
         # TODO: rename legacy files with "l_"
         ###
-
-        filename = r'{}laminate_{}ply_p{}_t{:.1f}_{}'.format(
-            prefix, nplies, p, t_total, geo_string)
+        if hasattr(L_, 'LMFrame'):
+            kind = 'laminatemodel'
+        else:
+            kind = 'laminate'
+        filename = r'{}{}_{}ply_p{}_t{:.1f}_{}'.format(
+            prefix, kind, nplies, p, t_total, geo_string)
 
         # Force-create export directory or path (REF 047)
         # Send file to export directory
         defaultpath = get_path()
         if not os.path.exists(defaultpath):
             # TODO: Make sure this log prints out
-            logging.info('No default export directory found.  Making directory {}'.format(defaultpath))
+            logging.info(
+                'No default export directory found.  Making directory {} ...'.format(defaultpath)
+            )
             os.makedirs(defaultpath)
     else:
         raise NotImplementedError('Custom directory paths are not yet implemented.')
@@ -961,11 +889,10 @@ def export(LM, overwrite=False, prefix=None, suffix=None, order=None,
     if order is None:
         order = ['Geometry', 'Model', 'Materials',
                  'Parameters', 'Globals', 'Properties']    # default
-
     converted_FI = convert_featureinput(FI)
-    reordered_FI = reorder_featureinput(converted_FI, order) # elevates strings
-    dash_df = pd.concat(reordered_FI)                      # combines all dfs into one
-    data_df = LM.LMFrame
+    reordered_FI = reorder_featureinput(converted_FI, order)  # elevates strings
+    dash_df = pd.concat(converted_FI)                       # combines all dfs into one
+    data_df = L_._frame
 
     # Assemble ----------------------------------------------------------------
     # Build csv data and dashboard (as optional temporary file)
@@ -1320,21 +1247,21 @@ def natural_sort(data):
     return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
 
 
-def with_metaclass(meta, *bases):
-    '''Create a base class with a metaclass (REF 054).
-
-    Examples
-    --------
-    >>> class MyClassA(object):
-    ...     ___metaclass__ = Meta                          # python 2
-    >>> class MyClassB(metaclass=Meta): pass               # python 3
-
-    >>> # Py 2/3 equivalent metaclasses
-    >>> class MyClassC(with_metaclass(Meta, object)): pass # python 2/3
-    >>> type(MyClassA) is type(MyClassC)                   # python 2
-    True
-    >>> type(MyClassA) is type(MyClassC)                   # python 3
-    True
-
-    '''
-    return meta('MetaBase', bases, {})
+# def with_metaclass(meta, *bases):
+#     '''Create a base class with a metaclass (REF 054).
+#
+#     Examples
+#     --------
+#     >>> class MyClassA(object):
+#     ...     ___metaclass__ = Meta                          # python 2
+#     >>> class MyClassB(metaclass=Meta): pass               # python 3
+#
+#     >>> # Py 2/3 equivalent metaclasses
+#     >>> class MyClassC(with_metaclass(Meta, object)): pass # python 2/3
+#     >>> type(MyClassA) is type(MyClassC)                   # python 2
+#     True
+#     >>> type(MyClassA) is type(MyClassC)                   # python 3
+#     True
+#
+#     '''
+#     return meta('MetaBase', bases, {})
