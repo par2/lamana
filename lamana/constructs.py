@@ -1078,6 +1078,11 @@ class LaminateModel(Laminate):
         - populates stress data calculations from the selected model.
         - may add extra keys to `FeatureInput`, e.g. 'Globals'
 
+        Raises
+        ------
+        ModelError : If the initial LaminateModel object passed to handshake is not
+                     empty, i.e. has LMFrame != None, then updates are unpredictable.
+
         '''
         try:
             # Pass in the pre-updated LaminateModel object; no LMFrame yet

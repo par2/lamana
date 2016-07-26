@@ -17,6 +17,7 @@ analysis and visualization.
 
    - Developer Release Cycle Workflow
    - Shippable (CI for unpinned builds)
+   - LaminateModel class
 
 LamAna enables users to **calculate**/**export**/**analyze** data and
 **author** custom models based on laminate theory.  *Feature modules*  are used to plot stress distributions, analyze thickessness effects and
