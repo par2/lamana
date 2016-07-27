@@ -20,9 +20,13 @@ import collections as ct
 
 import pandas as pd
 
-from lamana.input_ import BaseDefaults
-from lamana.theories import BaseModel
-from lamana.lt_exceptions import IndeterminateError
+from ...input_ import BaseDefaults
+from ...theories import BaseModel
+from ...lt_exceptions import IndeterminateError
+
+# from lamana.input_ import BaseDefaults
+# from lamana.theories import BaseModel
+# from lamana.lt_exceptions import IndeterminateError
 
 
 # This class lacks a hook method; theories should skip it.
