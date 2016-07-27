@@ -3,15 +3,17 @@
 
 import os
 
-import lamana as la
+from .. import __file__ as __root__
+#import lamana as la
 
 # Name for hook function/method; used in `theoires.handshake()` with models
 HOOKNAME = '_use_model_'
 
 # Default export directory path; used in `utils.get_path()`
-sourcepath = os.path.abspath(os.path.dirname(la.__file__))
-packagepath = os.path.dirname(sourcepath)
-DEFAULTPATH = os.path.join(packagepath, 'export')
+# sourcepath = os.path.abspath(os.path.dirname(la.__file__))
+SOURCEPATH = os.path.abspath(os.path.dirname(__root__))
+PACKAGEPATH = os.path.dirname(SOURCEPATH)
+DEFAULTPATH = os.path.join(PACKAGEPATH, 'export')
 
 # Supported export extensions
 EXTENSIONS = ('.csv', '.xlsx')
