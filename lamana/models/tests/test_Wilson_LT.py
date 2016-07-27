@@ -8,11 +8,14 @@
 import pandas as pd
 import nose.tools as nt
 
-import lamana as la
-from lamana.input_ import BaseDefaults
-#from lamana.lt_exceptions import IndeterminateError        # unused
-from lamana.models import Wilson_LT as wlt
-from lamana.utils import tools as ut
+from ...input_ import Geometry
+from ...input_ import BaseDefaults
+from ...models import Wilson_LT as wlt
+from ...utils import tools as ut
+
+# from lamana.input_ import BaseDefaults
+# from lamana.models import Wilson_LT as wlt
+# from lamana.utils import tools as ut
 
 # Global Cases
 bdft = BaseDefaults()
@@ -257,7 +260,7 @@ def test_WilsonLT_Defaults_mat_props1():
 
 def test_wilsonLT_Defaults_FeatureInput1():
     '''Confirm default FeatureInput values.'''
-    G = la.input_.Geometry
+    G = Geometry
     load_params = {
         'R': 12e-3,                                    # specimen radius
         'a': 7.5e-3,                                   # support ring radius

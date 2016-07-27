@@ -7,7 +7,8 @@ This fixture is used to test the importing of models, handled by the
 No more than one hook method is allowed per module.
 
 '''
-from lamana.theories import BaseModel
+from ...theories import BaseModel
+# from lamana.theories import BaseModel
 
 class OneMethod(BaseModel):
 	def _use_model_():
@@ -18,7 +19,7 @@ class OneMethod(BaseModel):
 class ManyMethods(BaseModel):
 	def _use_model_():
 		pass
-	
+
 	def method2():
 		pass
 	pass
