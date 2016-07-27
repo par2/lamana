@@ -55,7 +55,7 @@ Long-term goals for the laminate community are:
    :maxdepth: 1
    :caption: Gallery
 
-   showcase
+   quickview
 
 .. _user-docs:
 
