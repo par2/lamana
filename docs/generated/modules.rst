@@ -1,5 +1,5 @@
-lamana
-======
+.
+=
 
 .. toctree::
    :maxdepth: 4
