@@ -25,12 +25,15 @@ import collections as ct
 import pandas as pd
 import pandas.util.testing as pdt
 
-import lamana as la
-# TODO: just import extensions? from config import EXTENSIONS as conf.EXTENSIONS
-from lamana.utils import config
 
-# # TODO: Replace with config.EXTENSIONS
-# EXTENSIONS = ('.csv', '.xlsx')
+from .. import input_
+from .. import distributions
+from .. import theories
+from .utils import config
+
+
+# import lamana as la
+# from lamana.utils import config
 
 
 # TODO: Add deprecation warning
@@ -130,7 +133,7 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
         for i, p in enumerate(ps):
             '''raise exception if p is not int.'''
             load_params['p'] = p
-            case = la.distributions.Case(load_params, mat_props)
+            case = distributions.Case(load_params, mat_props)
             case.apply(geos)
             # Verbose printing
             if verbose:
@@ -232,7 +235,7 @@ def get_multi_geometry(Frame):
     geo_string = '-'.join(geo)
     # TODO: format geo_strings to General Convention
     # NOTE: geo_string comes in int-[float]-int format; _to_gen_convention should patch
-    geo_string = la.input_.Geometry._to_gen_convention(geo_string)
+    geo_string = input_.Geometry._to_gen_convention(geo_string)
     return geo_string
 
 
@@ -291,7 +294,7 @@ def get_special_geometry(Frame):
     #print(geo)
     geo_string = '-'.join(geo)
     # TODO: format geo_strings to General Convention
-    geo_string = la.input_.Geometry._to_gen_convention(geo_string)
+    geo_string = input_.Geometry._to_gen_convention(geo_string)
     return geo_string
 
 
@@ -539,7 +542,7 @@ def convert_featureinput(FI):
         elif isinstance(v, str):
             dd[k] = pd.DataFrame({'': {k: v}})
             logging.debug('{0} {1} -> df'.format(k, type(v)))
-        elif isinstance(v, la.input_.Geometry):
+        elif isinstance(v, input_.Geometry):
             v = v.string                                       # get geo_string
             dd[k] = pd.DataFrame({'': {k: v}})
             logging.debug('{0} {1} -> df'.format(k, type(v)))
@@ -712,19 +715,22 @@ def get_path(filename=None, prefix=None, suffix=None, overwrite=True,
 
     # Set Root/Source/Default Paths -------------------------------------------
     # The export folder is relative to the root (package) path
-    # TODO: replace with config.DEFAULTPATH
-    sourcepath = os.path.abspath(os.path.dirname(la.__file__))
-    packagepath = os.path.dirname(sourcepath)
-    if not os.path.isfile(os.path.join(packagepath, 'setup.py')):
+    # sourcepath = os.path.abspath(os.path.dirname(la.__file__))
+    # packagepath = os.path.dirname(sourcepath)
+    # if not os.path.isfile(os.path.join(packagepath, 'setup.py')):
+    if not os.path.isfile(os.path.join(config.PACKAGEPATH, 'setup.py')):
         raise OSError(
             'Package root path location is not correct: {}'
             ' Verify working directory is ./lamana.'.format(packagepath)
         )
-    defaultpath = os.path.join(packagepath, 'export')
+    # defaultpath = os.path.join(config.PACKAGEPATH, 'export')
+    #
+    # dirpath = defaultpath
 
-    dirpath = defaultpath
+    dirpath = config.DEFAULTPATH
 
-    logging.debug('Root path: {}'.format(packagepath))
+
+    logging.debug('Root path: {}'.format(config.PACKAGEPATH))
     if not filename and (suffix or dashboard):
         logging.warn("Missing 'filename' arg.  Using default export directory ...")
 
@@ -1050,7 +1056,7 @@ def get_hook_class(module, hookname):
     for name, kls in find_classes(module):
         logging.debug('Found class: {}'.format(kls))
         # Need to make sure we not looking in the parent class BaseModel
-        if issubclass(kls, la.theories.BaseModel) and not isparent(kls):
+        if issubclass(kls, theories.BaseModel) and not isparent(kls):
             logging.debug('Sub-classes of BaseModel: {}'.format(kls))
             methods = [(name, mthd) for name, mthd in find_methods(kls)
                 if name == hookname]

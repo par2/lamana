@@ -11,8 +11,11 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 
-import lamana as la
-from lamana.lt_exceptions import InputError
+from .. import input_
+from .. import output_
+from ..lt_exceptions import InputError
+# import lamana as la
+# from lamana.lt_exceptions import InputError
 
 
 # Analyze Geometries ----------------------------------------------------------
@@ -470,7 +473,7 @@ def _unfold_geometry2(geo_string):
     - _unfold_geometry(): builds stacks with lists
 
     '''
-    outer, inner_i, middle = la.input_.tokenize_geostring(geo_string)
+    outer, inner_i, middle = input_.tokenize_geostring(geo_string)
 
     # Middle ------------------------------------------------------------------
     s = ct.deque([_get_middle(middle)])
@@ -516,7 +519,7 @@ def analyze_geostring(geo_string):
     # Pre-process geo_string
     # TODO: add is_valid conditional; else continue
     # TODO: add is_gen_convention
-    conv_geostring = la.input_.Geometry._to_gen_convention(geo_string)
+    conv_geostring = input_.Geometry._to_gen_convention(geo_string)
     tokens = conv_geostring.split('-')
     #tokens = geo_string.split('-')                         # beta; allow unconventional
 
@@ -569,7 +572,7 @@ def extract_plot_LM_xy(cases, normalized=True, extrema=False):
     '''
     for i, case in enumerate(cases.values()):
         fig, ax = plt.subplots()
-        plot = la.output_._distribplot(
+        plot = output_._distribplot(
             case.LMs, normalized=normalized, extrema=extrema, ax=ax
         )
         #print(plot)
