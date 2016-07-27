@@ -11,10 +11,12 @@ import collections as ct
 
 import pandas as pd
 
-import lamana as la
-#import lamana.lt_exceptions as exc
-from lamana.lt_exceptions import FormatError
-from lamana.utils import tools as ut
+from .lt_exceptions import FormatError
+from .utils import tools as ut
+
+# import lamana as la
+# from lamana.lt_exceptions import FormatError
+# from lamana.utils import tools as ut
 
 # =============================================================================
 # USER INPUT ------------------------------------------------------------------
@@ -614,7 +616,8 @@ class BaseDefaults(object):
             # Prepare k, v
             num = cls._extract_number(k)
             if Geo_obj:                             # build Geo_objects simul.
-                G = la.input_.Geometry
+                # G = la.input_.Geometry
+                G = Geometry
                 v = [G(geo_string) for geo_string in v]
                 dict_[k] = v                        # overwrite original dict_
             # Group keys

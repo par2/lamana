@@ -9,10 +9,11 @@ import logging
 
 import six
 
-# TODO: Replace with interactive way to import models
-from lamana.models import *
-##import lamana.models
-from lamana.utils import tools as ut
+from models import *
+from .utils import tools as ut
+
+# from lamana.models import *
+# from lamana.utils import tools as ut
 
 
 @six.add_metaclass(abc.ABCMeta)

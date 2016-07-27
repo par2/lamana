@@ -155,7 +155,10 @@ import itertools as it
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from lamana.lt_exceptions import InputError, PlottingError
+from .lt_exceptions import InputError
+from .lt_exceptions import PlottingError
+
+# from lamana.lt_exceptions import InputError, PlottingError
 
 
 
