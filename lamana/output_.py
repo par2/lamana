@@ -157,20 +157,9 @@ import matplotlib.pyplot as plt
 
 from .lt_exceptions import InputError
 from .lt_exceptions import PlottingError
+from .utils import config
 
 # from lamana.lt_exceptions import InputError, PlottingError
-
-
-
-# TODO: Replace with config.LAMANA_PALETTES
-# colorblind palette from seaborn; grayscale is web-safe
-LAMANA_PALETTES = dict(
-    #bold=['#FC0D00','#FC7700','#018C99','#00C318','#6A07A9','#009797','#CF0069'],
-    bold=['#EB0C00', '#FC7700', '#018C99', '#00C318', '#6A07A9', '#009797', '#CF0069'],
-    colorblind=['#0072B2', '#009E73', '#D55E00', '#CC79A7', '#F0E442', '#56B4E9'],
-    grayscale=['#FFFFFF', '#999999', '#666666', '#333333', '#000000'],
-    HAPSu=['#E7940E', '#F5A9A9', '#FCEB00', '#0B4EA5'],
-    )
 
 
 # =============================================================================
@@ -376,20 +365,20 @@ def _distribplot(
     if linestyles is None:
         linestyles = it.cycle(["-", "--", "-.", ":"])
     if linecolors is None:
-        linecolors = LAMANA_PALETTES['bold']
+        linecolors = config.LAMANA_PALETTES['bold']
     if markerstyles is None:
         markerstyles = [mrk for mrk in mpl.lines.Line2D.filled_markers
                         if mrk not in ('None', None)]
     if layercolors is None:
-        layercolors = LAMANA_PALETTES['HAPSu']
+        layercolors = config.LAMANA_PALETTES['HAPSu']
         ##layercolors = ['#E7940E', '#F5A9A9', '#FCEB00', '#0B4EA5']
 
     if colorblind:
-        linecolors = LAMANA_PALETTES['colorblind']
+        linecolors = config.LAMANA_PALETTES['colorblind']
         '''Add special color blind to layers'''
     if grayscale:
         linecolors = ['#000000']
-        layercolors = reversed(LAMANA_PALETTES['grayscale'][:-1])     # exclude black
+        layercolors = reversed(config.LAMANA_PALETTES['grayscale'][:-1])     # exclude black
         patch_kw.update(dict(alpha=0.5))
         if colorblind:
             print('Grayscale has overriden the colorblind option.')

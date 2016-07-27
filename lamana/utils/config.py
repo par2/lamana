@@ -26,4 +26,4 @@ LAMANA_PALETTES = dict(
     colorblind=['#0072B2', '#009E73', '#D55E00', '#CC79A7', '#F0E442', '#56B4E9'],
     grayscale=['#FFFFFF', '#999999', '#666666', '#333333', '#000000'],
     HAPSu=['#E7940E', '#F5A9A9', '#FCEB00', '#0B4EA5'],
-    )
+)
