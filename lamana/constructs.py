@@ -10,9 +10,14 @@ import collections as ct
 import numpy as np
 import pandas as pd
 
-from lamana import theories
-from lamana.utils import tools as ut
-from lamana.lt_exceptions import IndeterminateError, ModelError
+from . import theories
+from .lt_exceptions import IndeterminateError
+from .lt_exceptions import ModelError
+from .utils import tools as ut
+
+# from lamana import theories
+# from lamana.utils import tools as ut
+# from lamana.lt_exceptions import IndeterminateError, ModelError
 
 # =============================================================================
 # STACK -----------------------------------------------------------------------
