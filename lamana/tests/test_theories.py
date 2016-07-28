@@ -133,9 +133,9 @@ def test_theories_FeatureInput_consistency1():
     utils tools automatic case building, post-theories.'''
     case1 = distributions.Case(dft.load_params, dft.mat_props)
     case1.apply(dft.geos_standard)                         # classic case build
-    case2 = distributions.laminator(geos=dft.geos_standard)           # auto case build
+    case2 = distributions.laminator(geos=dft.geos_standard)    # auto case build
     LM = case1.LMs[0]
-    ##del LM.FeatureInput['Geometry']                        # comp. unsupported 0.4.3d
+    ##del LM.FeatureInput['Geometry']                      # comp. unsupported 0.4.3d
     ##del LM.FeatureInput['Materials']
     expected = LM.FeatureInput
 
@@ -170,11 +170,11 @@ def test_theories_Exception_default1():
     '''Check LMFrame is set by LFrame if exception raised.'''
     # Force an exception in Wilson_LT; r must be non-zero
     zero_r = {
-        'R': 12e-3,                                       # specimen radius
-        'a': 7.5e-3,                                      # support ring radius
-        'p': 5,                                           # points/layer
-        'P_a': 1,                                         # applied load
-        'r': 0,                                           # radial distance from center loading
+        'R': 12e-3,                                        # specimen radius
+        'a': 7.5e-3,                                       # support ring radius
+        'p': 5,                                            # points/layer
+        'P_a': 1,                                          # applied load
+        'r': 0,                                            # radial distance from center loading
     }
     case = distributions.laminator(geos=dft.geos_standard, load_params=zero_r)
     for case_ in case.values():

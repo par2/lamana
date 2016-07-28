@@ -9,11 +9,7 @@ import logging
 
 import six
 
-#from .models import *
 from .utils import tools as ut
-
-# from lamana.models import *
-# from lamana.utils import tools as ut
 
 
 @six.add_metaclass(abc.ABCMeta)

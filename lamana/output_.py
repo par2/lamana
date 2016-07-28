@@ -46,9 +46,9 @@ Notes
 -----
 See `_distroplot()` for more kwargs. Here are some preferred idioms:
 
->>> case.LM.plot()                                # geometries in case
+>>> case.LM.plot()                                         # geometries in case
 Case Plotted. Data Written. Image Saved.
->>> case.LM[4:-1].plot()                          # handle slicing
+>>> case.LM[4:-1].plot()                                   # handle slicing
 Case Plotted. Data Written. Image Saved.
 
 Examples
@@ -163,7 +163,8 @@ from .lt_exceptions import InputError
 from .lt_exceptions import PlottingError
 from .lt_exceptions import ExportError
 from .utils import tools as ut
-from .utils import config
+##from .utils import config
+from .utils.config import LAMANA_PALETTES, EXTENSIONS
 
 
 # =============================================================================
@@ -369,20 +370,20 @@ def _distribplot(
     if linestyles is None:
         linestyles = it.cycle(["-", "--", "-.", ":"])
     if linecolors is None:
-        linecolors = config.LAMANA_PALETTES['bold']
+        linecolors = LAMANA_PALETTES['bold']
     if markerstyles is None:
         markerstyles = [mrk for mrk in mpl.lines.Line2D.filled_markers
                         if mrk not in ('None', None)]
     if layercolors is None:
-        layercolors = config.LAMANA_PALETTES['HAPSu']
+        layercolors = LAMANA_PALETTES['HAPSu']
         ##layercolors = ['#E7940E', '#F5A9A9', '#FCEB00', '#0B4EA5']
 
     if colorblind:
-        linecolors = config.LAMANA_PALETTES['colorblind']
+        linecolors = LAMANA_PALETTES['colorblind']
         '''Add special color blind to layers'''
     if grayscale:
         linecolors = ['#000000']
-        layercolors = reversed(config.LAMANA_PALETTES['grayscale'][:-1])     # exclude black
+        layercolors = reversed(LAMANA_PALETTES['grayscale'][:-1])     # exclude black
         patch_kw.update(dict(alpha=0.5))
         if colorblind:
             print('Grayscale has overriden the colorblind option.')
@@ -396,10 +397,10 @@ def _distribplot(
     minX, maxX = (0, 0)
     for i, LM in enumerate(LMs):
         if extrema:
-            df = LM.extrema                                        # plots p=2
+            df = LM.extrema                                # plots p=2
         else:
             df = LM.LMFrame
-        #nplies = LM.nplies                                         # unused
+        #nplies = LM.nplies                                # unused
         materials = LM.materials
         lbl = LM.Geometry.string
         stack_order = LM.stack_order
@@ -459,7 +460,7 @@ def _distribplot(
         ax.tick_params(axis='y', pad=10)
         ax.plot(xs, ys, **plot_kw)
 
-    width = maxX - minX                                            # sets rectangle width
+    width = maxX - minX                                    # sets rectangle width
     minY = y_series.min()
     maxY = y_series.max()
 
@@ -472,7 +473,7 @@ def _distribplot(
     incrementer = 0
     for layer_, (type_, t_, matl_) in stack_order.items():
         if normalized:
-            ypos, thick = layer_, 1                                # thick is a unit thick (k-k_1)
+            ypos, thick = layer_, 1                        # thick is a unit thick (k-k_1)
         elif (not normalized and len(LMs) == 1):
             thick = t_ / 1e6
             ypos = incrementer
@@ -498,10 +499,10 @@ def _distribplot(
         ypad_plot = 0.03
 
         if normalized:
-            ypad = (rect.get_height() * ypad_layer)                # relative to layers
+            ypad = (rect.get_height() * ypad_layer)        # relative to layers
         elif not normalized:
             #print(ax.get_ylim()[1])
-            ypad = ax.get_ylim()[1] * ypad_plot                    # relative to plot
+            ypad = ax.get_ylim()[1] * ypad_plot            # relative to plot
             #print(ypad)
         rx, ry = rect.get_xy()
         cx = rx + (rect.get_width() * xpad)
@@ -521,7 +522,7 @@ def _distribplot(
             ax.set_xlim([minX, 0.0])
             ax.set_ylim([minY, maxY])
             ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(5))
-        else:                                                      # default tensile
+        else:                                               # default tensile
             ax.set_xlim([0.0, maxX])
             ax.set_ylim([minY, maxY])
             ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(5))
@@ -532,7 +533,7 @@ def _distribplot(
     # Set legend parameters and axes labels
     if legend_kw is not None and legend_on:
         ax.legend(**legend_kw)
-    ax.text(**sublabel_kw)                                         # figure sublabel
+    ax.text(**sublabel_kw)                                 # figure sublabel
 
     # TODO: Refactor for less limited parameter-setting of axes labels.
     axtitle = kwargs.get('label', '')
@@ -628,7 +629,7 @@ def _multiplot(
     title = '' if title is None else title
 
     if labels_off:
-        kwargs['xlabel'], kwargs['ylabel'] = ('', '')              # turn off axes labels
+        kwargs['xlabel'], kwargs['ylabel'] = ('', '')      # turn off axes labels
 
     subplots_kw = {} if subplots_kw is None else subplots_kw
     subplots_dft = dict(ncols=4)
@@ -639,7 +640,7 @@ def _multiplot(
     #print('patch_kw: ', patch_kw)
 
     plot_kw = {} if plot_kw is None else plot_kw
-    plot_dft = dict(clip_on=True)                                  # needed in halfplots; else BUG
+    plot_dft = dict(clip_on=True)                          # needed in halfplots; else BUG
     plot_kw.update({k: v for k, v in plot_dft.items() if k not in plot_kw})
     #print('plot_kw: ', plot_kw)
 
@@ -659,17 +660,17 @@ def _multiplot(
     # sublabels defaults to no labels after letter 'z'.
     # Will auto label subplots from a to z.  Afterwhich, the user must supply labels.
     labels_kw = {} if labels_kw is None else labels_kw
-    alphabet = map(chr, range(97, 123))                            # to label subplots; REF 037
+    alphabet = map(chr, range(97, 123))                    # to label subplots; REF 037
     labels_dft = dict(suptitle=None, sublabels=list(alphabet),
                       axes_titles=None, legend_titles=None,)
     if title:
-        labels_dft.update(suptitle=title)                    # compliment convenience kw arg
+        labels_dft.update(suptitle=title)                  # compliment convenience kw arg
     labels_kw.update({k: v for k, v in labels_dft.items() if k not in labels_kw})
     if labels_kw['suptitle']:
         suptitle_kw.update(t=labels_kw['suptitle'])
 #    if labels_kw['subtitle']: subtitle=labels_kw['subtitle']
-#     if labels_kw['xlabel']: kwargs['xlabel'] = ''                # remove axlabels; use text()
-#     if labels_kw['ylabel']: kwargs['ylabel'] = ''                # remove axlabels; use text()
+#     if labels_kw['xlabel']: kwargs['xlabel'] = ''        # remove axlabels; use text()
+#     if labels_kw['ylabel']: kwargs['ylabel'] = ''        # remove axlabels; use text()
     #print('labels_kw: ', labels_kw)
 
     '''Consider cycling linecolors for each single geo, multiplot.'''
@@ -922,7 +923,7 @@ def export(L_, overwrite=False, prefix=None, suffix=None, order=None,
     if prefix is None:
         prefix = ''
     if suffix is None:
-        suffix = config.EXTENSIONS[1]                      # .xlsx
+        suffix = EXTENSIONS[1]                             # .xlsx
 
     if dirpath is None:
         ###

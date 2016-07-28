@@ -14,8 +14,6 @@ import matplotlib.pyplot as plt
 from .. import input_
 from .. import output_
 from ..lt_exceptions import InputError
-# import lamana as la
-# from lamana.lt_exceptions import InputError
 
 
 # Analyze Geometries ----------------------------------------------------------
@@ -96,15 +94,15 @@ def _get_duples(token, swap=False):
 
     Examples
     --------
-    >>> _get_duples('(300,100)')                            # outer token
+    >>> _get_duples('(300,100)')                           # outer token
     [(0, '(300.0, 100.0)']
-    >>> _get_duples('[100,(150.0,50),300]')                 # inner_i token
+    >>> _get_duples('[100,(150.0,50),300]')                # inner_i token
     [(5, '(150.0, 50.0)')]
-    >>> _get_duples('[100,300]')                            # if non-duple, empty list
+    >>> _get_duples('[100,300]')                           # if non-duple, empty list
     []
-    >>> _get_duples('(150.0,50)', swap=True)                # inner_i token
+    >>> _get_duples('(150.0,50)', swap=True)               # inner_i token
     [(5, '(50.0, 150.0)')]
-    # >>> _get_duples('(400)')                                # non_duple, give None
+    # >>> _get_duples('(400)')                             # non_duple, give None
     # None
 
     Raises
@@ -498,8 +496,8 @@ def _unfold_geometry2(geo_string):
     # Outer -------------------------------------------------------------------
     try:
         outer_conv = (_get_outer(outer))
-        s.appendleft(outer_conv[0])                             # tensile
-        s.append(outer_conv[1])                                 # compressive
+        s.appendleft(outer_conv[0])                        # tensile
+        s.append(outer_conv[1])                            # compressive
         logging.debug('Appending duple indices {}.  Running stack: {} '.format(outer_conv, s))
     except TypeError:
         # If outer is an integer; no reversals required

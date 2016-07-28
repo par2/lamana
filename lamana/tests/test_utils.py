@@ -9,7 +9,6 @@ import abc
 import logging
 import tempfile
 import difflib
-##import collections as ct
 
 import nose.tools as nt
 import pandas as pd
@@ -24,11 +23,12 @@ from ..models.fixtures import fixture_model_module_a  # special import for hooks
 from ..models.fixtures import fixture_model_module_b  # special import for hooksfrom lamana.utils import config
 from ..models import Wilson_LT as wlt
 from ..utils import tools as ut
-from ..utils import config
+##from ..utils import config
+from ..utils.config import HOOKNAME, RANDOMCHARS, EXTENSIONS
 
 dft = wlt.Defaults()                                       # from inherited class in models; user
 
-RANDOMCHARS = 'xZ(1-)[]'                                   # file characters
+##RANDOMCHARS = 'xZ(1-)[]'                                   # file characters
 
 # PARAMETERS ------------------------------------------------------------------
 # Build dicts of geometric and material parameters
@@ -138,7 +138,7 @@ def test_tool_get_path_name2():
 
 def test_tool_get_path_name3():
     '''Verify returns path name correctly.'''
-    path = ut.get_path(filename=RANDOMCHARS, suffix='.xlsx')
+    path = ut.get_path(filename=RANDOMCHARS, suffix=EXTENSIONS[1])
     actual = path.endswith('.'.join([RANDOMCHARS, 'xlsx']))
     nt.assert_true(actual)
 
@@ -146,7 +146,7 @@ def test_tool_get_path_name3():
 def test_tool_get_path_name4():
     '''Verify returns path name correctly, for a dashboard; no "dash_" for xlsx.'''
     # The following should inform dashboards are not separate files.
-    path = ut.get_path(filename=RANDOMCHARS, suffix='.xlsx', dashboard=True)
+    path = ut.get_path(filename=RANDOMCHARS, suffix=EXTENSIONS[1], dashboard=True)
     actual1 = path.endswith('.'.join([RANDOMCHARS, 'xlsx']))
     actual2 = os.path.basename(path).startswith('dash_')
     nt.assert_true(actual1)
@@ -156,7 +156,7 @@ def test_tool_get_path_name4():
 def test_tool_get_path_name5():
     '''Verify overwrite protected filepath is returned if overwrite is False.'''
     # Just testing that it's triggered; not that it increments.
-    path = ut.get_path(filename=RANDOMCHARS, suffix='.xlsx', overwrite=False)
+    path = ut.get_path(filename=RANDOMCHARS, suffix=EXTENSIONS[1], overwrite=False)
     actual = path.endswith('.'.join([RANDOMCHARS, 'xlsx']))
     nt.assert_true(actual)
 
@@ -335,14 +335,14 @@ class TestExport():
                              if '-' in i and i[2:].isdigit()]
                 post_inc = [int(i[2:]) for i in difflib.ndiff(baseline, incremented)
                             if '+' in i and i[2:].isdigit()]
-                if prior_inc == []: prior_inc = [0]            # reset prior
-                if post_inc:                                   # ignore loop if [], means first loop, and hasn't incremented yet
+                if prior_inc == []: prior_inc = [0]        # reset prior
+                if post_inc:                               # ignore loop if [], means first loop, and hasn't incremented yet
                     actual = prior_inc[0] < post_inc[0]
                     nt.assert_true(actual)
                 baseline = data_fpath
 
                 fname_list.append(data_fpath)
-                fname_list.append(dash_fpath)                  # not used by still written, so need cleaning
+                fname_list.append(dash_fpath)              # not used by still written, so need cleaning
         finally:
             for fpath in fname_list:
                 os.remove(fpath)
@@ -439,8 +439,8 @@ class TestExport():
                              if '-' in i and i[2:].isdigit()]
                 post_inc = [int(i[2:]) for i in difflib.ndiff(baseline, incremented)
                             if '+' in i and i[2:].isdigit()]
-                if prior_inc == []: prior_inc = [0]            # reset prior
-                if post_inc:                                   # ignore loop if [], means first loop, and hasn't incremented yet
+                if prior_inc == []: prior_inc = [0]        # reset prior
+                if post_inc:                               # ignore loop if [], means first loop, and hasn't incremented yet
                     actual = prior_inc[0] < post_inc[0]
                     nt.assert_true(actual)
                 baseline = workbook_fpath
@@ -1066,7 +1066,7 @@ class TestHookTools:
 
     '''
     # TODO: Remove
-    hookname = config.HOOKNAME
+    ##hookname = HOOKNAME
 
     hook_func_module = fixture_model_func
     hook_class_module = fixture_model_class
@@ -1077,22 +1077,26 @@ class TestHookTools:
     def test_utils_tools_gethookfunction_error1(self):
         '''Verify raise error if no hook function found.'''
         # Assumes no hook functions in the fixture containing hook classes
-        actual = ut.get_hook_function(self.hook_class_module, self.hookname)
+        ##actual = ut.get_hook_function(self.hook_class_module, self.hookname)
+        actual = ut.get_hook_function(self.hook_class_module, HOOKNAME)
 
     @nt.raises(AttributeError)
     def test_utils_tools_gethookclass_error1(self):
         '''Verify raise error if no hook class found.'''
         # Assumes no hook classes in the fixture containing hook functions
-        actual = ut.get_hook_class(self.hook_func_module, self.hookname)
+        ##actual = ut.get_hook_class(self.hook_func_module, self.hookname)
+        actual = ut.get_hook_class(self.hook_func_module, HOOKNAME)
 
     @nt.raises(AttributeError)
     def test_utils_tools_gethookclass_error2(self):
         '''Verify raise error if no hook class found.'''
         # Assumes no hook classes in the fixture containing hook functions
-        actual = ut.get_hook_class(self.non_hook_module, self.hookname)
+        ##actual = ut.get_hook_class(self.non_hook_module, self.hookname)
+        actual = ut.get_hook_class(self.non_hook_module,  HOOKNAME)
 
     @nt.raises(AttributeError)
     def test_utils_tools_gethookclass_error3(self):
         '''Verify raise error if too many hooks classes found.'''
         # Assumes no hook classes in the fixture containing hook functions
-        actual = ut.get_hook_class(self.many_hook_module, self.hookname)
+        ##actual = ut.get_hook_class(self.many_hook_module, self.hookname)
+        actual = ut.get_hook_class(self.many_hook_module, HOOKNAME)
