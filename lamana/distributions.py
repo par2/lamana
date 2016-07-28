@@ -18,7 +18,9 @@ import matplotlib as mpl
 mpl.use('Agg')                                             # required to prevent DISPLAY error; must be before pyplot (REF 050)
 import matplotlib.pyplot as plt
 
-from .input_ import Geometry, BaseDefaults
+# TODO: Rename Geometry attr to something else; deconflist with inp.Geometry
+from .input_ import Geometry as inputGeometry
+from .input_ import BaseDefaults
 from .constructs import Laminate, LaminateModel
 from . import output_
 from .lt_exceptions import ModelError
@@ -237,7 +239,7 @@ class Case(object):
 
         '''
         '''Consider moving, to all only once.'''
-        G = Geometry
+        G = inputGeometry
         self.Geometries = []
         self.model = model
 
@@ -281,7 +283,7 @@ class Case(object):
 
             for geometry in geometries:
                 # TODO: Move conversion to Caselet()
-                conv_geometry = Geometry._to_gen_convention(geometry)
+                conv_geometry = inputGeometry._to_gen_convention(geometry)
 
                 # Check a cache
                 if unique and (conv_geometry in _geo_cache):
@@ -882,7 +884,7 @@ class Cases(ct.MutableMapping):
                 try:
                     # Assume list of geometry strings
                     caselets = [
-                        Geometry._to_gen_convention(caselet)
+                        inputGeometry._to_gen_convention(caselet)
                         for caselet in caselets
                     ]
                 except(TypeError):
@@ -1261,3 +1263,112 @@ class Cases(ct.MutableMapping):
         logging.debug('Accessing frames method in self.__class__.__name__ ...')
         cases = self
         return list(LM.frame for case in cases for LM in case.LMs)
+
+
+# Transferred from utils
+def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False):
+    '''Return a dict of Cases; quickly build and encase a suite of Case objects.
+
+    This is useful for tests requiring laminates with different thicknesses,
+    ps and geometries.
+
+    .. note:: Deprecate warning LamAna 0.4.10
+            `lamanator` will be removed in LamAna 0.5 and replaced by
+            `lamana.distributions.Cases` because the latter is more efficient.
+
+    Parameters
+    ----------
+    geos : list; default `None`
+        Contains (optionally tuples of) geometry strings.
+    load_params : dict; default `None`
+        Passed-in geometric parameters if specified; else default is used.
+    mat_props : dict; default `None`
+        Passed-in materials parameters if specified; else default is used.
+    ps : list of int, optional; default 5
+        p values to be looped over; this sets the number of rows per DataFrame.
+    verbose : bool; default `False`
+        If True, print a list of Geometries.
+
+    See Also
+    --------
+    test_sanity#() : set of test functions that run sanity checks
+    utils.tools.select_frames() : utility function to parse DataFrames
+
+    Notes
+    -----
+    The preferred use for this function is the following:
+
+    >>> for case in cases:
+    ...    print(case.LMs)
+    [<lamana LaminateModel object (400-200-400S)>,
+     <lamana LaminateModel object (400-200-800)>],
+    [<lamana LaminateModel object (400-200-400S)>,
+     <lamana LaminateModel object (400-200-800)>]
+
+    >>> (LM for case in cases for LM in case.LMs)
+    <generator object>
+
+    Examples
+    --------
+    >>> from lamana.utils import tools as ut
+    >>> g = ('400-200-400S')
+    >>> case = ut.laminator(geos=g, ps=[2])
+    >>> LM = case[0]
+    >>> LM
+    <lamana LaminateModel object (400-200-400S)>
+
+    >>> g = ['400-200-400S', '400-200-800']
+    >>> cases = ut.laminator(geos=g, p=[2,3])
+    >>> cases
+    {0: <lamana.distributions.Case p=2>,
+     1: <lamana.distributions.Case p=3>,}                  # keys by p
+
+    >>> for i, case in cases.items():                      # process cases
+    ...     for LM in case.LMs:
+    ...         print(LM.Geometry)
+
+    >>> (LM for i, LMs in cases.items() for LM in LMs)     # generator processing
+
+    '''
+    # Default
+    if (geos is None) and (load_params is None) and (mat_props is None):
+        print('CAUTION: No Geometry or parameters provided to case builder.  Using defaults...')
+    if geos is None:
+        geos = [('400-200-800')]
+    if isinstance(geos, str):
+        geos = [geos]
+    elif (geos is not None) and not (isinstance(geos, list)):
+        # TODO: use custom Exception
+        raise Exception('geos must be a list of strings')
+
+    if load_params is None:
+        ''' UPDATE: pull from Defaults()'''
+        load_params = {
+            'R': 12e-3,                                    # specimen radius
+            'a': 7.5e-3,                                   # support ring radius
+            'p': 5,                                        # points/layer
+            'P_a': 1,                                      # applied load
+            'r': 2e-4,                                     # radial distance from center loading
+        }
+    if mat_props is None:
+        mat_props = {
+            'HA': [5.2e10, 0.25],
+            'PSu': [2.7e9, 0.33],
+        }
+
+    # Laminates of different ps
+    '''Fix to output repr; may do this with an iterator class.'''
+    def cases_by_p():
+        for i, p in enumerate(ps):
+            '''raise exception if p is not int.'''
+            load_params['p'] = p
+            case = Case(load_params, mat_props)
+            case.apply(geos)
+            # Verbose printing
+            if verbose:
+                print('A new case was created. '
+                      '# of LaminateModels: {}, p: {}'.format(len(geos), p))
+                #print('A new case was created. # LaminateModels: %s, ps: %s' % (len(geos), p))
+            #yield p, case
+            yield i, case
+    return dict((i, case) for i, case in cases_by_p())

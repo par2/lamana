@@ -29,121 +29,11 @@ import pandas.util.testing as pdt
 #from .. import input_
 #from .. import distributions
 #from .. import theories
-from .config import DEFAULTPATH, PACKAGEPATH, EXTENSIONS  
+from .config import DEFAULTPATH, PACKAGEPATH, EXTENSIONS
 
 
 # import lamana as la
 # from lamana.utils import config
-
-
-# TODO: Add deprecation warning
-# TODO: To distributions
-# def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False):
-#     '''Return a dict of Cases; quickly build and encase a suite of Case objects.
-#
-#     This is useful for tests requiring laminates with different thicknesses,
-#     ps and geometries.
-#
-#     .. note:: Deprecate warning LamAna 0.4.10
-#             `lamanator` will be removed in LamAna 0.5 and replaced by
-#             `lamana.distributions.Cases` because the latter is more efficient.
-#
-#     Parameters
-#     ----------
-#     geos : list; default `None`
-#         Contains (optionally tuples of) geometry strings.
-#     load_params : dict; default `None`
-#         Passed-in geometric parameters if specified; else default is used.
-#     mat_props : dict; default `None`
-#         Passed-in materials parameters if specified; else default is used.
-#     ps : list of int, optional; default 5
-#         p values to be looped over; this sets the number of rows per DataFrame.
-#     verbose : bool; default `False`
-#         If True, print a list of Geometries.
-#
-#     See Also
-#     --------
-#     test_sanity#() : set of test functions that run sanity checks
-#     utils.tools.select_frames() : utility function to parse DataFrames
-#
-#     Notes
-#     -----
-#     The preferred use for this function is the following:
-#
-#     >>> for case in cases:
-#     ...    print(case.LMs)
-#     [<lamana LaminateModel object (400-200-400S)>,
-#      <lamana LaminateModel object (400-200-800)>],
-#     [<lamana LaminateModel object (400-200-400S)>,
-#      <lamana LaminateModel object (400-200-800)>]
-#
-#     >>> (LM for case in cases for LM in case.LMs)
-#     <generator object>
-#
-#     Examples
-#     --------
-#     >>> from lamana.utils import tools as ut
-#     >>> g = ('400-200-400S')
-#     >>> case = ut.laminator(geos=g, ps=[2])
-#     >>> LM = case[0]
-#     >>> LM
-#     <lamana LaminateModel object (400-200-400S)>
-#
-#     >>> g = ['400-200-400S', '400-200-800']
-#     >>> cases = ut.laminator(geos=g, p=[2,3])
-#     >>> cases
-#     {0: <lamana.distributions.Case p=2>,
-#      1: <lamana.distributions.Case p=3>,}                  # keys by p
-#
-#     >>> for i, case in cases.items():                      # process cases
-#     ...     for LM in case.LMs:
-#     ...         print(LM.Geometry)
-#
-#     >>> (LM for i, LMs in cases.items() for LM in LMs)     # generator processing
-#
-#     '''
-#     # Default
-#     if (geos is None) and (load_params is None) and (mat_props is None):
-#         print('CAUTION: No Geometry or parameters provided to case builder.  Using defaults...')
-#     if geos is None:
-#         geos = [('400-200-800')]
-#     if isinstance(geos, str):
-#         geos = [geos]
-#     elif (geos is not None) and not (isinstance(geos, list)):
-#         # TODO: use custom Exception
-#         raise Exception('geos must be a list of strings')
-#
-#     if load_params is None:
-#         ''' UPDATE: pull from Defaults()'''
-#         load_params = {
-#             'R': 12e-3,                                    # specimen radius
-#             'a': 7.5e-3,                                   # support ring radius
-#             'p': 5,                                        # points/layer
-#             'P_a': 1,                                      # applied load
-#             'r': 2e-4,                                     # radial distance from center loading
-#         }
-#     if mat_props is None:
-#         mat_props = {
-#             'HA': [5.2e10, 0.25],
-#             'PSu': [2.7e9, 0.33],
-#         }
-#
-#     # Laminates of different ps
-#     '''Fix to output repr; may do this with an iterator class.'''
-#     def cases_by_p():
-#         for i, p in enumerate(ps):
-#             '''raise exception if p is not int.'''
-#             load_params['p'] = p
-#             case = distributions.Case(load_params, mat_props)
-#             case.apply(geos)
-#             # Verbose printing
-#             if verbose:
-#                 print('A new case was created. '
-#                       '# of LaminateModels: {}, p: {}'.format(len(geos), p))
-#                 #print('A new case was created. # LaminateModels: %s, ps: %s' % (len(geos), p))
-#             #yield p, case
-#             yield i, case
-#     return dict((i, case) for i, case in cases_by_p())
 
 
 # Helpers
@@ -1023,61 +913,7 @@ def find_functions(module):
     return funcmembers
 
 
-# Hook Utils ------------------------------------------------------------------
-# These tools are used by `theories.handshake` to search for hook functions
-def get_hook_function(module, hookname):
-    '''Return the hook function given a module.
-
-    Inspect all functions in a module for one a given a HOOKNAME.  Assumes
-    only one hook per module.
-
-    '''
-    logging.debug("Given hookname: '{}'".format(hookname))
-    functions = [(name, func) for name, func in find_functions(module)
-            if name == hookname]
-    if not len(functions):
-        raise AttributeError('No hook function found.')
-    elif len(functions) != 1:
-        raise AttributeError('Found more than one hook_function in {}'
-                             ' Expected only one per module.'.format(module))
-    _, hook_function = functions[0]
-    logging.debug('Hook function: {}'.format(hook_function))
-
-    return hook_function
-
-
-# TODO: To theories
-# def get_hook_class(module, hookname):
-#     '''Return the class containing the hook method.
-#
-#     Inspect all classes in a module for a method with a given HOOKNAME. Assumes
-#     only one hook per module.  Return the class so that it can be later
-#     instantiated for it's hook method.
-#
-#     '''
-#     logging.debug("Given hookname: '{}'".format(hookname))
-#     methods = []
-#     all_methods = []
-#     for name, kls in find_classes(module):
-#         logging.debug('Found class: {}'.format(kls))
-#         # Need to make sure we not looking in the parent class BaseModel
-#         if issubclass(kls, theories.BaseModel) and not isparent(kls):
-#             logging.debug('Sub-classes of BaseModel: {}'.format(kls))
-#             methods = [(name, mthd) for name, mthd in find_methods(kls)
-#                 if name == hookname]
-#             class_obj = kls
-#             all_methods.extend(methods)
-#     logging.debug("All hook methods ({}) found in module {}: '{}'".format(
-#         len(all_methods), module, all_methods))
-#     if not len(all_methods):
-#         raise AttributeError('No hook class found.')
-#     elif len(all_methods) != 1:
-#         raise AttributeError('Found more than one hook_method in {}'
-#                              ' Expected only one per module.'.format(module))
-#
-#     return class_obj
-
-# =============================================================================
+## =============================================================================
 # CITED CODE ------------------------------------------------------------------
 # =============================================================================
 # Code is modified from existing examples and cited in reference.py

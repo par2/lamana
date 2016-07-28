@@ -126,12 +126,12 @@ def handshake(precursor, adjusted_z=False):
     # TODO: add assertion for presursor.LMFrame == Laminate(FI).LMFrame prior to update
     try:
         # Look for a hook function
-        hook = ut.get_hook_function(module, hookname=HOOKNAME)
+        hook = get_hook_function(module, hookname=HOOKNAME)
         logging.debug('Found a hook function: {}'.format(hook))
     except(AttributeError):
         # This code block obviates hardcoding a specific model class name.
         # Look for a class containing the hook method
-        class_obj = ut.get_hook_class(module, hookname=HOOKNAME)
+        class_obj = get_hook_class(module, hookname=HOOKNAME)
         class_name = getattr(module, class_obj.__name__)
         my_instance = class_name()                         # instantiate the class; important
         hook = getattr(my_instance, HOOKNAME)              # hook method
@@ -147,3 +147,58 @@ def handshake(precursor, adjusted_z=False):
     ##assert FeatureInput['Parameters']['p'] == Laminate.p
 
     return(LaminateModel, FeatureInput)
+
+
+# Hook Utils ------------------------------------------------------------------
+# These tools are used by `theories.handshake` to search for hook functions/method
+# NOTE: Transfered from utils
+def get_hook_function(module, hookname):
+    '''Return the hook function given a module.
+
+    Inspect all functions in a module for one a given a HOOKNAME.  Assumes
+    only one hook per module.
+
+    '''
+    logging.debug("Given hookname: '{}'".format(hookname))
+    functions = [(name, func) for name, func in ut.find_functions(module)
+            if name == hookname]
+    if not len(functions):
+        raise AttributeError('No hook function found.')
+    elif len(functions) != 1:
+        raise AttributeError('Found more than one hook_function in {}'
+                             ' Expected only one per module.'.format(module))
+    _, hook_function = functions[0]
+    logging.debug('Hook function: {}'.format(hook_function))
+
+    return hook_function
+
+
+def get_hook_class(module, hookname):
+    '''Return the class containing the hook method.
+
+    Inspect all classes in a module for a method with a given HOOKNAME. Assumes
+    only one hook per module.  Return the class so that it can be later
+    instantiated for it's hook method.
+
+    '''
+    logging.debug("Given hookname: '{}'".format(hookname))
+    methods = []
+    all_methods = []
+    for name, kls in ut.find_classes(module):
+        logging.debug('Found class: {}'.format(kls))
+        # Need to make sure we not looking in the parent class BaseModel
+        if issubclass(kls, BaseModel) and not ut.isparent(kls):
+            logging.debug('Sub-classes of BaseModel: {}'.format(kls))
+            methods = [(name, mthd) for name, mthd in ut.find_methods(kls)
+                if name == hookname]
+            class_obj = kls
+            all_methods.extend(methods)
+    logging.debug("All hook methods ({}) found in module {}: '{}'".format(
+        len(all_methods), module, all_methods))
+    if not len(all_methods):
+        raise AttributeError('No hook class found.')
+    elif len(all_methods) != 1:
+        raise AttributeError('Found more than one hook_method in {}'
+                             ' Expected only one per module.'.format(module))
+
+    return class_obj
