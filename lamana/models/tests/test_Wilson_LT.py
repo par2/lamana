@@ -9,6 +9,7 @@ import pandas as pd
 import nose.tools as nt
 
 from ...input_ import Geometry, BaseDefaults
+from ...distributions import laminator
 #from ...models import Wilson_LT as wlt
 from ...models import Wilson_LT as wlt
 from ...utils import tools as ut
@@ -20,8 +21,8 @@ from ...utils import tools as ut
 # Global Cases
 bdft = BaseDefaults()
 dft = wlt.Defaults()
-case = ut.laminator(geos=dft.geos_standard)
-cases = ut.laminator(geos=dft.geos_all, ps=[2, 3, 4, 5], verbose=True)
+case = laminator(geos=dft.geos_standard)
+cases = laminator(geos=dft.geos_all, ps=[2, 3, 4, 5], verbose=True)
 
 # TESTS -----------------------------------------------------------------------
 # Tests that check the LMFrame rollsback to LFrame if exceptions are made.
@@ -40,7 +41,7 @@ def test_models_WisonLT_r1():
         'P_a': 1,                                          # applied load
         'r': 0,                                            # radial distance from center loading
     }
-    case = ut.laminator(geos=dft.geos_standard, load_params=zero_r)
+    case = laminator(geos=dft.geos_standard, load_params=zero_r)
     for case_ in case.values():
         for LM in case_.LMs:
             actual = LM.LMFrame
@@ -57,7 +58,7 @@ def test_models_WisonLT_r2():
         'P_a': 1,                                          # applied load
         'r': -2e-3,                                        # radial distance from center loading
     }
-    case = ut.laminator(geos=dft.geos_standard, load_params=neg_r)
+    case = laminator(geos=dft.geos_standard, load_params=neg_r)
     for case_ in case.values():
         for LM in case_.LMs:
             actual = LM.LMFrame
@@ -74,7 +75,7 @@ def test_models_WisonLT_a1():
         'P_a': 1,                                          # applied load
         'r': 2e-4,                                         # radial distance from center loading
     }
-    case = ut.laminator(geos=dft.geos_standard, load_params=zero_a)
+    case = laminator(geos=dft.geos_standard, load_params=zero_a)
     for case_ in case.values():
         for LM in case_.LMs:
             actual = LM.LMFrame
@@ -91,7 +92,7 @@ def test_models_WisonLT_a2():
         'P_a': 1,                                          # applied load
         'r': 2e-4,                                         # radial distance from center loading
     }
-    case = ut.laminator(geos=dft.geos_standard, load_params=neg_a)
+    case = laminator(geos=dft.geos_standard, load_params=neg_a)
     for case_ in case.values():
         for LM in case_.LMs:
             actual = LM.LMFrame
@@ -115,7 +116,7 @@ def test_models_WisonLT_a3():
         'P_a': 1,                                          # applied load
         'r': 2e-4,                                         # radial distance from center loading
     }
-    case = ut.laminator(geos=dft.geos_standard, load_params=big_a)
+    case = laminator(geos=dft.geos_standard, load_params=big_a)
     for case_ in case.values():
         for LM in case_.LMs:
             actual = LM.FeatureInput['Parameters']['a']
@@ -129,7 +130,7 @@ def test_models_WisonLT_a3():
 # @nt.raises(IndeterminateError)
 # def test_models_WisonLT_INDET1():
 #     '''Check exception for p=1 when INDET is found; do not calculate stress.'''
-#     case = ut.laminator(geos=['400-[200]-800'], ps=[1])
+#     case = laminator(geos=['400-[200]-800'], ps=[1])
 #     for i, LMs in case.items():
 #         for LM in LMs:
 #             actual = LM.LFrame
@@ -139,7 +140,7 @@ def test_models_WisonLT_a3():
 
 def test_models_WisonLT_diameter1():
     '''Check the support radius, a, is smaller than the sample radius, R.'''
-    case = ut.laminator(geos=dft.geos_standard)
+    case = laminator(geos=dft.geos_standard)
     for case_ in case.values():
         for LM in case_.LMs:
             actual = LM.FeatureInput['Parameters']['a']
