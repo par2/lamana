@@ -1,5 +1,0 @@
-,layer,side,type,matl,label,t(um),h(m),d(m),intf,k,Z(m),z(m),z(m)*
-0,1,Tens.,outer,HA,interface,1000.0,0.001,0.0,1.0,0.0,0.001,0.0005,0.0005
-1,1,Tens.,outer,HA,discont.,1000.0,0.001,0.001,1.0,1.0,0.0,0.0,0.0
-2,2,Comp.,outer,PSu,discont.,1000.0,0.001,0.001,3.0,1.0,0.0,0.0,0.0
-3,2,Comp.,outer,PSu,interface,1000.0,0.001,0.002,3.0,2.0,-0.001,-0.0005,-0.0005

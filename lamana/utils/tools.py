@@ -26,10 +26,10 @@ import pandas as pd
 import pandas.util.testing as pdt
 
 
-from .. import input_
-from .. import distributions
-from .. import theories
-from .utils import config
+#from .. import input_
+#from .. import distributions
+#from .. import theories
+from .config import DEFAULTPATH, PACKAGEPATH, EXTENSIONS  
 
 
 # import lamana as la
@@ -37,265 +37,268 @@ from .utils import config
 
 
 # TODO: Add deprecation warning
-def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False):
-    '''Return a dict of Cases; quickly build and encase a suite of Case objects.
-
-    This is useful for tests requiring laminates with different thicknesses,
-    ps and geometries.
-
-    .. note:: Deprecate warning LamAna 0.4.10
-            `lamanator` will be removed in LamAna 0.5 and replaced by
-            `lamana.distributions.Cases` because the latter is more efficient.
-
-    Parameters
-    ----------
-    geos : list; default `None`
-        Contains (optionally tuples of) geometry strings.
-    load_params : dict; default `None`
-        Passed-in geometric parameters if specified; else default is used.
-    mat_props : dict; default `None`
-        Passed-in materials parameters if specified; else default is used.
-    ps : list of int, optional; default 5
-        p values to be looped over; this sets the number of rows per DataFrame.
-    verbose : bool; default `False`
-        If True, print a list of Geometries.
-
-    See Also
-    --------
-    test_sanity#() : set of test functions that run sanity checks
-    utils.tools.select_frames() : utility function to parse DataFrames
-
-    Notes
-    -----
-    The preferred use for this function is the following:
-
-    >>> for case in cases:
-    ...    print(case.LMs)
-    [<lamana LaminateModel object (400-200-400S)>,
-     <lamana LaminateModel object (400-200-800)>],
-    [<lamana LaminateModel object (400-200-400S)>,
-     <lamana LaminateModel object (400-200-800)>]
-
-    >>> (LM for case in cases for LM in case.LMs)
-    <generator object>
-
-    Examples
-    --------
-    >>> from lamana.utils import tools as ut
-    >>> g = ('400-200-400S')
-    >>> case = ut.laminator(geos=g, ps=[2])
-    >>> LM = case[0]
-    >>> LM
-    <lamana LaminateModel object (400-200-400S)>
-
-    >>> g = ['400-200-400S', '400-200-800']
-    >>> cases = ut.laminator(geos=g, p=[2,3])
-    >>> cases
-    {0: <lamana.distributions.Case p=2>,
-     1: <lamana.distributions.Case p=3>,}                  # keys by p
-
-    >>> for i, case in cases.items():                      # process cases
-    ...     for LM in case.LMs:
-    ...         print(LM.Geometry)
-
-    >>> (LM for i, LMs in cases.items() for LM in LMs)     # generator processing
-
-    '''
-    # Default
-    if (geos is None) and (load_params is None) and (mat_props is None):
-        print('CAUTION: No Geometry or parameters provided to case builder.  Using defaults...')
-    if geos is None:
-        geos = [('400-200-800')]
-    if isinstance(geos, str):
-        geos = [geos]
-    elif (geos is not None) and not (isinstance(geos, list)):
-        # TODO: use custom Exception
-        raise Exception('geos must be a list of strings')
-
-    if load_params is None:
-        ''' UPDATE: pull from Defaults()'''
-        load_params = {
-            'R': 12e-3,                                    # specimen radius
-            'a': 7.5e-3,                                   # support ring radius
-            'p': 5,                                        # points/layer
-            'P_a': 1,                                      # applied load
-            'r': 2e-4,                                     # radial distance from center loading
-        }
-    if mat_props is None:
-        mat_props = {
-            'HA': [5.2e10, 0.25],
-            'PSu': [2.7e9, 0.33],
-        }
-
-    # Laminates of different ps
-    '''Fix to output repr; may do this with an iterator class.'''
-    def cases_by_p():
-        for i, p in enumerate(ps):
-            '''raise exception if p is not int.'''
-            load_params['p'] = p
-            case = distributions.Case(load_params, mat_props)
-            case.apply(geos)
-            # Verbose printing
-            if verbose:
-                print('A new case was created. '
-                      '# of LaminateModels: {}, p: {}'.format(len(geos), p))
-                #print('A new case was created. # LaminateModels: %s, ps: %s' % (len(geos), p))
-            #yield p, case
-            yield i, case
-    return dict((i, case) for i, case in cases_by_p())
+# TODO: To distributions
+# def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False):
+#     '''Return a dict of Cases; quickly build and encase a suite of Case objects.
+#
+#     This is useful for tests requiring laminates with different thicknesses,
+#     ps and geometries.
+#
+#     .. note:: Deprecate warning LamAna 0.4.10
+#             `lamanator` will be removed in LamAna 0.5 and replaced by
+#             `lamana.distributions.Cases` because the latter is more efficient.
+#
+#     Parameters
+#     ----------
+#     geos : list; default `None`
+#         Contains (optionally tuples of) geometry strings.
+#     load_params : dict; default `None`
+#         Passed-in geometric parameters if specified; else default is used.
+#     mat_props : dict; default `None`
+#         Passed-in materials parameters if specified; else default is used.
+#     ps : list of int, optional; default 5
+#         p values to be looped over; this sets the number of rows per DataFrame.
+#     verbose : bool; default `False`
+#         If True, print a list of Geometries.
+#
+#     See Also
+#     --------
+#     test_sanity#() : set of test functions that run sanity checks
+#     utils.tools.select_frames() : utility function to parse DataFrames
+#
+#     Notes
+#     -----
+#     The preferred use for this function is the following:
+#
+#     >>> for case in cases:
+#     ...    print(case.LMs)
+#     [<lamana LaminateModel object (400-200-400S)>,
+#      <lamana LaminateModel object (400-200-800)>],
+#     [<lamana LaminateModel object (400-200-400S)>,
+#      <lamana LaminateModel object (400-200-800)>]
+#
+#     >>> (LM for case in cases for LM in case.LMs)
+#     <generator object>
+#
+#     Examples
+#     --------
+#     >>> from lamana.utils import tools as ut
+#     >>> g = ('400-200-400S')
+#     >>> case = ut.laminator(geos=g, ps=[2])
+#     >>> LM = case[0]
+#     >>> LM
+#     <lamana LaminateModel object (400-200-400S)>
+#
+#     >>> g = ['400-200-400S', '400-200-800']
+#     >>> cases = ut.laminator(geos=g, p=[2,3])
+#     >>> cases
+#     {0: <lamana.distributions.Case p=2>,
+#      1: <lamana.distributions.Case p=3>,}                  # keys by p
+#
+#     >>> for i, case in cases.items():                      # process cases
+#     ...     for LM in case.LMs:
+#     ...         print(LM.Geometry)
+#
+#     >>> (LM for i, LMs in cases.items() for LM in LMs)     # generator processing
+#
+#     '''
+#     # Default
+#     if (geos is None) and (load_params is None) and (mat_props is None):
+#         print('CAUTION: No Geometry or parameters provided to case builder.  Using defaults...')
+#     if geos is None:
+#         geos = [('400-200-800')]
+#     if isinstance(geos, str):
+#         geos = [geos]
+#     elif (geos is not None) and not (isinstance(geos, list)):
+#         # TODO: use custom Exception
+#         raise Exception('geos must be a list of strings')
+#
+#     if load_params is None:
+#         ''' UPDATE: pull from Defaults()'''
+#         load_params = {
+#             'R': 12e-3,                                    # specimen radius
+#             'a': 7.5e-3,                                   # support ring radius
+#             'p': 5,                                        # points/layer
+#             'P_a': 1,                                      # applied load
+#             'r': 2e-4,                                     # radial distance from center loading
+#         }
+#     if mat_props is None:
+#         mat_props = {
+#             'HA': [5.2e10, 0.25],
+#             'PSu': [2.7e9, 0.33],
+#         }
+#
+#     # Laminates of different ps
+#     '''Fix to output repr; may do this with an iterator class.'''
+#     def cases_by_p():
+#         for i, p in enumerate(ps):
+#             '''raise exception if p is not int.'''
+#             load_params['p'] = p
+#             case = distributions.Case(load_params, mat_props)
+#             case.apply(geos)
+#             # Verbose printing
+#             if verbose:
+#                 print('A new case was created. '
+#                       '# of LaminateModels: {}, p: {}'.format(len(geos), p))
+#                 #print('A new case was created. # LaminateModels: %s, ps: %s' % (len(geos), p))
+#             #yield p, case
+#             yield i, case
+#     return dict((i, case) for i, case in cases_by_p())
 
 
 # Helpers
-def get_multi_geometry(Frame):
-    '''Return geometry string parsed from a multi-plied laminate DataFrame.
+# TODO: To input
+# def get_multi_geometry(Frame):
+#     '''Return geometry string parsed from a multi-plied laminate DataFrame.
+#
+#     Uses pandas GroupBy to extract indices with unique values
+#     in middle and outer.  Splits the inner_i list by p.  Used in controls.py.
+#     Refactored for even multi-plies in 0.4.3d4.
+#
+#     Parameters
+#     ----------
+#     Frame : DataFrame
+#         A laminate DataFrame, typically extracted from a file.  Therefore,
+#         it is ambigouous whether Frame is an LFrame or LMFrame.
+#
+#     Notes
+#     -----
+#     Used in controls.py, extract_dataframe() to parse data from files.
+#
+#     See Also
+#     --------
+#     - get_special_geometry: for getting geo_strings of laminates w/nplies<=4.
+#
+#     '''
+#     # TODO: Move to separate function in utils
+#     def chunks(lst, n):
+#         '''Split up a list into n-sized smaller lists; (REF 018)'''
+#         for i in range(0, len(lst), n):
+#             yield lst[i:i + n]
+#
+#     # TODO: why convert to int?; consider conversion to str
+#     def convert_lists(lst):
+#         '''Convert numeric contents of lists to int then str'''
+#         return [str(int(i)) for i in lst]
+#
+#     #print(Frame)
+#     group = Frame.groupby('type')
+#     nplies = len(Frame['layer'].unique())
+#     if nplies < 5:
+#         raise Exception('Number of plies < 5.  Use get_special_geometry() instead.')
+#     p = Frame.groupby('layer').size().iloc[0]              # should be same for each group
+#
+#     # Identify laminae types by creating lists of indices
+#     # These lists must consider the the inner lists as well
+#     # Final lists appear to contain strings.
+#
+#     # Access types by indices
+#     if nplies % 2 != 0:
+#         middle_group = group.get_group('middle')
+#     inner_group = group.get_group('inner').groupby('side')
+#     outer_group = group.get_group('outer')
+#
+#     # Convert to list of indices for each group
+#     if nplies % 2 != 0:
+#         mid_idx = middle_group.index.tolist()
+#     in_idx = inner_group.groups['Tens.']                   # need to split in chunks
+#     out_idx = outer_group.index.tolist()
+#
+#     # Make lists of inner_i indices for a single stress side_
+#     # TODO: Would like to make this inner_i splitting more robust
+#     # TODO: better for it to auto differentiate subsets within inner_i
+#     # NOTE: inner values are converting to floats somewhere, i.e. 400-200-800 --> 400-[200.0]-800
+#     # Might be fixed with _gen_convention, but take note o the inconsistency.
+#     # Looks like out_lst, in_lst, mid_lst are all floats.  Out and mid convert to ints.
+#     in_lst = []
+#     for inner_i_idx in chunks(in_idx, p):
+#         #print(inner_i_idx)
+#         t = Frame.ix[inner_i_idx, 't(um)'].dropna().unique().tolist()
+#         in_lst.append(t)
+#
+#     if nplies % 2 != 0:
+#         mid_lst = Frame.ix[mid_idx, 't(um)'].dropna().unique().tolist()
+#     in_lst = sum(in_lst, [])                               # flatten list
+#     out_lst = Frame.ix[out_idx, 't(um)'].dropna().unique().tolist()
+#     #print(out_lst, in_lst, mid_lst)
+#
+#     # Convert list thicknesses to strings
+#     if nplies % 2 != 0:
+#         mid_con = convert_lists(mid_lst)
+#     else:
+#         mid_con = ['0']                                   # for even plies
+#     out_con = convert_lists(out_lst)
+#
+#     # Make geometry string
+#     geo = []
+#     geo.extend(out_con)
+#     geo.append(str(in_lst))
+#     geo.extend(mid_con)
+#     geo_string = '-'.join(geo)
+#     # TODO: format geo_strings to General Convention
+#     # NOTE: geo_string comes in int-[float]-int format; _to_gen_convention should patch
+#     geo_string = input_.Geometry._to_gen_convention(geo_string)
+#     return geo_string
 
-    Uses pandas GroupBy to extract indices with unique values
-    in middle and outer.  Splits the inner_i list by p.  Used in controls.py.
-    Refactored for even multi-plies in 0.4.3d4.
 
-    Parameters
-    ----------
-    Frame : DataFrame
-        A laminate DataFrame, typically extracted from a file.  Therefore,
-        it is ambigouous whether Frame is an LFrame or LMFrame.
-
-    Notes
-    -----
-    Used in controls.py, extract_dataframe() to parse data from files.
-
-    See Also
-    --------
-    - get_special_geometry: for getting geo_strings of laminates w/nplies<=4.
-
-    '''
-    # TODO: Move to separate function in utils
-    def chunks(lst, n):
-        '''Split up a list into n-sized smaller lists; (REF 018)'''
-        for i in range(0, len(lst), n):
-            yield lst[i:i + n]
-
-    # TODO: why convert to int?; consider conversion to str
-    def convert_lists(lst):
-        '''Convert numeric contents of lists to int then str'''
-        return [str(int(i)) for i in lst]
-
-    #print(Frame)
-    group = Frame.groupby('type')
-    nplies = len(Frame['layer'].unique())
-    if nplies < 5:
-        raise Exception('Number of plies < 5.  Use get_special_geometry() instead.')
-    p = Frame.groupby('layer').size().iloc[0]              # should be same for each group
-
-    # Identify laminae types by creating lists of indices
-    # These lists must consider the the inner lists as well
-    # Final lists appear to contain strings.
-
-    # Access types by indices
-    if nplies % 2 != 0:
-        middle_group = group.get_group('middle')
-    inner_group = group.get_group('inner').groupby('side')
-    outer_group = group.get_group('outer')
-
-    # Convert to list of indices for each group
-    if nplies % 2 != 0:
-        mid_idx = middle_group.index.tolist()
-    in_idx = inner_group.groups['Tens.']                   # need to split in chunks
-    out_idx = outer_group.index.tolist()
-
-    # Make lists of inner_i indices for a single stress side_
-    # TODO: Would like to make this inner_i splitting more robust
-    # TODO: better for it to auto differentiate subsets within inner_i
-    # NOTE: inner values are converting to floats somewhere, i.e. 400-200-800 --> 400-[200.0]-800
-    # Might be fixed with _gen_convention, but take note o the inconsistency.
-    # Looks like out_lst, in_lst, mid_lst are all floats.  Out and mid convert to ints.
-    in_lst = []
-    for inner_i_idx in chunks(in_idx, p):
-        #print(inner_i_idx)
-        t = Frame.ix[inner_i_idx, 't(um)'].dropna().unique().tolist()
-        in_lst.append(t)
-
-    if nplies % 2 != 0:
-        mid_lst = Frame.ix[mid_idx, 't(um)'].dropna().unique().tolist()
-    in_lst = sum(in_lst, [])                               # flatten list
-    out_lst = Frame.ix[out_idx, 't(um)'].dropna().unique().tolist()
-    #print(out_lst, in_lst, mid_lst)
-
-    # Convert list thicknesses to strings
-    if nplies % 2 != 0:
-        mid_con = convert_lists(mid_lst)
-    else:
-        mid_con = ['0']                                   # for even plies
-    out_con = convert_lists(out_lst)
-
-    # Make geometry string
-    geo = []
-    geo.extend(out_con)
-    geo.append(str(in_lst))
-    geo.extend(mid_con)
-    geo_string = '-'.join(geo)
-    # TODO: format geo_strings to General Convention
-    # NOTE: geo_string comes in int-[float]-int format; _to_gen_convention should patch
-    geo_string = input_.Geometry._to_gen_convention(geo_string)
-    return geo_string
-
-
-def get_special_geometry(Frame):
-    '''Return geometry string parsed from a special-plied (<5) laminate DataFrame.
-
-    Parameters
-    ----------
-    Frame : DataFrame
-        A laminate DataFrame, typically extracted from a file.  Therefore,
-        it is ambigouous whether Frame is an LFrame or LMFrame.
-
-    Notes
-    -----
-    Used in controls.py, extract_dataframe() to parse data from files.
-
-    See Also
-    --------
-    - get_multi_geometry: for getting geo_strings of laminates w/nplies>=5.
-
-    '''
-    #nplies = len(laminate['layer'].unique())
-    #geo = [
-    #    str(int(thickness)) for thickness               # gets unique values
-    #    in laminate.groupby('type', sort=False)['t(um)'].first()
-    #]
-    nplies = len(Frame['layer'].unique())
-    geo = [
-        str(int(thickness)) for thickness               # gets unique values
-        in Frame.groupby('type', sort=False)['t(um)'].first()
-    ]
-    #print(geo)
-
-    # Amend list by plies by inserting 0 for missing layer type thicknesses; list required for .join
-    if nplies == 1:
-        #ply = 'Monolith'
-        geo.insert(0, '0')                                 # outer
-        geo.insert(1, '0')                                 # inner
-    elif nplies == 2:
-        #ply = 'Bilayer'
-        geo.append('0')                                    # middle
-        geo.append('0')
-    elif nplies == 3:
-        #ply = 'Trilayer'
-        geo.insert(1, '0')
-    elif nplies == 4:
-        #ply = '4-ply'
-        geo.append('0')
-        # TODO: use join
-        geo[1] = '[' + geo[1] + ']'                        # redo inner in General Convention notation
-    else:
-        # TODO: use custom Exception
-        raise Exception('Number of plies > 4.  Use get_multi_geometry() instead.')
-
-    #print('nplies:', nplies)
-    #print(geo)
-    geo_string = '-'.join(geo)
-    # TODO: format geo_strings to General Convention
-    geo_string = input_.Geometry._to_gen_convention(geo_string)
-    return geo_string
+# TODO: To input
+# def get_special_geometry(Frame):
+#     '''Return geometry string parsed from a special-plied (<5) laminate DataFrame.
+#
+#     Parameters
+#     ----------
+#     Frame : DataFrame
+#         A laminate DataFrame, typically extracted from a file.  Therefore,
+#         it is ambigouous whether Frame is an LFrame or LMFrame.
+#
+#     Notes
+#     -----
+#     Used in controls.py, extract_dataframe() to parse data from files.
+#
+#     See Also
+#     --------
+#     - get_multi_geometry: for getting geo_strings of laminates w/nplies>=5.
+#
+#     '''
+#     #nplies = len(laminate['layer'].unique())
+#     #geo = [
+#     #    str(int(thickness)) for thickness               # gets unique values
+#     #    in laminate.groupby('type', sort=False)['t(um)'].first()
+#     #]
+#     nplies = len(Frame['layer'].unique())
+#     geo = [
+#         str(int(thickness)) for thickness               # gets unique values
+#         in Frame.groupby('type', sort=False)['t(um)'].first()
+#     ]
+#     #print(geo)
+#
+#     # Amend list by plies by inserting 0 for missing layer type thicknesses; list required for .join
+#     if nplies == 1:
+#         #ply = 'Monolith'
+#         geo.insert(0, '0')                                 # outer
+#         geo.insert(1, '0')                                 # inner
+#     elif nplies == 2:
+#         #ply = 'Bilayer'
+#         geo.append('0')                                    # middle
+#         geo.append('0')
+#     elif nplies == 3:
+#         #ply = 'Trilayer'
+#         geo.insert(1, '0')
+#     elif nplies == 4:
+#         #ply = '4-ply'
+#         geo.append('0')
+#         # TODO: use join
+#         geo[1] = '[' + geo[1] + ']'                        # redo inner in General Convention notation
+#     else:
+#         # TODO: use custom Exception
+#         raise Exception('Number of plies > 4.  Use get_multi_geometry() instead.')
+#
+#     #print('nplies:', nplies)
+#     #print(geo)
+#     geo_string = '-'.join(geo)
+#     # TODO: format geo_strings to General Convention
+#     geo_string = input_.Geometry._to_gen_convention(geo_string)
+#     return geo_string
 
 
 # TODO: Add extract_dataframe and fix_discontinuities here from controls.py; make tests.
@@ -511,51 +514,52 @@ def rename_tempfile(filepath, filename):
 
 
 # TODO: Add write functions from controls.py here
-def convert_featureinput(FI):
-    '''Return FeaureInput dict with converted values to Dataframes.
-
-    Can accept almost any dict.  Converts to DataFrames depending on type.
-
-    Returns
-    -------
-    defaultdict
-        Values are DataFrames.
-
-    '''
-    logging.info('Converting FeatureInput values to DataFrames: {}...'.format(
-        FI.get('Geometry')))
-
-    dd = ct.defaultdict(list)
-    for k, v in FI.items():
-        if isinstance(v, dict):
-            try:
-                # if dict of dicts
-                dd[k] = pd.DataFrame(v).T
-            except(ValueError):
-                # if regular dict, put in a list
-                dd[k] = pd.DataFrame([v], index=[k]).T
-            finally:
-                logging.debug('{0} {1} -> df'.format(k, type(v)))
-        elif isinstance(v, list):
-            dd[k] = pd.DataFrame(v, columns=[k])
-            logging.debug('{0} {1} -> df'.format(k, type(v)))
-        elif isinstance(v, str):
-            dd[k] = pd.DataFrame({'': {k: v}})
-            logging.debug('{0} {1} -> df'.format(k, type(v)))
-        elif isinstance(v, input_.Geometry):
-            v = v.string                                       # get geo_string
-            dd[k] = pd.DataFrame({'': {k: v}})
-            logging.debug('{0} {1} -> df'.format(k, type(v)))
-        elif isinstance(v, pd.DataFrame):                      # sometimes materials is df
-            dd[k] = v
-            logging.debug('{0} {1} -> df'.format(k, type(v)))
-        elif not v:                                            # empty container
-            dd[k] = pd.DataFrame()
-            logging.debug('{0} {1} -> empty df'.format(k, v))
-        else:
-            logging.debug('{0} -> Skipped'.format(type(v)))    # pragma: no cover
-
-    return dd
+# TODO: To input
+# def convert_featureinput(FI):
+#     '''Return FeaureInput dict with converted values to Dataframes.
+#
+#     Can accept almost any dict.  Converts to DataFrames depending on type.
+#
+#     Returns
+#     -------
+#     defaultdict
+#         Values are DataFrames.
+#
+#     '''
+#     logging.info('Converting FeatureInput values to DataFrames: {}...'.format(
+#         FI.get('Geometry')))
+#
+#     dd = ct.defaultdict(list)
+#     for k, v in FI.items():
+#         if isinstance(v, dict):
+#             try:
+#                 # if dict of dicts
+#                 dd[k] = pd.DataFrame(v).T
+#             except(ValueError):
+#                 # if regular dict, put in a list
+#                 dd[k] = pd.DataFrame([v], index=[k]).T
+#             finally:
+#                 logging.debug('{0} {1} -> df'.format(k, type(v)))
+#         elif isinstance(v, list):
+#             dd[k] = pd.DataFrame(v, columns=[k])
+#             logging.debug('{0} {1} -> df'.format(k, type(v)))
+#         elif isinstance(v, str):
+#             dd[k] = pd.DataFrame({'': {k: v}})
+#             logging.debug('{0} {1} -> df'.format(k, type(v)))
+#         elif isinstance(v, input_.Geometry):
+#             v = v.string                                       # get geo_string
+#             dd[k] = pd.DataFrame({'': {k: v}})
+#             logging.debug('{0} {1} -> df'.format(k, type(v)))
+#         elif isinstance(v, pd.DataFrame):                      # sometimes materials is df
+#             dd[k] = v
+#             logging.debug('{0} {1} -> df'.format(k, type(v)))
+#         elif not v:                                            # empty container
+#             dd[k] = pd.DataFrame()
+#             logging.debug('{0} {1} -> empty df'.format(k, v))
+#         else:
+#             logging.debug('{0} -> Skipped'.format(type(v)))    # pragma: no cover
+#
+#     return dd
 
 
 def reorder_featureinput(d, keys=None):
@@ -709,16 +713,16 @@ def get_path(filename=None, prefix=None, suffix=None, overwrite=True,
     if suffix is None:
         suffix = ''
     elif suffix.endswith('csv'):
-        suffix = config.EXTENSIONS[0]
+        suffix = EXTENSIONS[0]
     elif suffix.endswith('xlsx'):
-        suffix = config.EXTENSIONS[1]
+        suffix = EXTENSIONS[1]
 
     # Set Root/Source/Default Paths -------------------------------------------
     # The export folder is relative to the root (package) path
     # sourcepath = os.path.abspath(os.path.dirname(la.__file__))
     # packagepath = os.path.dirname(sourcepath)
     # if not os.path.isfile(os.path.join(packagepath, 'setup.py')):
-    if not os.path.isfile(os.path.join(config.PACKAGEPATH, 'setup.py')):
+    if not os.path.isfile(os.path.join(PACKAGEPATH, 'setup.py')):
         raise OSError(
             'Package root path location is not correct: {}'
             ' Verify working directory is ./lamana.'.format(packagepath)
@@ -727,10 +731,10 @@ def get_path(filename=None, prefix=None, suffix=None, overwrite=True,
     #
     # dirpath = defaultpath
 
-    dirpath = config.DEFAULTPATH
+    dirpath = DEFAULTPATH
 
 
-    logging.debug('Root path: {}'.format(config.PACKAGEPATH))
+    logging.debug('Root path: {}'.format(PACKAGEPATH))
     if not filename and (suffix or dashboard):
         logging.warn("Missing 'filename' arg.  Using default export directory ...")
 
@@ -864,7 +868,7 @@ def export(L_, overwrite=False, prefix=None, suffix=None, order=None,
     if prefix is None:
         prefix = ''
     if suffix is None:
-        suffix = config.EXTENSIONS[1]                      # .xlsx
+        suffix = EXTENSIONS[1]                      # .xlsx
 
     if dirpath is None:
         ###
@@ -1042,35 +1046,36 @@ def get_hook_function(module, hookname):
     return hook_function
 
 
-def get_hook_class(module, hookname):
-    '''Return the class containing the hook method.
-
-    Inspect all classes in a module for a method with a given HOOKNAME. Assumes
-    only one hook per module.  Return the class so that it can be later
-    instantiated for it's hook method.
-
-    '''
-    logging.debug("Given hookname: '{}'".format(hookname))
-    methods = []
-    all_methods = []
-    for name, kls in find_classes(module):
-        logging.debug('Found class: {}'.format(kls))
-        # Need to make sure we not looking in the parent class BaseModel
-        if issubclass(kls, theories.BaseModel) and not isparent(kls):
-            logging.debug('Sub-classes of BaseModel: {}'.format(kls))
-            methods = [(name, mthd) for name, mthd in find_methods(kls)
-                if name == hookname]
-            class_obj = kls
-            all_methods.extend(methods)
-    logging.debug("All hook methods ({}) found in module {}: '{}'".format(
-        len(all_methods), module, all_methods))
-    if not len(all_methods):
-        raise AttributeError('No hook class found.')
-    elif len(all_methods) != 1:
-        raise AttributeError('Found more than one hook_method in {}'
-                             ' Expected only one per module.'.format(module))
-
-    return class_obj
+# TODO: To theories
+# def get_hook_class(module, hookname):
+#     '''Return the class containing the hook method.
+#
+#     Inspect all classes in a module for a method with a given HOOKNAME. Assumes
+#     only one hook per module.  Return the class so that it can be later
+#     instantiated for it's hook method.
+#
+#     '''
+#     logging.debug("Given hookname: '{}'".format(hookname))
+#     methods = []
+#     all_methods = []
+#     for name, kls in find_classes(module):
+#         logging.debug('Found class: {}'.format(kls))
+#         # Need to make sure we not looking in the parent class BaseModel
+#         if issubclass(kls, theories.BaseModel) and not isparent(kls):
+#             logging.debug('Sub-classes of BaseModel: {}'.format(kls))
+#             methods = [(name, mthd) for name, mthd in find_methods(kls)
+#                 if name == hookname]
+#             class_obj = kls
+#             all_methods.extend(methods)
+#     logging.debug("All hook methods ({}) found in module {}: '{}'".format(
+#         len(all_methods), module, all_methods))
+#     if not len(all_methods):
+#         raise AttributeError('No hook class found.')
+#     elif len(all_methods) != 1:
+#         raise AttributeError('Found more than one hook_method in {}'
+#                              ' Expected only one per module.'.format(module))
+#
+#     return class_obj
 
 # =============================================================================
 # CITED CODE ------------------------------------------------------------------

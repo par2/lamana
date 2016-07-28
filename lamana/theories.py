@@ -9,7 +9,7 @@ import logging
 
 import six
 
-from models import *
+#from .models import *
 from .utils import tools as ut
 
 # from lamana.models import *
