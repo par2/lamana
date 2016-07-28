@@ -61,6 +61,8 @@ class Reference(object):
     # (053) How to use abstractmethod           https://julien.danjou.info/blog/2013/guide-python-static-class-abstract-methods
     # (054) Py2/3 metaclasses; adapt from six   https://stackoverflow.com/questions/18513821/python-metaclass-understanding-the-with-metaclass/18513858#18513858
     # (055) Dyn. Import all modules in a folder https://stackoverflow.com/questions/1057431/loading-all-modules-in-a-folder-in-python
+    # (056) You can use __init__ is tests dir   http://docs.pytest.org/en/latest/goodpractices.html
+    # (056) Relative imports, tests & __init__  https://stackoverflow.com/questions/4348452/python-packaging-for-relative-imports
 
     pass
 
