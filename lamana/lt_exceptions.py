@@ -45,6 +45,11 @@ class PlottingError(Error):
     pass
 
 
+class ExportError(Error):
+    '''Associated with export errors.'''
+    pass
+
+
 class ModelError(Error):
     '''Associated with model exceptions.'''
     # TODO: Consider replacing Attribute Error in hook tools and theories.handshake

@@ -678,6 +678,7 @@ class BaseDefaults(object):
 
         return dict_
 
+
     # HELPERS -------------------------------------------------------------
     # Material Manipulations
     @classmethod
@@ -765,7 +766,8 @@ class BaseDefaults(object):
         return pd.DataFrame(mat_props_conv).index.values.tolist()
 
     # TODO: Look into why global_vars is used instead of globals
-    def get_FeatureInput(self, Geometry, load_params=None, mat_props=None,
+    # TODO: Rename Geo
+    def get_FeatureInput(self, Geo, load_params=None, mat_props=None,
                          materials=None, model=None, global_vars=None):
         '''Return a FeatureInput for a given Geometry object.
 
@@ -775,7 +777,7 @@ class BaseDefaults(object):
 
         Parameters
         ----------
-        Geometry : Geometry object
+        Geo : Geometry object
             A native data type comprising geometry information.
         load_params : dict; default None
             Loading parameters.
@@ -808,7 +810,7 @@ class BaseDefaults(object):
 
         # TODO: Add Exception handling of materials order list and mat_props here.
         FeatureInput = {
-            'Geometry': Geometry,
+            'Geometry': Geo,
             'Parameters': load_params,
             'Properties': mat_props_conv,
             'Materials': materials,
@@ -871,3 +873,285 @@ class BaseDefaults(object):
                             if k in sorted(dict_, key=ut.natural_sort))
             # print(list(flattened))
             return it.chain(*nested_lists)                   # flattened
+
+
+def get_multi_geometry(Frame):
+    '''Return geometry string parsed from a multi-plied laminate DataFrame.
+
+    Uses pandas GroupBy to extract indices with unique values
+    in middle and outer.  Splits the inner_i list by p.  Used in controls.py.
+    Refactored for even multi-plies in 0.4.3d4.
+
+    Parameters
+    ----------
+    Frame : DataFrame
+        A laminate DataFrame, typically extracted from a file.  Therefore,
+        it is ambigouous whether Frame is an LFrame or LMFrame.
+
+    Notes
+    -----
+    Used in controls.py, extract_dataframe() to parse data from files.
+
+    See Also
+    --------
+    - get_special_geometry: for getting geo_strings of laminates w/nplies<=4.
+
+    '''
+    # TODO: Move to separate function in utils
+    def chunks(lst, n):
+        '''Split up a list into n-sized smaller lists; (REF 018)'''
+        for i in range(0, len(lst), n):
+            yield lst[i:i + n]
+
+    # TODO: why convert to int?; consider conversion to str
+    def convert_lists(lst):
+        '''Convert numeric contents of lists to int then str'''
+        return [str(int(i)) for i in lst]
+
+    #print(Frame)
+    group = Frame.groupby('type')
+    nplies = len(Frame['layer'].unique())
+    if nplies < 5:
+        raise Exception('Number of plies < 5.  Use get_special_geometry() instead.')
+    p = Frame.groupby('layer').size().iloc[0]              # should be same for each group
+
+    # Identify laminae types by creating lists of indices
+    # These lists must consider the the inner lists as well
+    # Final lists appear to contain strings.
+
+    # Access types by indices
+    if nplies % 2 != 0:
+        middle_group = group.get_group('middle')
+    inner_group = group.get_group('inner').groupby('side')
+    outer_group = group.get_group('outer')
+
+    # Convert to list of indices for each group
+    if nplies % 2 != 0:
+        mid_idx = middle_group.index.tolist()
+    in_idx = inner_group.groups['Tens.']                   # need to split in chunks
+    out_idx = outer_group.index.tolist()
+
+    # Make lists of inner_i indices for a single stress side_
+    # TODO: Would like to make this inner_i splitting more robust
+    # TODO: better for it to auto differentiate subsets within inner_i
+    # NOTE: inner values are converting to floats somewhere, i.e. 400-200-800 --> 400-[200.0]-800
+    # Might be fixed with _gen_convention, but take note o the inconsistency.
+    # Looks like out_lst, in_lst, mid_lst are all floats.  Out and mid convert to ints.
+    in_lst = []
+    for inner_i_idx in chunks(in_idx, p):
+        #print(inner_i_idx)
+        t = Frame.ix[inner_i_idx, 't(um)'].dropna().unique().tolist()
+        in_lst.append(t)
+
+    if nplies % 2 != 0:
+        mid_lst = Frame.ix[mid_idx, 't(um)'].dropna().unique().tolist()
+    in_lst = sum(in_lst, [])                               # flatten list
+    out_lst = Frame.ix[out_idx, 't(um)'].dropna().unique().tolist()
+    #print(out_lst, in_lst, mid_lst)
+
+    # Convert list thicknesses to strings
+    if nplies % 2 != 0:
+        mid_con = convert_lists(mid_lst)
+    else:
+        mid_con = ['0']                                   # for even plies
+    out_con = convert_lists(out_lst)
+
+    # Make geometry string
+    geo = []
+    geo.extend(out_con)
+    geo.append(str(in_lst))
+    geo.extend(mid_con)
+    geo_string = '-'.join(geo)
+    # TODO: format geo_strings to General Convention
+    # NOTE: geo_string comes in int-[float]-int format; _to_gen_convention should patch
+    geo_string = Geometry._to_gen_convention(geo_string)
+    return geo_string
+
+
+def get_special_geometry(Frame):
+    '''Return geometry string parsed from a special-plied (<5) laminate DataFrame.
+
+    Parameters
+    ----------
+    Frame : DataFrame
+        A laminate DataFrame, typically extracted from a file.  Therefore,
+        it is ambigouous whether Frame is an LFrame or LMFrame.
+
+    Notes
+    -----
+    Used in controls.py, extract_dataframe() to parse data from files.
+
+    See Also
+    --------
+    - get_multi_geometry: for getting geo_strings of laminates w/nplies>=5.
+
+    '''
+    #nplies = len(laminate['layer'].unique())
+    #geo = [
+    #    str(int(thickness)) for thickness               # gets unique values
+    #    in laminate.groupby('type', sort=False)['t(um)'].first()
+    #]
+    nplies = len(Frame['layer'].unique())
+    geo = [
+        str(int(thickness)) for thickness               # gets unique values
+        in Frame.groupby('type', sort=False)['t(um)'].first()
+    ]
+    #print(geo)
+
+    # Amend list by plies by inserting 0 for missing layer type thicknesses; list required for .join
+    if nplies == 1:
+        #ply = 'Monolith'
+        geo.insert(0, '0')                                 # outer
+        geo.insert(1, '0')                                 # inner
+    elif nplies == 2:
+        #ply = 'Bilayer'
+        geo.append('0')                                    # middle
+        geo.append('0')
+    elif nplies == 3:
+        #ply = 'Trilayer'
+        geo.insert(1, '0')
+    elif nplies == 4:
+        #ply = '4-ply'
+        geo.append('0')
+        # TODO: use join
+        geo[1] = '[' + geo[1] + ']'                        # redo inner in General Convention notation
+    else:
+        # TODO: use custom Exception
+        raise Exception('Number of plies > 4.  Use get_multi_geometry() instead.')
+
+    #print('nplies:', nplies)
+    #print(geo)
+    geo_string = '-'.join(geo)
+    # TODO: format geo_strings to General Convention
+    geo_string = Geometry._to_gen_convention(geo_string)
+    return geo_string
+
+
+#TODO: Add extract_dataframe and fix_discontinuities here from controls.py; make tests.
+
+#DEPRECATE: remove and replace with Cases() (0.4.11.dev0)
+#Does not print cases accurately
+#Did not fail test although alias given for name
+def get_frames(cases, name=None, nplies=None, ps=None):
+#def select_frames(cases, name=None, nplies=None, ps=None):
+    '''Yield and print a subset of case DataFrames given cases.
+
+    Else, print all DataFrames for all cases.
+
+   .. note:: DEPRECATE LamAna 0.4.11.dev0
+           `lamanator` will be removed in LamAna 0.5 and replaced by
+           `lamana.distributions.Cases` because the latter is more efficient.
+
+    Parameters
+    ----------
+    cases : list of DataFrames
+        Contains case objects.
+    name : str
+        Common name.
+    nplies : int
+        Number of plies.
+    ps : int
+        Number of points per layer.
+
+    Examples
+    --------
+    >>> cases_selected = ut.select_frames(cases, name='Trilayer', ps=[])
+    >>> LMs_list = list(cases)                              # capture generator contents
+    >>> LMs_list = [LM for LM in cases_selected]            # capture and exhaust generator
+    >>> for LMs in cases_selected:                          # exhaust generator; see contents
+    ...    print(LMs)
+
+    Notes
+    -----
+    This function is a predecessor to the modern Cases.select() method.  It is
+    no longer maintained (0.4.11.dev0), though possibly useful for extracting
+    selected DataFrames from existing cases.  Formerly `get_frames()`.
+
+    See Also
+    --------
+    lamana.distributions.Cases.select() : canonical way to select df subsets.
+
+    Yields
+    ------
+    DataFrame
+        Extracted data from a sequence of case objects.
+
+    '''
+    # Default
+    if ps is None:
+        ps = []
+
+    try:
+        for i, case in enumerate(cases.values()):          # Python 3
+            print('case', i + 1)
+            for LM in case.LMs:
+                #print(LM.Geometry)
+                #print(name, nplies, ps)
+                # Select based on what is not None
+                if not not ps:                             # if list not empty
+                    for p in ps:
+                        #print('p', p)
+                        if ((LM.name == name) | (LM.nplies == nplies)) & (LM.p == p):
+                            #print(LM.LMFrame)
+                            print(LM.Geometry)
+                            yield LM.LMFrame
+                # All ps in the case suite
+                elif ((LM.name == name) | (LM.nplies == nplies)):
+                    #print(LM.LMFrame)
+                    print(LM.Geometry)
+                    yield LM.LMFrame
+                # No subset --> print all
+                if (name is None) & (nplies is None) & (ps == []):
+                    #print(LM.LMFrame)
+                    print(LM.Geometry)
+                    yield LM.LMFrame
+    finally:
+        print('\n')
+        print('Finished getting DataFrames.')
+
+# TODO: Transferred from utils.tools
+def convert_featureinput(FI):
+    '''Return FeaureInput dict with converted values to Dataframes.
+
+    Can accept almost any dict.  Converts to DataFrames depending on type.
+
+    Returns
+    -------
+    defaultdict
+        Values are DataFrames.
+
+    '''
+    logging.info('Converting FeatureInput values to DataFrames: {}...'.format(
+        FI.get('Geometry')))
+
+    dd = ct.defaultdict(list)
+    for k, v in FI.items():
+        if isinstance(v, dict):
+            try:
+                # if dict of dicts
+                dd[k] = pd.DataFrame(v).T
+            except(ValueError):
+                # if regular dict, put in a list
+                dd[k] = pd.DataFrame([v], index=[k]).T
+            finally:
+                logging.debug('{0} {1} -> df'.format(k, type(v)))
+        elif isinstance(v, list):
+            dd[k] = pd.DataFrame(v, columns=[k])
+            logging.debug('{0} {1} -> df'.format(k, type(v)))
+        elif isinstance(v, str):
+            dd[k] = pd.DataFrame({'': {k: v}})
+            logging.debug('{0} {1} -> df'.format(k, type(v)))
+        elif isinstance(v, Geometry):                          # class
+            v = v.string                                       # get geo_string
+            dd[k] = pd.DataFrame({'': {k: v}})
+            logging.debug('{0} {1} -> df'.format(k, type(v)))
+        elif isinstance(v, pd.DataFrame):                      # sometimes materials is df
+            dd[k] = v
+            logging.debug('{0} {1} -> df'.format(k, type(v)))
+        elif not v:                                            # empty container
+            dd[k] = pd.DataFrame()
+            logging.debug('{0} {1} -> empty df'.format(k, v))
+        else:
+            logging.debug('{0} -> Skipped'.format(type(v)))    # pragma: no cover
+
+    return dd
