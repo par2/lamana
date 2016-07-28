@@ -5,8 +5,6 @@ import os
 import logging
 
 import numpy as np
-##import pandas as pd
-##import nose.tools as nt
 
 from .. import input_
 from .. import distributions

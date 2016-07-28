@@ -16,7 +16,7 @@ from ..lt_exceptions import PlottingError
 from ..utils import plottools as upt
 from ..models import Wilson_LT as wlt
 
-# Setup -----------------------------------------------------------------------
+
 dft = wlt.Defaults()
 
 
@@ -135,7 +135,7 @@ class TestDistribplotDimensions():
 
     # Sample plots
     plot1 = output_._distribplot(case1.LMs, normalized=True, extrema=True)
-    fig2, ax2 = plt.subplots()                          # make new, separate axes; prevent inifinite loop of plt.gca()
+    fig2, ax2 = plt.subplots()                             # make new, separate axes; prevent inifinite loop of plt.gca()
     plot2 = output_._distribplot(case1.LMs, normalized=False, extrema=True, ax=ax2)
 
     # TODO: randomize cases for this test

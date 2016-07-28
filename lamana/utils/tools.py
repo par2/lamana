@@ -495,7 +495,7 @@ def read_csv_dir(dirpath, *args, **kwargs):
 
     '''
     # Read all files in path
-    for itemname in os.listdir(dirpath):                  # list files, folders, etc in a dir
+    for itemname in os.listdir(dirpath):                   # list files, folders, etc in a dir
         dir_item_path = os.path.join(dirpath, itemname)
         # TODO: How to test this if branch?
         if os.path.isfile(dir_item_path):
@@ -562,28 +562,8 @@ def natural_sort(data):
     # Extract string from a key-value tuple in a sorted dict; if data.items() used
     elif isinstance(data, tuple):
         #string_ = data[0]
-        string_, list_ = data                             # key, value pair
+        string_, list_ = data                              # key, value pair
     #print(string_)
 
     # TODO: Need to complete; doesn't really do any sorting, just sets up the iterator.  Redo.
     return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
-
-
-# def with_metaclass(meta, *bases):
-#     '''Create a base class with a metaclass (REF 054).
-#
-#     Examples
-#     --------
-#     >>> class MyClassA(object):
-#     ...     ___metaclass__ = Meta                          # python 2
-#     >>> class MyClassB(metaclass=Meta): pass               # python 3
-#
-#     >>> # Py 2/3 equivalent metaclasses
-#     >>> class MyClassC(with_metaclass(Meta, object)): pass # python 2/3
-#     >>> type(MyClassA) is type(MyClassC)                   # python 2
-#     True
-#     >>> type(MyClassA) is type(MyClassC)                   # python 3
-#     True
-#
-#     '''
-#     return meta('MetaBase', bases, {})

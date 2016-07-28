@@ -12,7 +12,8 @@ import numpy as np
 from .. import input_
 from .. import distributions
 from .. import constructs
-from ..lt_exceptions import IndeterminateError, ModelError
+from ..lt_exceptions import IndeterminateError
+from ..lt_exceptions import ModelError
 from ..utils import tools as ut
 from ..models import Wilson_LT as wlt
 
@@ -1197,10 +1198,10 @@ def test_Laminate_compare_sets1():
     # Tests __hash__
     cases1 = distributions.laminator(dft.geo_inputs['5-ply'])
     cases2 = distributions.laminator(dft.geo_inputs['1-ply'])
-    LM1 = cases1[0].LMs[0]                                     # 400-200-800
-    LM2 = cases1[0].LMs[1]                                     # 400-[200]-800
-    LM3 = cases1[0].LMs[2]                                     # 400-[200]-400S
-    LM4 = cases2[0].LMs[0]                                     # 0-0-2000
+    LM1 = cases1[0].LMs[0]                                 # 400-200-800
+    LM2 = cases1[0].LMs[1]                                 # 400-[200]-800
+    LM3 = cases1[0].LMs[2]                                 # 400-[200]-400S
+    LM4 = cases2[0].LMs[0]                                 # 0-0-2000
 
     nt.assert_set_equal(set([LM1, LM2]), set([LM1, LM2]))
     nt.assert_set_equal(set([LM1]), set([LM2]))

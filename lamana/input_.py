@@ -14,9 +14,6 @@ import pandas as pd
 from .lt_exceptions import FormatError
 from .utils import tools as ut
 
-# import lamana as la
-# from lamana.lt_exceptions import FormatError
-# from lamana.utils import tools as ut
 
 # =============================================================================
 # USER INPUT ------------------------------------------------------------------
@@ -615,11 +612,11 @@ class BaseDefaults(object):
         for k, v in sorted(dict_.items(), key=ut.natural_sort):
             # Prepare k, v
             num = cls._extract_number(k)
-            if Geo_obj:                             # build Geo_objects simul.
+            if Geo_obj:                                    # build Geo_objects simul.
                 # G = la.input_.Geometry
                 G = Geometry
                 v = [G(geo_string) for geo_string in v]
-                dict_[k] = v                        # overwrite original dict_
+                dict_[k] = v                               # overwrite original dict_
             # Group keys
             if (num is not None) and (num % 2 == 0):
                 #print(num)
@@ -703,8 +700,8 @@ class BaseDefaults(object):
             # Nested dict (Standard Form), directly assign
             elif isinstance(mat_props, dict):
                 # Standard (Nested) Dict
-                mat_props['Modulus'].keys()                     # needed; triggers KeyError if not Standard Form
-                ##_trigger = mat_props['Modulus'].keys()        # needed; triggers KeyError if not Standard Form
+                mat_props['Modulus'].keys()                # needed; triggers KeyError if not Standard Form
+                ##_trigger = mat_props['Modulus'].keys()     # needed; triggers KeyError if not Standard Form
                 dict_prop = mat_props
             else:
                 raise TypeError('Nested dict of material parameters required.  See Tutorial.')
@@ -839,14 +836,14 @@ class BaseDefaults(object):
         >>> from lamana.input_ import BaseDefaults
         >>> bdft = BaseDefaults()
         >>> bdft.generate()
-        <itertools.chain at 0x7d1e278>                        # yields a generator
+        <itertools.chain at 0x7d1e278>                     # yields a generator
 
         >>> list(bdft.generate(selection=['5-ply'], geo_inputs=True))
         >>> list(gen)
-        ['400-200-800', '400-[200]-800', '400-200-400S']      # geometry strings
+        ['400-200-800', '400-[200]-800', '400-200-400S']   # geometry strings
 
         >>> list(bdft.generate(selection=['standard'], geo_inputs=False))
-        [Geometry object (400.0-[200.0]-800.0)]               # Geometry object; default
+        [Geometry object (400.0-[200.0]-800.0)]            # Geometry object; default
 
         '''
         # Default to all strings/objects (not groups) if None selected
@@ -864,15 +861,15 @@ class BaseDefaults(object):
         else:
             # selection=['valid key']
             if geo_inputs is True:
-                dict_ = self.geo_inputs                      # geometry strings
+                dict_ = self.geo_inputs                    # geometry strings
             else:
-                dict_ = self.Geo_objects                     # Geometry objects
+                dict_ = self.Geo_objects                   # Geometry objects
 
             # Sorted values filtered by selected keys
             nested_lists = (dict_[k] for k in selection
                             if k in sorted(dict_, key=ut.natural_sort))
             # print(list(flattened))
-            return it.chain(*nested_lists)                   # flattened
+            return it.chain(*nested_lists)                 # flattened
 
 
 def get_multi_geometry(Frame):
@@ -953,7 +950,7 @@ def get_multi_geometry(Frame):
     if nplies % 2 != 0:
         mid_con = convert_lists(mid_lst)
     else:
-        mid_con = ['0']                                   # for even plies
+        mid_con = ['0']                                    # for even plies
     out_con = convert_lists(out_lst)
 
     # Make geometry string
@@ -988,12 +985,12 @@ def get_special_geometry(Frame):
     '''
     #nplies = len(laminate['layer'].unique())
     #geo = [
-    #    str(int(thickness)) for thickness               # gets unique values
+    #    str(int(thickness)) for thickness                  # gets unique values
     #    in laminate.groupby('type', sort=False)['t(um)'].first()
     #]
     nplies = len(Frame['layer'].unique())
     geo = [
-        str(int(thickness)) for thickness               # gets unique values
+        str(int(thickness)) for thickness                  # gets unique values
         in Frame.groupby('type', sort=False)['t(um)'].first()
     ]
     #print(geo)
@@ -1056,9 +1053,9 @@ def get_frames(cases, name=None, nplies=None, ps=None):
     Examples
     --------
     >>> cases_selected = ut.select_frames(cases, name='Trilayer', ps=[])
-    >>> LMs_list = list(cases)                              # capture generator contents
-    >>> LMs_list = [LM for LM in cases_selected]            # capture and exhaust generator
-    >>> for LMs in cases_selected:                          # exhaust generator; see contents
+    >>> LMs_list = list(cases)                             # capture generator contents
+    >>> LMs_list = [LM for LM in cases_selected]           # capture and exhaust generator
+    >>> for LMs in cases_selected:                         # exhaust generator; see contents
     ...    print(LMs)
 
     Notes

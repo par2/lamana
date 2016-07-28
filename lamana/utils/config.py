@@ -4,9 +4,8 @@
 import os
 
 from .. import __file__ as __root__
-#import lamana as la
 
-# Name for hook function/method; used in `theoires.handshake()` with models
+# Name for hook function/method; used in `theories.handshake()` with models
 HOOKNAME = '_use_model_'
 
 # Default export directory path; used in `utils.get_path()`
@@ -17,6 +16,10 @@ DEFAULTPATH = os.path.join(PACKAGEPATH, 'export')
 
 # Supported export extensions
 EXTENSIONS = ('.csv', '.xlsx')
+
+# Random characters
+RANDOMCHARS = 'xZ(1-)[]' 
+
 
 # Default layer colors
 # colorblind palette from seaborn; grayscale is web-safe

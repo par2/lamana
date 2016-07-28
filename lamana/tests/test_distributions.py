@@ -13,7 +13,7 @@ from .. import input_
 from .. import distributions
 from .. import constructs
 from ..utils import tools as ut
-from ..models import Wilson_LT as wlt                 # for post Laminate, i.e. Cases only
+from ..models import Wilson_LT as wlt                      # for post Laminate, i.e. Cases only
 
 # PARAMETERS ------------------------------------------------------------------
 # Build dicts of geometric and material parameters
@@ -1072,8 +1072,8 @@ load_params = copy.deepcopy(dft.load_params)
 # Manual and Auto Cases for Attribute Tests
 cases1a = distributions.Cases(dft.geo_inputs['5-ply'], ps=[2, 3, 4])
 cases1b = distributions.Cases(dft.geo_inputs['5-ply'], ps=[2, 3, 4])
-#cases1a = Cases(dft.geo_inputs['5-ply'], ps=[2,3,4])     # assumes Defaults
-#cases1b = Cases(dft.geo_inputs['5-ply'], ps=[2,3,4])     # assumes Defaults
+#cases1a = Cases(dft.geo_inputs['5-ply'], ps=[2,3,4])       # assumes Defaults
+#cases1b = Cases(dft.geo_inputs['5-ply'], ps=[2,3,4])       # assumes Defaults
 load_params['p'] = 2
 # TODO: Rename; this is a case not cases
 cases1c = distributions.Case(load_params, dft.mat_props)
@@ -1141,7 +1141,7 @@ def test_Cases_spmthd_get2():
     '''Check __getitem__ handles negative indicies.'''
     full_range = [case for case in cases5a]
     actual1 = cases5a[-1]                                  # negative index
-    actual2 = cases5a[-2]                                 # negative index
+    actual2 = cases5a[-2]                                  # negative index
     expected1 = full_range[-1]
     expected2 = full_range[-2]
     nt.assert_equal(actual1, expected1)
@@ -1441,7 +1441,7 @@ def test_Cases_mthd_select_crossselect4():
         LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
         cases2b4.LMs) if (LM.nplies == 4) ^ (LM.p == 3)
     }
-    list_p3 = list(cases2b3.LMs[:-1])                  # copy list
+    list_p3 = list(cases2b3.LMs[:-1])                      # copy list
     list_p3.append(cases2b2.LMs[-1])
     list_p3.append(cases2b4.LMs[-1])
     expected2 = set(list_p3)

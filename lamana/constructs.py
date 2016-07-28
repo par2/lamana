@@ -15,10 +15,8 @@ from . import output_
 from .lt_exceptions import IndeterminateError
 from .lt_exceptions import ModelError
 from .utils import tools as ut
+from .utils.config import EXTENSIONS
 
-# from lamana import theories
-# from lamana.utils import tools as ut
-# from lamana.lt_exceptions import IndeterminateError, ModelError
 
 # =============================================================================
 # STACK -----------------------------------------------------------------------
@@ -90,7 +88,7 @@ class Stack(object):
     '''
     def __init__(self, FeatureInput):
         # Parse FeatureInput
-        self.FeatureInput = FeatureInput.copy()                      # for preserving FI in each Case
+        self.FeatureInput = FeatureInput.copy()            # for preserving FI in each Case
         self.Geometry = self.FeatureInput['Geometry']
         self.load_params = self.FeatureInput['Parameters']
         self.mat_props = self.FeatureInput['Properties']
@@ -100,15 +98,15 @@ class Stack(object):
         # Parse Stack Object
         # TODO: Improve recall
         decoded = self.decode_geometry(self.Geometry)
-        self.unfolded = list(decoded)                                # used in tests
+        self.unfolded = list(decoded)                      # used in tests
         '''Recalled because generator exhausts decoded.  Improve.'''
         decoded = self.decode_geometry(self.Geometry)
 
-        self.StackTuple = self.identify_geometry(decoded)            # namedtuple of (stack, nplies, name, alias)
+        self.StackTuple = self.identify_geometry(decoded)  # namedtuple of (stack, nplies, name, alias)
         self.stack_order = self.StackTuple.order
         self.nplies = self.StackTuple.nplies
         self.name = self.StackTuple.name
-        self.alias = self.StackTuple.alias                           # new in 0.4.3c5a
+        self.alias = self.StackTuple.alias                 # new in 0.4.3c5a
 
     def decode_geometry(self, Geometry):
         '''Return a generator that decodes the Geometry object.
@@ -153,7 +151,7 @@ class Stack(object):
          ('outer', 400.0)]
 
         '''
-        def get_decoded():                                           # procedure
+        def get_decoded():                                 # procedure
             '''Iterate forward and backward for each type of layer.'''
             # Forward: outer, inner_i, middle ...
             for ltype, thickness in listify_layer(Geometry):
@@ -169,19 +167,19 @@ class Stack(object):
                 for layer_ in process_layer(ltype, thickness, reverse=True):
                     yield layer_
 
-        def listify_layer(Geometry):                                 # pure function 1
+        def listify_layer(Geometry):                       # pure function 1
             '''Return a converted Geometry namedtuple to a list of tuples; pops symmetric entry'''
             layers = list(Geometry.geometry._asdict().items())
-            if Geometry.is_symmetric:                                # clean up last element; see namedtuple of symmetric Geometry
+            if Geometry.is_symmetric:                      # clean up last element; see namedtuple of symmetric Geometry
                 layers.pop()
                 '''Add to verbose mode.'''
                 #print('Symmetry detected in Geometry object.  Conforming to General Convention...')
             return layers
 
-        def process_layer(ltype, thickness, reverse=False):          # pure function 2
+        def process_layer(ltype, thickness, reverse=False):        # pure function 2
             '''Return items from inner_i thickness list and "unfold" Geometry stack.
             Reverse inner_i list if set True.'''
-            if isinstance(thickness, list) & (reverse is False):     # parse inner_i list for forward iteration
+            if isinstance(thickness, list) & (reverse is False):   # parse inner_i list for forward iteration
                 for inner in thickness:
                     yield (ltype, inner)
             elif isinstance(thickness, list) & (reverse is True):    # reverse inner_i list for reverse iteration
@@ -250,18 +248,18 @@ class Stack(object):
         }
 
         StackTuple = ct.namedtuple('StackTuple', ['order', 'nplies', 'name', 'alias'])
-        order = ct.defaultdict(list)                                 # subs empty {}
+        order = ct.defaultdict(list)                       # subs empty {}
 
         '''Is there a way to replace this nested counter with something pythonic?'''
-        layer_ = 0                                                   # nested counter
+        layer_ = 0                                         # nested counter
         for (ltype, thickness) in decoded:
             #print(ltype, thickness)
             # Exclude Zero layers from the Stack
             if thickness != 0.0:
-                layer_ += 1                                          # updates only for non-zero thickness laminae
-                order[layer_].append(ltype)                          # adds tuple elements into the defaultdicts list
-                order[layer_].append(thickness)                      # ...
-        nplies = layer_                                              # updates, but last layer_ is retained in nplies
+                layer_ += 1                                # updates only for non-zero thickness laminae
+                order[layer_].append(ltype)                # adds tuple elements into the defaultdicts list
+                order[layer_].append(thickness)            # ...
+        nplies = layer_                                    # updates, but last layer_ is retained in nplies
         name = '{0}{1}'.format(nplies, '-ply')
         if nplies in alias_dict.keys():
             alias = alias_dict[nplies]
@@ -321,8 +319,8 @@ class Stack(object):
             #print('material index:', ind)
             #print('materials:', material)
             clean_values = []
-            clean_values.extend(stack[ind])                          # take extant stack
-            clean_values.append(material)                            # add new value
+            clean_values.extend(stack[ind])                # take extant stack
+            clean_values.append(material)                  # add new value
             stack[ind] = clean_values
 
             if ind == nplies:
@@ -334,11 +332,11 @@ class Stack(object):
     def stack_to_df(cls, stack):
         '''Return a DataFrame of converted stacks with materials (list of dicts).'''
         df = pd.DataFrame(stack).T
-        df.reset_index(level=0, inplace=True)                        # reset index; make new column
-        df.columns = ['layer', 'type', 't(um)', 'matl']              # rename columns
+        df.reset_index(level=0, inplace=True)              # reset index; make new column
+        df.columns = ['layer', 'type', 't(um)', 'matl']    # rename columns
         recolumned = ['layer', 'matl', 'type', 't(um)']
-        df = ut.set_column_sequence(df, recolumned)                  # uses ext. f(x)
-        df[['t(um)']] = df[['t(um)']].astype(float)                  # reset numeric dtypes
+        df = ut.set_column_sequence(df, recolumned)        # uses ext. f(x)
+        df[['t(um)']] = df[['t(um)']].astype(float)        # reset numeric dtypes
         return df
 
 
@@ -442,10 +440,10 @@ class Laminate(Stack):
         self._type_cache = []
 
         # Laminate Objects
-        self.Snapshot = self._build_snapshot()                       # df object; stack
-        self._primitive = self._build_primitive()                    # phase 1
-        self.LFrame = self._build_LFrame()                           # phase 1; df of IDs; formerly Laminate_
-        self._frame = self.LFrame                                    # general accessor
+        self.Snapshot = self._build_snapshot()             # df object; stack
+        self._primitive = self._build_primitive()          # phase 1
+        self.LFrame = self._build_LFrame()                 # phase 1; df of IDs; formerly Laminate_
+        self._frame = self.LFrame                          # general accessor
 
 
     def __repr__(self):
@@ -540,9 +538,9 @@ class Laminate(Stack):
         # Build Laminate with Classes
         layers = df.groupby('layer')
         self._type_cache = layers['type'].unique()
-        self._type_cache.apply(str)                                  # converts to str class, not str alone
+        self._type_cache.apply(str)                        # converts to str class, not str alone
 
-        #self.LFrame = df                                             # retains copy of partial Laminate (IDs & Dimensionals)
+        #self.LFrame = df                                   # retains copy of partial Laminate (IDs & Dimensionals)
         return df
 
     # PHASE 2
@@ -910,7 +908,7 @@ class Laminate(Stack):
         - `output_.export`: for kwargs and docstring.
 
         '''
-        (workbook_fpath,) = output_.export(self, suffix='.xlsx', offset=offset, **kwargs)
+        (workbook_fpath,) = output_.export(self, suffix=EXTENSIONS[1], offset=offset, **kwargs)
         return (workbook_fpath,)
 
     # Properties --------------------------------------------------------------

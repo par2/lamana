@@ -1,7 +1,6 @@
 #------------------------------------------------------------------------------
 import nose.tools as nt
 
-
 from .. import distributions
 from ..lt_exceptions import InputError
 from ..utils import tools as ut
@@ -28,7 +27,7 @@ def test_get_duples1():
     inner_i2 = '[100.0, (200.0, 200.0), 300.0, (100,300.0)]'
     inner_i3 = '[100.0, (200.0, 200.0), 300, (100.0,300),(100,300.0)]'
     inner_i4 = '[100.0, (150.0, 50.0), 300.0]'
-    invalid = '800.0'                                    # invalid arg
+    invalid = '800.0'                                      # invalid arg
     actual1 = upt._get_duples(outer)
     actual2 = upt._get_duples(inner_i1)
     actual3 = upt._get_duples(inner_i2)
@@ -274,7 +273,7 @@ def test_extract_equivalence2():
 def test_extract_equivalence3():
     '''Given a case, line plot data agrees with the DataFrame data; normalized=False.'''
 
-    case = distributions.laminator(['400-[200]-800'])                 # unnormalized multiplot requires only one geoemetry
+    case = distributions.laminator(['400-[200]-800'])      # unnormalized multiplot requires only one geoemetry
     line_df_case = upt.extract_plot_LM_xy(case, normalized=False)
     line_data, df_data = line_df_case
 
@@ -286,7 +285,7 @@ def test_extract_equivalence3():
 def test_extract_equivalence4():
     '''Given a case, line plot data agrees with the DataFrame data; {extrema,normalized}=False.'''
 
-    case = distributions.laminator(['400-[200]-800'])                 # unnormalized multiplot requires only one geoemetry
+    case = distributions.laminator(['400-[200]-800'])      # unnormalized multiplot requires only one geoemetry
     line_df_case = upt.extract_plot_LM_xy(case, extrema=False, normalized=False)
     line_data, df_data = line_df_case
 
