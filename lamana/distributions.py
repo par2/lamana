@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 # TODO: Rename Geometry attr to something else; deconflist with inp.Geometry
 from .input_ import Geometry as inputGeometry
 from .input_ import BaseDefaults
+from . import input_
 from .constructs import Laminate, LaminateModel
 from . import output_
 from .lt_exceptions import ModelError
@@ -471,7 +472,7 @@ class Case(object):
 
         See Also
         --------
-        - `utils.tools.export`: for kwargs and docstring.
+        - `output_.export`: for kwargs and docstring.
 
         '''
         return [LM.to_csv(**kwargs) for LM in self.LMs]
@@ -487,7 +488,7 @@ class Case(object):
 
         See Also
         --------
-        - `utils.tools.export`: for comparable kwargs and docstring.
+        - `output_.export`: for comparable kwargs and docstring.
         - `utils.tools.reorder_featureinput`: for order of dashboard data
 
         Notes
@@ -521,7 +522,7 @@ class Case(object):
                 geo_string = LM.Geometry.string
                 FI = LM.FeatureInput
                 data_df = LM.frame
-                converted_FI = ut.convert_featureinput(FI)
+                converted_FI = input_.convert_featureinput(FI)
                 reordered_FI = ut.reorder_featureinput(converted_FI, order)
 
                 # Data sheet
@@ -894,7 +895,7 @@ class Cases(ct.MutableMapping):
                         for caselet in caselets:
                             caselet_lst = []
                             for geo_string in caselet:
-                                conv = Geometry._to_gen_convention(geo_string)
+                                conv = inputGeometry._to_gen_convention(geo_string)
                                 caselet_lst.append(conv)
                             caselet_lsts.append(caselet_lst)
                         caselets = caselet_lsts
@@ -988,7 +989,7 @@ class Cases(ct.MutableMapping):
         # Given a list of geometry strings, convert them and set unique
         # ['400-200-800', '400-400-400', '400-[200]-800'] -->
         # {'400-[400]-400', '400-[200]-800'}
-        converted_caselet_ = [Geometry._to_gen_convention(geo_string)
+        converted_caselet_ = [inputGeometry._to_gen_convention(geo_string)
                               for geo_string in caselet_]
         #print(set(converted_caselet_))
         return set(converted_caselet_)

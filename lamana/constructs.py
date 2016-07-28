@@ -10,7 +10,8 @@ import collections as ct
 import numpy as np
 import pandas as pd
 
-from .theories import handshake
+from . import theories
+from . import output_
 from .lt_exceptions import IndeterminateError
 from .lt_exceptions import ModelError
 from .utils import tools as ut
@@ -890,10 +891,10 @@ class Laminate(Stack):
 
         See Also
         --------
-        - `utils.tools.export`: for kwargs and docstring.
+        - `output_.export`: for kwargs and docstring.
 
         '''
-        data_fpath, dash_fpath = ut.export(self, suffix='.csv', **kwargs)
+        data_fpath, dash_fpath = output_.export(self, suffix='.csv', **kwargs)
         return data_fpath, dash_fpath
 
     def to_xlsx(self, offset=3, **kwargs):
@@ -906,10 +907,10 @@ class Laminate(Stack):
 
         See Also
         --------
-        - `utils.tools.export`: for kwargs and docstring.
+        - `output_.export`: for kwargs and docstring.
 
         '''
-        (workbook_fpath,) = ut.export(self, suffix='.xlsx', offset=offset, **kwargs)
+        (workbook_fpath,) = output_.export(self, suffix='.xlsx', offset=offset, **kwargs)
         return (workbook_fpath,)
 
     # Properties --------------------------------------------------------------
@@ -1086,7 +1087,7 @@ class LaminateModel(Laminate):
         '''
         try:
             # Pass in the pre-updated LaminateModel object; no LMFrame yet
-            LMFrame, self.FeatureInput = handshake(self, **kwargs)
+            LMFrame, self.FeatureInput = theories.handshake(self, **kwargs)
             return LMFrame
         except(IndeterminateError) as e:
             raise ModelError(

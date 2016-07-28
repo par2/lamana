@@ -148,18 +148,22 @@ lamana.distributions.Cases.plot : makes call to `_multiplot()`.
 '''
 
 
+import os
 import math
+import tempfile
 import logging
 import itertools as it
 
+import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+from . import input_
 from .lt_exceptions import InputError
 from .lt_exceptions import PlottingError
+from .lt_exceptions import ExportError
+from .utils import tools as ut
 from .utils import config
-
-# from lamana.lt_exceptions import InputError, PlottingError
 
 
 # =============================================================================
@@ -808,3 +812,241 @@ class FigurePlot():
     '''
     #figsize = (ncols * size * aspect, nrows * size)
     pass
+
+# NOTE: Transferred from tools.utils in 0.4.13-dev
+def export(L_, overwrite=False, prefix=None, suffix=None, order=None,
+           offset=3, dirpath=None, temp=False, keepname=True, delete=False):
+    '''Write LaminateModels and FeatureInput to files; return a tuple of paths.
+
+    Supported formats:
+    - .csv: two files; separate data and dashboard files
+    - .xlsx: one file; data and dashboard sheets
+
+    Parameters
+    ----------
+    L_ : Laminate-like object
+        Laminate or subclass containing attributes and calculations.
+    overwrite : bool; default False
+        Save over files with the same name.  Prevents file incrementation
+        and excess files after cyclic calls.
+    prefix : str; default None
+        Prepend a prefix to the filename.  Conventions are:
+        - '' : legacy or new
+        - 'w': written by the package
+        - 't': temporary file; used when tempfile is renamed
+        - 'r': redone; altered from legacy
+        - 'dash': dashboard
+    suffix : |'.csv'|'.xlsx'|
+        Determines the file format by appending to filename; default '.xlsx'.
+    order: list
+        Keys of the FeatureInput.
+    offset : int
+        Blank columns between data in the dashboard.
+    dirpath : str, optional; default "/export" directory
+        Directory path to store resulting csv files; custom path NotImplemented.
+    temp : bool, default False
+        Make temporary files in the OS Temp directory instead.
+    keepname : bool, True
+        Toggle renaming temporary files; temp must be True.
+    delete : bool, default False
+        Force file removal after created; mainly used for temporary files.
+
+    Returns
+    -------
+    tuple
+        Full file paths (str) of the created files LM and dashboard data.
+
+    See Also
+    --------
+    - get_path(): deals with munging paths and validations
+    - convert_featureinput(): convert dict values to DataFrames
+    - reorder_featureinput(): make and ordered list for the dashboard
+    - make_tempfile(): review how Python 'mkstemp' makes temp; NotImplemented
+    - rename_tempfile(): rename the file post closing file.
+
+    Notes
+    -----
+    Contents are written into an "/export" directory. FeatureInput data a.k.a "dashboard".
+    We use mkstemp (low-level), which leaves it open for to_excel to write.
+    Here are technical characteristics:
+    - OK  Outputs different file formats.
+    - OK  Writes regular or temporary files (get auto-deleted by the OS; for tests)
+    - OK  Calls helper functions to clean paths and datastructures.
+    - OK  Allows prefixing for file indentification.
+    - OK  Outputs data and dashboards.
+    - OK  Works even when files exist in the directory.
+    - OK  Auto creates "\export" directory if none exists.
+    - OK  Renames temporary files by default.
+    - OK  Support Laminate and LaminateModel objects
+    - X   Supports custom directory paths.
+
+    Examples
+    --------
+    >>> import lamana as la
+    >>> case = la.distributions.laminator('400.0-[200.0]-800.0')[0]
+    >>> LM = case.LMs[0]
+    >>> export(LM)
+    '~/lamana/export/laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0.xlsx'
+
+    >>> # Overwrite Protection
+    >>> export(LM, overwrite=False)
+    '~/lamana/export/laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0(1).xlsx'
+
+    >>> # Optional .csv Format
+    >>> export(LM, suffix='.csv')
+    '~/lamana/export/dash_laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+    '~/lamana/export/laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+
+    >>> # Optional Temporary Files
+    >>> export(LM, suffix='.csv', temp=True)
+    'temp/t_dash_laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+    'temp/t_laminatemodel_5ply_p5_t2.0_400.0-[200.0]-800.0.csv'
+
+    >>> # Supports Laminate objects too
+    >>> from lamana.models import Wilson_LT as wlt
+    >>> dft = wlt.Defaults()
+    >>> L = la.constructs.Laminate(dft.FeatureInput)
+    >>> export(L)
+    '~/lamana/export/dash_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.xlsx'
+
+    '''
+    # Parse for Filename ------------------------------------------------------
+    nplies = L_.nplies
+    p = L_.p
+    # TODO: Fix units
+    t_total = L_.total * 1e3                               # (in mm)
+    geo_string = L_.Geometry.string
+    FI = L_.FeatureInput
+
+    # Path Munge --------------------------------------------------------------
+    if prefix is None:
+        prefix = ''
+    if suffix is None:
+        suffix = config.EXTENSIONS[1]                      # .xlsx
+
+    if dirpath is None:
+        ###
+        # Prepend files with 'w' for "written" by the package
+        # NOTE: removed default w_ prefix; check the control and other uses to maintain coding
+        # TODO: rename legacy files with "l_"
+        ###
+        if hasattr(L_, 'LMFrame'):
+            kind = 'laminatemodel'
+        else:
+            kind = 'laminate'
+        filename = r'{}{}_{}ply_p{}_t{:.1f}_{}'.format(
+            prefix, kind, nplies, p, t_total, geo_string)
+
+        # Force-create export directory or path (REF 047)
+        # Send file to export directory
+        defaultpath = ut.get_path()
+        if not os.path.exists(defaultpath):
+            # TODO: Make sure this log prints out
+            logging.info(
+                'No default export directory found.  Making directory {} ...'.format(defaultpath)
+            )
+            os.makedirs(defaultpath)
+    else:
+        raise NotImplementedError('Custom directory paths are not yet implemented.')
+
+    # Prepare FeatureInput ----------------------------------------------------
+    if order is None:
+        order = ['Geometry', 'Model', 'Materials',
+                 'Parameters', 'Globals', 'Properties']    # default
+    converted_FI = input_.convert_featureinput(FI)
+    reordered_FI = ut.reorder_featureinput(converted_FI, order)  # elevates strings
+    dash_df = pd.concat(converted_FI)                       # combines all dfs into one
+    data_df = L_._frame
+
+    # Assemble ----------------------------------------------------------------
+    # Build csv data and dashboard (as optional temporary file)
+    if not suffix.endswith('xlsx'):
+        try:
+            # Tempfiles are used to obviate writing to package folders
+            if temp:
+                data_des, data_filepath = tempfile.mkstemp(suffix=suffix)
+                dash_des, dash_filepath = tempfile.mkstemp(suffix=suffix)
+            else:
+                data_filepath = ut.get_path(
+                    filename, suffix=suffix, overwrite=overwrite
+                )                                          # pragma: no cover
+                dash_filepath = ut.get_path(
+                    filename, suffix=suffix, overwrite=overwrite, dashboard=True
+                )                                          # pragma: no cover
+
+            # Write File
+            data_df.to_csv(data_filepath)
+            dash_df.to_csv(dash_filepath)
+
+            # Tempfile Options
+            if temp:
+                os.close(data_des)
+                os.close(dash_des)
+
+            if temp and keepname:
+                data_filepath = ut.rename_tempfile(
+                    data_filepath, ''.join(['t_', filename, suffix]))
+                dash_filepath = ut.rename_tempfile(
+                    dash_filepath, ''.join(['t_', 'dash_', filename, suffix]))
+
+            logging.info('DataFrame written as {} file in: {}'.format(suffix, data_filepath))
+            logging.info('Dashboard written as {} file in: {}'.format(suffix, dash_filepath))
+        except (NameError) as e:
+            raise ExportError('Export failed.  {}'.format(e))
+        finally:
+            if delete:
+                os.remove(data_filepath)
+                os.remove(dash_filepath)
+                logging.info('File has been deleted: {}'.format(data_filepath))
+                logging.info('File has been deleted: {}'.format(dash_filepath))
+            pass
+        return (data_filepath, dash_filepath)
+
+    # For Excel Files Only
+    elif suffix.endswith('xlsx'):
+        try:
+            # Tempfiles are used to obviate writing to package folders
+            if temp:
+                data_des, workbook_filepath = tempfile.mkstemp(suffix=suffix)
+            else:
+                workbook_filepath = ut.get_path(
+                    filename, suffix=suffix, overwrite=overwrite
+                )                                          # pragma: no cover
+
+            # Excel worksheet code block --------------------------------------
+            writer = pd.ExcelWriter(workbook_filepath)
+
+            # Data sheet
+            sheetname = geo_string.replace('[', '|').replace(']', '|')
+            data_sheetname = ' '.join(['Data', sheetname])
+            data_df.to_excel(writer, data_sheetname)
+
+            # Dashboard sheet
+            dash_sheetname = ' '.join(['Dash', sheetname])
+
+            for i, dict_df in enumerate(reordered_FI.values()):
+                if dict_df.size == 1:                      # assumes string strs are ordered first
+                    dict_df.to_excel(writer, dash_sheetname, startrow=4**i)
+                else:
+                    dict_df.to_excel(writer, dash_sheetname, startcol=(i-1)*offset)
+
+            writer.save()
+
+            if temp:
+                os.close(data_des)
+
+            if temp and keepname:
+                workbook_filepath = ut.rename_tempfile(
+                    workbook_filepath, ''.join(['t_', filename, suffix]))
+
+            logging.info('Data and dashboard written as {} file in: {}'.format(suffix, workbook_filepath))
+            print(workbook_filepath, "second time")
+        except (NameError) as e:
+            raise ExportError('Export failed.  {}'.format(e))
+        finally:
+            if delete:
+                os.remove(workbook_filepath)
+                logging.info('File has been deleted: {}'.format(workbook_filepath))
+            pass
+
+        return (workbook_filepath,)
