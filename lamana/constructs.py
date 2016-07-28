@@ -10,7 +10,7 @@ import collections as ct
 import numpy as np
 import pandas as pd
 
-from . import theories
+from .theories import handshake
 from .lt_exceptions import IndeterminateError
 from .lt_exceptions import ModelError
 from .utils import tools as ut
@@ -1091,7 +1091,7 @@ class LaminateModel(Laminate):
         '''
         try:
             # Pass in the pre-updated LaminateModel object; no LMFrame yet
-            LMFrame, self.FeatureInput = theories.handshake(self, **kwargs)
+            LMFrame, self.FeatureInput = handshake(self, **kwargs)
             return LMFrame
         except(IndeterminateError) as e:
             raise ModelError(

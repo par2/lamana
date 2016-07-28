@@ -18,10 +18,8 @@ import matplotlib as mpl
 mpl.use('Agg')                                             # required to prevent DISPLAY error; must be before pyplot (REF 050)
 import matplotlib.pyplot as plt
 
-
-from . import input_
-from . import distributions
-from . import constructs
+from .input_ import Geometry, BaseDefaults
+from .constructs import Laminate, LaminateModel
 from . import output_
 from .lt_exceptions import ModelError
 from .utils import tools as ut
@@ -31,7 +29,7 @@ from .utils import tools as ut
 # from lamana.lt_exceptions import ModelError
 # from lamana.utils import tools as ut
 
-bdft = input_.BaseDefaults()
+bdft = BaseDefaults()
 
 # =============================================================================
 # FEATUREINPUT ----------------------------------------------------------------
@@ -239,7 +237,7 @@ class Case(object):
 
         '''
         '''Consider moving, to all only once.'''
-        G = input_.Geometry
+        G = Geometry
         self.Geometries = []
         self.model = model
 
@@ -283,7 +281,7 @@ class Case(object):
 
             for geometry in geometries:
                 # TODO: Move conversion to Caselet()
-                conv_geometry = input_.Geometry._to_gen_convention(geometry)
+                conv_geometry = Geometry._to_gen_convention(geometry)
 
                 # Check a cache
                 if unique and (conv_geometry in _geo_cache):
@@ -311,14 +309,14 @@ class Case(object):
                     # TODO: accept kwargs
                     #yield la.constructs.Laminate(FeatureInput)
                     try:
-                        yield constructs.LaminateModel(FeatureInput)
+                        yield LaminateModel(FeatureInput)
                     except(ModelError) as e:
                         logging.warn(
                             'The model raised an exception. LaminateModel not updated.'
                             ' Rolling back LMFrame to LFrame...'
                         )
                         logging.debug(traceback.format_exc())
-                        yield constructs.Laminate(FeatureInput)
+                        yield Laminate(FeatureInput)
         # DEPRECATED AttributeError exception.
         self.LaminateModels = list(get_LaminateModels(geo_strings))
         logging.info('User input geometries have been converted and set to Case.')
@@ -842,7 +840,7 @@ class Cases(ct.MutableMapping):
 ###
             try:
                 # Assuming a list of geometry strings
-                case_ = distributions.Case(self.load_params, self.mat_props)
+                case_ = Case(self.load_params, self.mat_props)
                 if unique:
                     case_.apply(caselets, unique=True)
                 else:
@@ -884,7 +882,7 @@ class Cases(ct.MutableMapping):
                 try:
                     # Assume list of geometry strings
                     caselets = [
-                        input_.Geometry._to_gen_convention(caselet)
+                        Geometry._to_gen_convention(caselet)
                         for caselet in caselets
                     ]
                 except(TypeError):
@@ -894,7 +892,7 @@ class Cases(ct.MutableMapping):
                         for caselet in caselets:
                             caselet_lst = []
                             for geo_string in caselet:
-                                conv = input_.Geometry._to_gen_convention(geo_string)
+                                conv = Geometry._to_gen_convention(geo_string)
                                 caselet_lst.append(conv)
                             caselet_lsts.append(caselet_lst)
                         caselets = caselet_lsts
@@ -939,10 +937,10 @@ class Cases(ct.MutableMapping):
                 # ['400-200-800', '400-400-400'] --> <case>
                 # {'400-200-800', '400-400-400'} --> <case>
                 case_ = self._get_case(caselet_)
-            elif isinstance(caselet_, distributions.Case) and (self.ps is None):
+            elif isinstance(caselet_, Case) and (self.ps is None):
                 # case1 --> <case>
                 case_ = caselet_
-            elif isinstance(caselet_, distributions.Case) and self.ps:
+            elif isinstance(caselet_, Case) and self.ps:
                 # TODO: clarify
                 # TODO: should be covered by test_Cases_caselets_ps3(); ?
                 # case1 --> <case>; redo case
@@ -957,7 +955,7 @@ class Cases(ct.MutableMapping):
 
     def _get_case(self, caselet_):
         '''Return a case given a caselet.'''
-        case_ = distributions.Case(self.load_params, self.mat_props)
+        case_ = Case(self.load_params, self.mat_props)
         case_.apply(caselet_, model=self.model)
         return case_
 
@@ -981,14 +979,14 @@ class Cases(ct.MutableMapping):
                 ' See combine=True keyword.'
             )
             return caselet_
-        elif isinstance(caselet_, distributions.Case):
+        elif isinstance(caselet_, Case):
             # Extract the list of geometry strings from the case
             caselet_ = [LM.Geometry.string for LM in caselet_.LMs]
 
         # Given a list of geometry strings, convert them and set unique
         # ['400-200-800', '400-400-400', '400-[200]-800'] -->
         # {'400-[400]-400', '400-[200]-800'}
-        converted_caselet_ = [input_.Geometry._to_gen_convention(geo_string)
+        converted_caselet_ = [Geometry._to_gen_convention(geo_string)
                               for geo_string in caselet_]
         #print(set(converted_caselet_))
         return set(converted_caselet_)

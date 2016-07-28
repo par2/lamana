@@ -59,7 +59,8 @@ class Reference(object):
     # (051) Many DataFrames w/xlsxwriter        http://xlsxwriter.readthedocs.io/working_with_pandas.html
     # (052) tempfile                            https://pymotw.com/2/tempfile/
     # (053) How to use abstractmethod           https://julien.danjou.info/blog/2013/guide-python-static-class-abstract-methods
-    # (054) Py 2/3 metaclasses; adapt from six  https://stackoverflow.com/questions/18513821/python-metaclass-understanding-the-with-metaclass/18513858#18513858
+    # (054) Py2/3 metaclasses; adapt from six   https://stackoverflow.com/questions/18513821/python-metaclass-understanding-the-with-metaclass/18513858#18513858
+    # (055) Dyn. Import all modules in a folder https://stackoverflow.com/questions/1057431/loading-all-modules-in-a-folder-in-python
 
     pass
 
