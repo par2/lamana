@@ -50,7 +50,7 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - "conda create -q -n test-environment python=%PYTHON_VERSION% pip nose numpy matplotlib pandas pytest"
+  - "conda create -q -n test-environment python=%PYTHON_VERSION% pip nose numpy matplotlib pandas"
   - activate test-environment
   #- pip install coverage
   - conda list
@@ -72,8 +72,8 @@ test_script:
   #- "build.cmd %PYTHON%\\python.exe setup.py test"
   #- "%PYTHON%/Scripts/nosetests"
   - nosetests
-  - cd docs
-  - py.test --nbval _demo_pinned.ipynb --sanitize-with nbval_sanitize.cfg
+ # - cd docs
+ # - py.test --nbval _demo_pinned.ipynb --sanitize-with nbval_sanitize.cfg
 
 #after_test:
   # This step builds your wheels.
