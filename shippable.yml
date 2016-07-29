@@ -41,7 +41,7 @@ install:
   - conda create -q -n test-environment2 python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas pytest
   - source activate test-environment2
   - conda list
-  - pip install nbval version_information
+  - pip install nbval version_information                  # to run notebook regression test
   - pip install -U .                                       # update-deps to latest version if needed; fixed py33 bug that failed in install latet
   - pip list
   # NOTE: the upgrade flag on pip forces updates on deps; this takes a very long time
