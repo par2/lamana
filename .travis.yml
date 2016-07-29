@@ -50,26 +50,28 @@ before_install:
 install:
   # Pre-build major dependencies with conda (much faster and easier)
   # Ensure `pip` and `nose` will install within the conda env
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas pytest
   - source activate test-environment
   - pip install coverage codecov nose-cov                  # code coverage; see other projects on how to install w/Miniconda
   ##- python setup.py install
   - conda list
   # Uses conda's `pip` instead of Travis' `pip`
-  - pip install -r dev_requirements.txt                    # pre-install pinned dependencies
+  - pip install -r dev_requirements.txt                    # pre-install pinned dependencies; includes reg. test deps
   - pip install .                                          # install source and build/install wheels
   #- "pip install wheel"
   #- "python setup.py bdist_wheel"
   #- "pip install dist/*.whl"
   - pip list
 
-# Commands to run tests and coverage
+# Commands to run tests, coverage and nbval regression tests
 script:
   - nosetests --with-cov --cov lamana
   - ls -al
   - coverage combine
   - coverage xml
   - which coverage
+  - cd docs
+  - py.test --nbval _demo_pinned.ipynb --sanitize-with nbval_sanitize.cfg
 
 # Interact with codecov
 after_success:
