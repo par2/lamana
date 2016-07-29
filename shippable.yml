@@ -38,7 +38,7 @@ before_install:
 install:
   # Attempt to pull dependencies only from setup.py
 
-  - conda create -q -n test-environment2 python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas
+  - conda create -q -n test-environment2 python=$TRAVIS_PYTHON_VERSION pip nose numpy matplotlib pandas pytest
   - source activate test-environment2
   - conda list
   - pip install -U .                                       # update-deps to latest version if needed; fixed py33 bug that failed in install latet
@@ -49,7 +49,9 @@ install:
 script:
   - nosetests lamana
   - ls -al
-
+  # Regression testing of API notebook using nbval plugin
+  - cd docs
+  - py.test --nbval demo.ipynb --sanitize-with nbval_sanitize.cfg
 
 # References
 # ----- ---------                           -------------
