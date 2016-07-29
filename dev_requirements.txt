@@ -42,7 +42,7 @@ notebook==4.2.0
 #numpy==1.10.4                                             # try for py27, py34 BUG on travis (build T264, A1.0.192, S33)
 numpydoc==0.5
 openpyxl==2.3.2                                            # for pandas to_excel()
-pandas==0.18.0
+#pandas==0.18.0
 pathlib2==2.1.0                                            #++
 pickleshare==0.7.3
 #pkginfo==1.2.1                                             #+? not used in py27 or py35
