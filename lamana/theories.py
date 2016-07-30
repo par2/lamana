@@ -114,11 +114,6 @@ def handshake(precursor, adjusted_z=False):
        (if function-style) or `models.<model_name>._use_model_` (if class-style)
     5. The a `LaminateModel.LMFrame` object is either updated or raises an error.
 
-    Raises
-    ------
-    ModelError : If the initial LaminateModel object passed to handshake is not
-                 empty, i.e. has LMFrame != None, then updates are unpredicatable.
-
     '''
     HOOKNAME = '_use_model_'                               # looks for this in custom models
 
@@ -141,6 +136,7 @@ def handshake(precursor, adjusted_z=False):
         hook = getattr(my_instance, HOOKNAME)              # hook method
         logging.debug('Found a hook method {} in {}'.format(hook, class_name))
 
+    # TODO: Try adding ModelError back in here
     # TODO: Add following with args
     #LaminateModel, FeatureInput = hook(Laminate, *args, adjusted_z=False, **kwargs)
     # eqiv. LM, FI = module._use_model_()

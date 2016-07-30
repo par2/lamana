@@ -31,7 +31,9 @@ Auxiliary Modules
     :toctree: generated/
 
     utils.tools
+    utils.plottools
     utils.references
+    utils.config
 
 Models
 ------
@@ -56,6 +58,7 @@ Classes
     distributions.Cases
     constructs.Stack
     constructs.Laminate
+    constructs.LaminateModel
     theories.BaseModel
 
 Functions

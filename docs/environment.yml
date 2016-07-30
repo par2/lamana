@@ -11,6 +11,3 @@ dependencies:
 - pip:                                                     # unpinned 0.4.13-dev
   - nbsphinx
   - numpydoc
-#  - nbsphinx==0.2.2
-#  - ipykernel==4.2.2
-#  - numpydoc==0.5

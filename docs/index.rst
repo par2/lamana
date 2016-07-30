@@ -16,7 +16,9 @@ analysis and visualization.
 .. sidebar:: What's New in LamAna
 
    - Developer Release Cycle Workflow
-   - Shippable (CI for unpinned builds)
+   - Shippable (unpinned CI builds)
+   - Decoupled LaminateModel class
+   - nbval Regression Test (unpinned)
 
 LamAna enables users to **calculate**/**export**/**analyze** data and
 **author** custom models based on laminate theory.  *Feature modules*  are used to plot stress distributions, analyze thickessness effects and
@@ -54,7 +56,7 @@ Long-term goals for the laminate community are:
    :maxdepth: 1
    :caption: Gallery
 
-   showcase
+   quickview
 
 .. _user-docs:
 

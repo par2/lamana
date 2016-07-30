@@ -56,20 +56,22 @@ install:
   ##- python setup.py install
   - conda list
   # Uses conda's `pip` instead of Travis' `pip`
-  - pip install -r dev_requirements.txt                    # pre-install pinned dependencies
+  - pip install -r dev_requirements.txt                    # pre-install pinned dependencies; includes reg. test deps
   - pip install .                                          # install source and build/install wheels
   #- "pip install wheel"
   #- "python setup.py bdist_wheel"
   #- "pip install dist/*.whl"
   - pip list
 
-# Commands to run tests and coverage
+# Commands to run tests, coverage and nbval regression tests
 script:
   - nosetests --with-cov --cov lamana
   - ls -al
   - coverage combine
   - coverage xml
   - which coverage
+#  - cd docs
+#  - py.test --nbval _demo_pinned.ipynb --sanitize-with nbval_sanitize.cfg
 
 # Interact with codecov
 after_success:

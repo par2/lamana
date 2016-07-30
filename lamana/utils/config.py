@@ -25,3 +25,15 @@ LAMANA_PALETTES = dict(
     grayscale=['#FFFFFF', '#999999', '#666666', '#333333', '#000000'],
     HAPSu=['#E7940E', '#F5A9A9', '#FCEB00', '#0B4EA5'],
     )
+
+# Store pacage regexes; see reference.py for links
+REGEXES = {
+    # Last Run: 2016-07-28 09:12:14
+    'custom timestamp': '\w+ \w+: \d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}',
+    # <matplotlib.figure.Figure at 0x84773c8>
+    'addressed output': '<[a-zA-z.]+\b at \b0[xX][0-9a-fA-F]+>',
+    # {...}
+    'dict/set': '{[\w\W]*}',
+    # ....xlsx' or ....csv'
+    'file extensions': ".*.((\bcsv\b)|(\bxlsx\b))'",
+}
