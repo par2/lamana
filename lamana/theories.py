@@ -36,7 +36,7 @@ class BaseModel(object):
 
     '''
     def __init__(self):
-        super(BaseModel, self).__init__()
+        ##super(BaseModel, self).__init__()
         self.model_name = None
         self.LaminateModel = None
         self.FeatureInput = None
@@ -45,6 +45,7 @@ class BaseModel(object):
         return '<{} Model object>'.format(self.__class__.__name__)
 
     # TODO: Find `_use_model_` more dynamically than forcing to search `Model._use_model`.
+	# NOTE: There is no self here
     @abc.abstractmethod
     def _use_model_():
         '''Hook method.
