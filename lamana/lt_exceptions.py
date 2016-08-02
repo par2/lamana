@@ -16,10 +16,6 @@ class FormatError(Error):
 #    pass
 
 
-#class KeyError(Error):
-#    pass
-
-
 class InputError(Error):
     '''Associated with invalid user inputs.'''
     pass
@@ -30,13 +26,7 @@ class NotImplementedError(Error):
 
 
 class IndeterminateError(Error):
-    '''Associated with INDET exceptions.
-
-    See Also
-    --------
-    - "More on IndeterminateError" in the documentation.
-
-    '''
+    '''Associated with INDET exceptions.'''
     pass
 
 
@@ -52,5 +42,4 @@ class ExportError(Error):
 
 class ModelError(Error):
     '''Associated with model exceptions.'''
-    # TODO: Consider replacing Attribute Error in hook tools and theories.handshake
     pass
