@@ -499,7 +499,6 @@ class BaseDefaults(object):
     {'R': 50e-3, 'a': 7.5e-3, 'p' : 5, 'P_a': 1, 'r': 2e-4,}
 
     '''
-
     def __init__(self):
 
         # TODO: Add BaseDefaults attributes to claim the namespace

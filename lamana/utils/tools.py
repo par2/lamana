@@ -24,7 +24,7 @@ import collections as ct
 import pandas as pd
 import pandas.util.testing as pdt
 
-# Try not to import core modules; act as an aux for common code
+# Avoid importing core modules; act as an aux for common code
 from .config import DEFAULTPATH, PACKAGEPATH, EXTENSIONS
 
 
@@ -99,7 +99,6 @@ def ndframe_equal(ndf1, ndf2):
         return False
 
 
-# Refactor to favor string as first arg (0.4.11.dev0)
 def is_matched(string, pattern=None):
     '''Return True if container brackets or parentheses have equal count; matched.
 
@@ -439,7 +438,7 @@ def set_column_sequence(df, seq):
 
 
 def assertSeriesEqual(s1, s2, **kwds):
-    '''Return True if two Series are equal.
+    '''Return True if two Series are equal (REF 014)?.
 
     Parameters
     ----------
