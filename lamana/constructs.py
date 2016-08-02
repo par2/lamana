@@ -560,7 +560,8 @@ class Laminate(Stack):
         #print('nplies: {}, p: {}, t_total (m): {}'.format(nplies, p, t_total))
 
         ##df = self.LFrame.copy()
-        df = self._primitive
+        ##df = self._primitive
+        df = self._primitive.copy()
 
         # WRANGLINGS --------------------------------------------------------------
         # Indexers ----------------------------------------------------------------
@@ -688,7 +689,7 @@ class Laminate(Stack):
         #df.loc[df['label'] == 'neut. axis', 'k'] = 'INDET'
         #df.loc[df['label'] == 'neut. axis', 'k'] = np.nan
 
-        # Odd plies have nuetral axes
+        # Odd plies have neutral axes
         if (p % 2 != 0) & (nplies % 2 != 0):                         # using indep. indexer vs. label_
             df.loc[idxs['middle'], 'k'] = (df['k'].max() + df['k'].min()) / 2.
 
@@ -799,6 +800,7 @@ class Laminate(Stack):
         if n_rows > 1:
             df.iloc[:half_the_stack, side_loc] = 'Tens.'             # applies to latest column 'side'
             df.iloc[-half_the_stack:, side_loc] = 'Comp.'
+        # TODO: Remove set_column here; leave for final return of df elsewhere
         return ut.set_column_sequence(df, cols)
 
     @classmethod
