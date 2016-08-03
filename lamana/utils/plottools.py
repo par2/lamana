@@ -11,9 +11,9 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 
-from .. import input_
-from .. import output_
-from ..lt_exceptions import InputError
+from lamana import input_
+from lamana import output_
+from lamana.lt_exceptions import InputError
 
 
 # Analyze Geometries ----------------------------------------------------------

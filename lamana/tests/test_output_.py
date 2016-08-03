@@ -9,12 +9,12 @@ mpl.use('Agg')                                             # required to prevent
 import matplotlib.pyplot as plt
 import nose.tools as nt
 
-from .. import distributions
-from .. import output_
-from ..utils import tools as ut
-from ..lt_exceptions import PlottingError
-from ..utils import plottools as upt
-from ..models import Wilson_LT as wlt
+from lamana import distributions
+from lamana import output_
+from lamana.utils import tools as ut
+from lamana.lt_exceptions import PlottingError
+from lamana.utils import plottools as upt
+from lamana.models import Wilson_LT as wlt
 
 
 dft = wlt.Defaults()

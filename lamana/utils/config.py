@@ -3,7 +3,7 @@
 
 import os
 
-from .. import __file__ as __root__
+from lamana import __file__ as __root__
 
 # Name for hook function/method; used in `theories.handshake()` with models
 HOOKNAME = '_use_model_'
@@ -18,7 +18,7 @@ DEFAULTPATH = os.path.join(PACKAGEPATH, 'export')
 EXTENSIONS = ('.csv', '.xlsx')
 
 # Random characters
-RANDOMCHARS = 'xZ(1-)[]' 
+RANDOMCHARS = 'xZ(1-)[]'
 
 
 # Default layer colors

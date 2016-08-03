@@ -9,11 +9,11 @@ import itertools as it
 import nose.tools as nt
 import pandas as pd
 
-from .. import input_
-from .. import distributions
-from .. import constructs
-from ..utils import tools as ut
-from ..models import Wilson_LT as wlt                      # for post Laminate, i.e. Cases only
+from lamana import input_
+from lamana import distributions
+from lamana import constructs
+from lamana.utils import tools as ut
+from lamana.models import Wilson_LT as wlt                      # for post Laminate, i.e. Cases only
 
 # PARAMETERS ------------------------------------------------------------------
 # Build dicts of geometric and material parameters

@@ -3,10 +3,10 @@
 
 import nose.tools as nt
 
-from .. import input_
-from ..lt_exceptions import FormatError
-from ..models import Wilson_LT as wlt
-from ..utils import tools as ut
+from lamana import input_
+from lamana.lt_exceptions import FormatError
+from lamana.models import Wilson_LT as wlt
+from lamana.utils import tools as ut
 
 
 # Setup -----------------------------------------------------------------------

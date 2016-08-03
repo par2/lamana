@@ -10,12 +10,12 @@ import collections as ct
 import numpy as np
 import pandas as pd
 
-from . import theories
-from . import output_
-from .lt_exceptions import IndeterminateError
-from .lt_exceptions import ModelError
-from .utils import tools as ut
-from .utils.config import EXTENSIONS
+from lamana import theories
+from lamana import output_
+from lamana.lt_exceptions import IndeterminateError
+from lamana.lt_exceptions import ModelError
+from lamana.utils import tools as ut
+from lamana.utils.config import EXTENSIONS
 
 
 # =============================================================================

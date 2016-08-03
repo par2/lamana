@@ -158,13 +158,13 @@ import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from . import input_
-from .lt_exceptions import InputError
-from .lt_exceptions import PlottingError
-from .lt_exceptions import ExportError
-from .utils import tools as ut
+from lamana import input_
+from lamana.lt_exceptions import InputError
+from lamana.lt_exceptions import PlottingError
+from lamana.lt_exceptions import ExportError
+from lamana.utils import tools as ut
 ##from .utils import config
-from .utils.config import LAMANA_PALETTES, EXTENSIONS
+from lamana.utils.config import LAMANA_PALETTES, EXTENSIONS
 
 
 # =============================================================================
