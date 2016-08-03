@@ -63,6 +63,7 @@ class Reference(object):
     # (055) Dyn. Import all modules in a folder https://stackoverflow.com/questions/1057431/loading-all-modules-in-a-folder-in-python
     # (056) You can use __init__ is tests dir   http://docs.pytest.org/en/latest/goodpractices.html
     # (056) Relative imports, tests & __init__  https://stackoverflow.com/questions/4348452/python-packaging-for-relative-imports
+    # (057) Speed up performance                https://wiki.python.org/moin/PythonSpeed/PerformanceTips
 
     pass
 
