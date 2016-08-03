@@ -13,18 +13,18 @@ import difflib
 import nose.tools as nt
 import pandas as pd
 
-from .. import input_
-from .. import distributions
-from .. import constructs
-from .. import output_
-from ..models.fixtures import fixture_model_func      # special import for hooks
-from ..models.fixtures import fixture_model_class     # special import for hooks
-from ..models.fixtures import fixture_model_module_a  # special import for hooks
-from ..models.fixtures import fixture_model_module_b  # special import for hooksfrom lamana.utils import config
-from ..models import Wilson_LT as wlt
-from ..utils import tools as ut
+from lamana import input_
+from lamana import distributions
+from lamana import constructs
+from lamana import output_
+from lamana.models.fixtures import fixture_model_func      # special import for hooks
+from lamana.models.fixtures import fixture_model_class     # special import for hooks
+from lamana.models.fixtures import fixture_model_module_a  # special import for hooks
+from lamana.models.fixtures import fixture_model_module_b  # special import for hooksfrom lamana.utils import config
+from lamana.models import Wilson_LT as wlt
+from lamana.utils import tools as ut
 ##from ..utils import config
-from ..utils.config import HOOKNAME, RANDOMCHARS, EXTENSIONS
+from lamana.utils.config import HOOKNAME, RANDOMCHARS, EXTENSIONS
 
 dft = wlt.Defaults()                                       # from inherited class in models; user
 

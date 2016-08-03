@@ -2,12 +2,12 @@
 '''The main init file that stores the package version number.'''
 # __version__ is used by find_version() in setup.py
 
-from . import input_
-from . import distributions
+from lamana import input_
+from lamana import distributions
 
 # Possible import of other modules required
 
-from .models import *
+from lamana.models import *
 
 #from . import ratios
 #from . import predictions

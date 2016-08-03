@@ -11,8 +11,8 @@ import collections as ct
 
 import pandas as pd
 
-from .lt_exceptions import FormatError
-from .utils import tools as ut
+from lamana.lt_exceptions import FormatError
+from lamana.utils import tools as ut
 
 
 # =============================================================================

@@ -3,11 +3,11 @@
 
 import nose.tools as nt
 
-from .. import input_
-from .. import distributions
-from .. import theories
-from ..utils import tools as ut
-from ..models import Wilson_LT as wlt
+from lamana import input_
+from lamana import distributions
+from lamana import theories
+from lamana.utils import tools as ut
+from lamana.models import Wilson_LT as wlt
 
 # Global Cases
 dft = wlt.Defaults()

@@ -9,13 +9,13 @@ import nose.tools as nt
 import pandas as pd
 import numpy as np
 
-from .. import input_
-from .. import distributions
-from .. import constructs
-from ..lt_exceptions import IndeterminateError
-from ..lt_exceptions import ModelError
-from ..utils import tools as ut
-from ..models import Wilson_LT as wlt
+from lamana import input_
+from lamana import distributions
+from lamana import constructs
+from lamana.lt_exceptions import IndeterminateError
+from lamana.lt_exceptions import ModelError
+from lamana.utils import tools as ut
+from lamana.models import Wilson_LT as wlt
 
 
 bdft = input_.BaseDefaults()

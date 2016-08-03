@@ -21,12 +21,12 @@ import matplotlib.pyplot as plt
 ##from .input_ import Geometry as input_.Geometry
 ##from .input_ import BaseDefaults
 ##from .constructs import Laminate, LaminateModel
-from . import input_
-from . import constructs
-from . import output_
-from .lt_exceptions import ModelError
-from .utils import tools as ut
-from .utils.config import EXTENSIONS
+from lamana import input_
+from lamana import constructs
+from lamana import output_
+from lamana.lt_exceptions import ModelError
+from lamana.utils import tools as ut
+from lamana.utils.config import EXTENSIONS
 
 bdft = input_.BaseDefaults()
 

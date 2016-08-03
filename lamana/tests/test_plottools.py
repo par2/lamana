@@ -1,10 +1,10 @@
 #------------------------------------------------------------------------------
 import nose.tools as nt
 
-from .. import distributions
-from ..lt_exceptions import InputError
-from ..utils import tools as ut
-from ..utils import plottools as upt
+from lamana import distributions
+from lamana.lt_exceptions import InputError
+from lamana.utils import tools as ut
+from lamana.utils import plottools as upt
 
 
 # Analyze Geometries ----------------------------------------------------------

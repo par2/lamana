@@ -25,7 +25,7 @@ import pandas as pd
 import pandas.util.testing as pdt
 
 # Avoid importing core modules; act as an aux for common code
-from .config import DEFAULTPATH, PACKAGEPATH, EXTENSIONS
+from lamana.utils.config import DEFAULTPATH, PACKAGEPATH, EXTENSIONS
 
 
 # Helpers

@@ -6,12 +6,12 @@ import logging
 
 import numpy as np
 
-from .. import input_
-from .. import distributions
-from ..utils import tools as ut
+from lamana import input_
+from lamana import distributions
+from lamana.utils import tools as ut
 ##from lamana import constructs as con
-from ..models import Wilson_LT as wlt
-from ..utils.config import SOURCEPATH
+from lamana.models import Wilson_LT as wlt
+from lamana.utils.config import SOURCEPATH
 
 dft = wlt.Defaults()
 
