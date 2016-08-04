@@ -426,8 +426,8 @@ def set_column_sequence(df, seq):
     >>> # Excluded names are appended to the end of the DataFrame
     >>> seq = ['apple', 'orange']
     >>> set_column_sequence(df, seq)
-            apple  banana  orange  blueberry
-    amount      4       2       3          3
+            apple  orange  banana  blueberry
+    amount      4       3       2          3
 
     '''
     cols = seq[:]                                          # copy so we don't mutate seq
@@ -436,6 +436,10 @@ def set_column_sequence(df, seq):
             cols.append(x)
     return df[cols]
 
+    # NOTE: Seems even returning the dataframes takes about 8 ms
+    #remaining = [seq.append(col) for col in df.columns if col not in seq]
+    #seq.extend(remaining)
+    #return df[seq]
 
 def assertSeriesEqual(s1, s2, **kwds):
     '''Return True if two Series are equal (REF 014)?.
