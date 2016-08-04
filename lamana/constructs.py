@@ -445,6 +445,7 @@ class Laminate(Stack):
         self.LFrame = self._build_LFrame()                 # phase 1; df of IDs; formerly Laminate_
         self._frame = self.LFrame                          # general accessor
 
+        # FIX: how is self.p getting assigned?
 
     def __repr__(self):
         return '<lamana {} object ({}), p={}>'.format(
@@ -500,10 +501,15 @@ class Laminate(Stack):
         concatenation; omits looping.
 
         '''
-        stack_extended = Stack.add_materials(self.stack_order, self.materials)
-        Snapshot = Stack.stack_to_df(stack_extended)
-        # TODO: Dehardcode Laminate
-        return Laminate._set_stresses(Snapshot)
+        # stack_extended = Stack.add_materials(self.stack_order, self.materials)
+        # Snapshot = Stack.stack_to_df(stack_extended)
+        # # TODO: Dehardcode Laminate
+        # return Laminate._set_stresses(Snapshot)
+        stack_extended = self.add_materials(self.stack_order, self.materials)
+        Snapshot = self.stack_to_df(stack_extended)
+        ##return self.__class__._set_stresses(Snapshot)
+        return self._set_stresses(Snapshot)
+
 
     # PHASE 1
     def _build_primitive(self):
@@ -531,9 +537,9 @@ class Laminate(Stack):
         df.sort_index(axis=0, inplace=True)
         ##df.sort(axis=0, inplace=True)
         df.reset_index(drop=True, inplace=True)
-        # TODO: dehardcode Lamainate for self.__class__
-        df = Laminate._set_stresses(df)
+        ##df = self.__class__._set_stresses(df)
         #print(df)
+        df = self._set_stresses(df)
 
         # Build Laminate with Classes
         layers = df.groupby('layer')
@@ -775,33 +781,48 @@ class Laminate(Stack):
         return abbrev
 
     '''Find way replace staticmethods with class methods.'''
-    @classmethod
-    def _set_stresses(cls, df):                                      # == side_()
-        '''Return updated DataFrame with stresses per side_ of neutral axis.'''
-        #print('Assigning stress states to sides for a given stack.')
-        cols = ['layer', 'side', 'matl', 'type', 't(um)']
-        n_rows = len(df.index)
-        half_the_stack = n_rows // 2
-        #print(half_the_stack)
-        n_middles = df['type'].str.contains(r'middle').sum()
-        #print(n_middles)
+    ##@classmethod
+    ##def _set_stresses(cls, df):                                      # == side_()
+    def _set_stresses(self, df):                                      # == side_()
+        '''Return updated DataFrame with stresses per side_ of neutral axis.
 
-        # Default
-        df.loc[:, 'side'] = 'None'
-        side_loc = df.columns.get_loc('side')
-        # Middle for Snapshot
-        if n_middles == 1:
-            df.iloc[half_the_stack, side_loc] = 'INDET'
-        # For the neutral axis
-        elif n_rows % 2 != 0 and n_rows != 1:
-            df.iloc[half_the_stack, side_loc] = 'None'               # for odd p
-        # Other plies
-        '''Replace with p'''
-        if n_rows > 1:
-            df.iloc[:half_the_stack, side_loc] = 'Tens.'             # applies to latest column 'side'
-            df.iloc[-half_the_stack:, side_loc] = 'Comp.'
-        # TODO: Remove set_column here; leave for final return of df elsewhere
-        return ut.set_column_sequence(df, cols)
+        Operates differently depending whether df is snapshot or primitive frame.
+        Since 0.4.13, no longer reorders columns (8k to 18 secs saved).
+
+        '''
+        ##cols = ['layer', 'side', 'matl', 'type', 't(um)']
+        # TODO: Add self.nrows to class attrs
+        n_rows = df.index.size
+        p = n_rows/self.nplies
+        # TODO: better if grabs the middle index from _FrameExtension (beta)
+        half_the_stack = n_rows // 2
+        #logging.debug('n_rows: {}, p: {}, half-stack: {}'.format(n_rows, p, half_the_stack))
+        #print(n_rows, half_the_stack, p,
+
+        # Take care of assigning middle row values
+        try:
+            # Insert a 'side' column if doesn't exist ...
+            # Assume a snapshot
+            df.insert(1, 'side', 'None')
+        except(ValueError):
+            # Assume a primitive frame and 'side' does exist
+            pass
+        finally:
+            side_loc = df.columns.get_loc('side')
+
+            # Set middle value
+            if n_rows == 1 or p < 2:
+                df.iloc[half_the_stack, side_loc] = 'INDET'
+            # For the neutral axis
+            elif n_rows % 2 != 0:
+                df.iloc[half_the_stack, side_loc] = 'None'               # for odd p
+
+            # Assign stress states for non-middle rows
+            if n_rows > 1:
+                df.iloc[:half_the_stack, side_loc] = 'Tens.'             # applies to latest column 'side'
+                df.iloc[-half_the_stack:, side_loc] = 'Comp.'
+            #print(df)
+        return df                                                    # 8k to 18 us
 
     @classmethod
     def _make_internals(cls, df_mod, p, column):
