@@ -911,6 +911,7 @@ def export(L_, overwrite=False, prefix=None, suffix=None, order=None,
     '~/lamana/export/dash_laminate_5ply_p5_t2.0_400.0-[200.0]-800.0.xlsx'
 
     '''
+    # NOTE: Test may fail with tx_xlsx; pip install `openpyxl` and `xlrd`
     # Parse for Filename ------------------------------------------------------
     nplies = L_.nplies
     p = L_.p
