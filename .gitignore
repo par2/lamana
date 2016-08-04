@@ -85,8 +85,10 @@ _archive
 # Profiling
 # =========
 *.prof
+*.cprof
 pycallgraph*.png
 *.pstat
+*.lprof
 
 # ====================================================
 
