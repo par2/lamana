@@ -632,9 +632,9 @@ class Laminate(Stack):
         # d_ ----------------------------------------------------------------------
         # Gives the height for interfaces, neutral axes, disconts and internal points
         # Assign Laminate Surfaces and Neutral Axis to odd p, odd nply laminates
-        df.loc[0, 'd(m)'] = 0                                        # first
+        df.at[0, 'd(m)'] = 0                                        # first
         df.loc[idxs['middle'], 'd(m)'] = t_total / 2.                # middle
-        df.iloc[-1, df.columns.get_loc('d(m)')] = t_total            # last
+        df.iat[-1, df.columns.get_loc('d(m)')] = t_total            # last
 
         # Assign Interfaces
         # Uses cumsum() for selected interfaces thickness to get d
@@ -744,7 +744,7 @@ class Laminate(Stack):
         df['z(m)*'] = joined['Z(m)'] - joined['z_intervals']
         df.loc[df['type'] == 'middle', 'z(m)*'] = df['Z(m)'] / 2.
         if (p == 1) & (nplies == 1):
-            df.loc[0, 'z(m)*'] = 0
+            df.at[0, 'z(m)*'] = 0
         ####
         del df['idx']
 
