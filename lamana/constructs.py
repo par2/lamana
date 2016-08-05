@@ -332,11 +332,12 @@ class Stack(object):
     def stack_to_df(cls, stack):
         '''Return a DataFrame of converted stacks with materials (list of dicts).'''
         df = pd.DataFrame(stack).T
-        df.reset_index(level=0, inplace=True)              # reset index; make new column
+        df.reset_index(level=0, inplace=True)
+        df[1] = pd.to_numeric(df[1])              # reset index; make new column
         df.columns = ['layer', 'type', 't(um)', 'matl']    # rename columns
         recolumned = ['layer', 'matl', 'type', 't(um)']
         df = ut.set_column_sequence(df, recolumned)        # uses ext. f(x)
-        df[['t(um)']] = df[['t(um)']].astype(float)        # reset numeric dtypes
+        ##df[['t(um)']] = df[['t(um)']].astype(float)        # reset numeric dtypes
         return df
 
 
@@ -542,11 +543,10 @@ class Laminate(Stack):
         df = self._set_stresses(df)
 
         # Build Laminate with Classes
-        layers = df.groupby('layer')
-        self._type_cache = layers['type'].unique()
+        #layers = df.groupby('layer')
+        self._type_cache = df.groupby('layer')['type'].unique()
         self._type_cache.apply(str)                        # converts to str class, not str alone
 
-        #self.LFrame = df                                   # retains copy of partial Laminate (IDs & Dimensionals)
         return df
 
     # PHASE 2
@@ -783,21 +783,31 @@ class Laminate(Stack):
     '''Find way replace staticmethods with class methods.'''
     ##@classmethod
     ##def _set_stresses(cls, df):                                      # == side_()
-    def _set_stresses(self, df):                                      # == side_()
+    def _set_stresses(self, df):                                     # == side_()
         '''Return updated DataFrame with stresses per side_ of neutral axis.
 
         Operates differently depending whether df is snapshot or primitive frame.
         Since 0.4.13, no longer reorders columns (8k to 18 secs saved).
 
+        " A Scalar is simply a variable that holds an individual value", so we
+        use `.iat` whenever what's in brackets is just one number, otherwise `.iloc`.
+
         '''
         ##cols = ['layer', 'side', 'matl', 'type', 't(um)']
-        # TODO: Add self.nrows to class attrs
+        # TODO: Add self.nrows to class attrs and nlayers
         n_rows = df.index.size
         p = n_rows/self.nplies
+        nlayers = df['layer'].max()
         # TODO: better if grabs the middle index from _FrameExtension (beta)
         half_the_stack = n_rows // 2
-        #logging.debug('n_rows: {}, p: {}, half-stack: {}'.format(n_rows, p, half_the_stack))
-        #print(n_rows, half_the_stack, p,
+        # tens_idx = df.index[0:half_the_stack]
+        # if nlayers % 2 == 0:
+        #     comp_idx = df.index[half_the_stack:]
+        # else:
+        #     comp_idx = df.index[half_the_stack + 1:]
+
+        # tens_idx = pd.Index(range(0, half_the_stack))
+        # comp_idx = pd.Index(range(half_the_stack+1, n_rows))
 
         # Take care of assigning middle row values
         try:
@@ -811,17 +821,19 @@ class Laminate(Stack):
             side_loc = df.columns.get_loc('side')
 
             # Set middle value
-            if n_rows == 1 or p < 2:
-                df.iloc[half_the_stack, side_loc] = 'INDET'
-            # For the neutral axis
-            elif n_rows % 2 != 0:
-                df.iloc[half_the_stack, side_loc] = 'None'               # for odd p
+            if nlayers % 2 != 0 and (n_rows == 1 or p < 2) :
+                df.iat[half_the_stack, side_loc] = 'INDET'
+            # For the neutral axis and side not present
+            elif nlayers % 2 != 0:
+                df.iat[half_the_stack, side_loc] = 'None'           # for odd p
 
             # Assign stress states for non-middle rows
             if n_rows > 1:
-                df.iloc[:half_the_stack, side_loc] = 'Tens.'             # applies to latest column 'side'
+                # NOTE: The next lines slows down by 100x; using a slice idx is why
+                df.iloc[:half_the_stack, side_loc] = 'Tens.'         # applies to latest column 'side'
                 df.iloc[-half_the_stack:, side_loc] = 'Comp.'
-            #print(df)
+
+            #print(df, nlayers, half_the_stack)
         return df                                                    # 8k to 18 us
 
     @classmethod
@@ -863,8 +875,9 @@ class Laminate(Stack):
         #print(internal_idx)
 
         # Intervals
-        first = df.groupby('layer').first()                          # make series of intervals
-        last = df.groupby('layer').last()
+        groupby_layer = df.groupby('layer')
+        first = groupby_layer.first()                                # make series of intervals
+        last = groupby_layer.last()
 
         # TODO: Unsure if this is accessed; check flow to see if this case is triggered
         if p == 1:
