@@ -957,12 +957,12 @@ class Laminate(Stack):
         '''
         df = df_mod.copy()
         idxs = self._indicies
-        print(idxs)
+        #print(idxs)
         custom_idx = idxs['internals'].union(idxs['neutralaxis'])
 
         # if p == 1:
         #     raise ZeroDivisionError('Unable to calculate interval.  Select p > 1.')
-        
+
         # Boundaries of Layers per Column and get a series of intervals
         # Make a series of intervals indexed by layer
         firsts_series = df.loc[idxs['firsts'], [column, 'layer']].set_index('layer')[column]
@@ -997,6 +997,7 @@ class Laminate(Stack):
     #     df.loc[idxs['internals'], column] = firsts_and_intv_df.loc[idxs['internals'], 'firsts'] + internal_sums
         df.loc[idxs['internals'], column] = firsts_and_intv_df.loc[custom_idx, 'firsts'] + internal_sums
 
+        # NOTE: Does not calucate middle values correctly.  Relies on post calculations.
         if self.nplies % 2 != 0 and p > 2 and idxs['neutralaxis'].all():
             df.loc[idxs['neutralaxis'], column] = df[column].mean()
 
