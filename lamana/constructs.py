@@ -443,6 +443,7 @@ class Laminate(Stack):
         # Laminate Objects
         self.Snapshot = self._build_snapshot()             # df object; stack
         self._primitive = self._build_primitive()          # phase 1
+        self._indicies = ut.get_indicies(self._primitive)
         self.LFrame = self._build_LFrame()                 # phase 1; df of IDs; formerly Laminate_
         self._frame = self.LFrame                          # general accessor
 
@@ -467,6 +468,7 @@ class Laminate(Stack):
             # Ignore pandas objects; check rest of __dict__ and build trimmed dicts
             # Important to blacklist the trimmed dict from looping in __dict__
             blacklisted.append('_dict_trim')                         # prevent infinite loop
+            blacklisted.append('_indicies')                          # added 0.4.13; comparing pandas index object throws error
             self._dict_trim = {
                 key: value
                 for key, value in self.__dict__.items()
@@ -545,7 +547,7 @@ class Laminate(Stack):
         # Build Laminate with Classes
         #layers = df.groupby('layer')
         self._type_cache = df.groupby('layer')['type'].unique()
-        self._type_cache.apply(str)                        # converts to str class, not str alone
+        self._type_cache.apply(str)                                # converts to str class, not str alone
 
         return df
 
@@ -574,7 +576,7 @@ class Laminate(Stack):
         # Many dimensional values are determined by index positions.
 
         # Revised Indexer
-        df['idx'] = df.index                                       # temp. index column for idxmin & idxmax
+        df['idx'] = df.index                                         # temp. index column for idxmin & idxmax
         interface_tens = df[df['side'] == 'Tens.'].groupby('layer')['idx'].idxmin()
         discontinuity_tens = df[(df['side'] == 'Tens.')
             & (df['type'] != 'middle')].groupby('layer')['idx'].idxmax()
@@ -632,9 +634,9 @@ class Laminate(Stack):
         # d_ ----------------------------------------------------------------------
         # Gives the height for interfaces, neutral axes, disconts and internal points
         # Assign Laminate Surfaces and Neutral Axis to odd p, odd nply laminates
-        df.at[0, 'd(m)'] = 0                                        # first
+        df.at[0, 'd(m)'] = 0                                         # first
         df.loc[idxs['middle'], 'd(m)'] = t_total / 2.                # middle
-        df.iat[-1, df.columns.get_loc('d(m)')] = t_total            # last
+        df.iat[-1, df.columns.get_loc('d(m)')] = t_total             # last
 
         # Assign Interfaces
         # Uses cumsum() for selected interfaces thickness to get d
@@ -653,7 +655,7 @@ class Laminate(Stack):
             df.loc[idxs['disTens'], 'd(m)'] = df['d(m)'].shift(-1)
             df.loc[idxs['disComp'], 'd(m)'] = df['d(m)'].shift(1)
         if p > 2:
-            df = Laminate._make_internals(df, p, column='d(m)')      # at internals
+            df = self._make_internals(df, p, column='d(m)')         # at internals
 
         # intf_ -------------------------------------------------------------------
         # Enumerates proximal interfaces; n layer, but n+1 interfaces
@@ -689,7 +691,7 @@ class Laminate(Stack):
 
         # Auto calculate internal divisions
         if p > 2:                                                    # at internals
-            df = Laminate._make_internals(df, p, column='k')
+            df = self._make_internals(df, p, column='k')
             ##df = _make_internals(df, p, column='k')
         '''Need an INDET. for numeric dtype.  Default to Nan for now'''
         #df.loc[df['label'] == 'neut. axis', 'k'] = 'INDET'
@@ -723,7 +725,7 @@ class Laminate(Stack):
             df.loc[idxs['disComp'], 'z(m)'] = df['z(m)'].shift(1)
         if p > 2:
             # Equi-partitioned, Linear Intervals (legacy code); z(m)
-            df = Laminate._make_internals(df, p, column='z(m)')
+            df = self._make_internals(df, p, column='z(m)')
             ##df = _make_internals(df, p, column='z(m)')
         if p % 2 != 0:
             ##df.loc[df['label'] == 'neut. axis', 'z(m)'] = 0
@@ -836,14 +838,95 @@ class Laminate(Stack):
             #print(df, nlayers, half_the_stack)
         return df                                                    # 8k to 18 us
 
-    @classmethod
-    def _make_internals(cls, df_mod, p, column):
-        '''Populate internals between a first and last index per group.
-        This determines the interval. See df_mod for caution. Steps:
+    # @classmethod
+    # def _make_internals(cls, df_mod, p, column):
+    #     '''Populate internals between a first and last index per group.
+    #
+    #     This determines the interval. See df_mod for caution. Steps:
+    #
+    #     - Make series comprising intervals for each group
+    #     - Make a temp df joining intervals of d (d_intervals) to replicate values
+    #     - Add the prior d_ row to the correl. interval for internal d_
+    #
+    #     Parameters
+    #     ----------
+    #     df_mod : DataFrame
+    #         Passed in modified DataFrame.  CAUTION: Assumes label_ column is
+    #         present.  Also assumes interface and discont. rows are correctly
+    #         populated.
+    #     p : int
+    #         Passed in self.p; number of data points.
+    #     column: str
+    #         Column to assign internals.
+    #
+    #     Notes
+    #     -----
+    #     .. math::
+    #
+    #         x_i = x_0 + sigma_{i=1}^p (delta * i)
+    #         inv = (x_n - x_0)/(p-1)
+    #
+    #     Raises
+    #     ------
+    #     ZeroDivisionError
+    #         If p = 1, internals cannot be made.
+    #
+    #     '''
+    #     df = df_mod.copy()
+    #
+    #     internal_idx = df[df['label'] == 'internal'].index.tolist()
+    #     #print(internal_idx)
+    #
+    #     # Boundaries for Intervals
+    #     groupby_layer = df.groupby('layer')
+    #     first = groupby_layer.first()                                # make series of intervals
+    #     last = groupby_layer.last()
+    #
+    #     # TODO: Unsure if this is accessed; check flow to see if this case is triggered
+    #     if p == 1:
+    #         raise ZeroDivisionError('p-1.  Interval cannot be calculated.')
+    #     else:
+    #         intervals = (last[column] - first[column]) / (p - 1)
+    #         intervals.name = 'intervals'
+    #     #print(intervals)
+    #
+    #     # Join Column of firsts and intervals to df
+    #     s_first = first[column]
+    #     s_first.name = 'firsts'
+    #     joined = df.join(s_first, on='layer')                        # x_0; join long df with short s to get equal lengths
+    #     joined = joined.join(intervals, on='layer')                  # join long df with short intervals for internal_sums
+    #     #print(joined)
+    #
+    #     '''Interval or internal sums?'''
+    #     # Calc. Interval Sums
+    #     trunc = joined[(joined['label'] != 'interface') & (
+    #         joined['label'] != 'discont.')]                          # remove firsts and lasts from cumsum
+    #     ##'''cumsum is not working with groupby in pandas 0.17.1'''
+    #     ##internal_sums = np.cumsum(
+    #     ##    trunc.groupby('layer')['intervals'])                   # delta; apply sigma from algo
+    #     internal_sums = trunc.groupby('layer')['intervals'].cumsum() # 0.17.2 work around; backwards compat.
+    #     #print(clipped)
+    #     #print(internal_sums)
+    #
+    #     # Apply Internals to df
+    #     df.loc[internal_idx, column] = joined.loc[
+    #         internal_idx, 'firsts'] + internal_sums                  # although shorter, internals added to joined_df by index
+    #     if p % 2 != 0:
+    #         df.loc[df['label'] == 'neut. axis', column] = df[column].mean()
+    #
+    #     return df
+    ###
 
-        - Make series comprising intervals for each group
-        - Make a temp df joining intervals of d (d_intervals) to replicate values
-        - Add the prior d_ row to the correl. interval for internal d_
+    # NOTE: Hard to do without pandas join; need pandas objects (vs. numpy arrays) to keep indicies
+    # Need different approach to get below 20 ms
+    def _make_internals(self, df_mod, p, column):
+        '''Return a DataFrame w computed internal values per group for a given column.
+
+        Determines the interval for a given column and applies to a DataFrame.
+        - boundaries of each layer are parsed
+        - intervals are calculated
+        - a mini df if makes with first and intervals then joined to the main df
+        - internals are grouped, cumsums are calculated that added to firsts column
 
         Parameters
         ----------
@@ -863,6 +946,9 @@ class Laminate(Stack):
             x_i = x_0 + sigma_{i=1}^p (delta * i)
             inv = (x_n - x_0)/(p-1)
 
+        So far, you can apply this function to most numeric columns as the intervals
+        are determined by the layer boundaries.
+
         Raises
         ------
         ZeroDivisionError
@@ -870,49 +956,52 @@ class Laminate(Stack):
 
         '''
         df = df_mod.copy()
+        idxs = self._indicies
+        print(idxs)
+        custom_idx = idxs['internals'].union(idxs['neutralaxis'])
 
-        internal_idx = df[df['label'] == 'internal'].index.tolist()
-        #print(internal_idx)
-
-        # Intervals
-        groupby_layer = df.groupby('layer')
-        first = groupby_layer.first()                                # make series of intervals
-        last = groupby_layer.last()
-
-        # TODO: Unsure if this is accessed; check flow to see if this case is triggered
-        if p == 1:
-            raise ZeroDivisionError('p-1.  Interval cannot be calculated.')
-        else:
-            intervals = (last[column] - first[column]) / (p - 1)
-            intervals.name = 'intervals'
+        # if p == 1:
+        #     raise ZeroDivisionError('Unable to calculate interval.  Select p > 1.')
+        
+        # Boundaries of Layers per Column and get a series of intervals
+        # Make a series of intervals indexed by layer
+        firsts_series = df.loc[idxs['firsts'], [column, 'layer']].set_index('layer')[column]
+        lasts_series = df.loc[idxs['lasts'], [column, 'layer']].set_index('layer')[column]
+        intervals = (lasts_series - firsts_series) / (p - 1)
+        firsts_series.name = 'firsts'
+        lasts_series.name = 'lasts'
+        intervals.name = 'intervals'
+        #print(firsts_series, lasts_series)
         #print(intervals)
 
-        # Join Column of firsts and intervals to df
-        s_first = first[column]
-        s_first.name = 'firsts'
-        joined = df.join(s_first, on='layer')                        # x_0; join long df with short s to get equal lengths
-        joined = joined.join(intervals, on='layer')                  # join long df with short intervals for internal_sums
+        #print(firsts_intvs)
+        #firsts_series['intervals'] = intervals
+        # Join the first and intervals columns to the main df along layer_ index (small to large column)
+        #firsts_and_intv_df = df.join(firsts_series, on='layer')
+        #firsts_and_intv_df = firsts_and_intv_df.join(intervals, on='layer')
         #print(joined)
 
-        '''Interval or internal sums?'''
-        # Calc. Interval Sums
-        trunc = joined[(joined['label'] != 'interface') & (
-            joined['label'] != 'discont.')]                          # remove firsts and lasts from cumsum
-        ##'''cumsum is not working with groupby in pandas 0.17.1'''
-        ##internal_sums = np.cumsum(
-        ##    trunc.groupby('layer')['intervals'])                   # delta; apply sigma from algo
-        internal_sums = trunc.groupby('layer')['intervals'].cumsum() # 0.17.2 work around; backwards compat.
-        #print(clipped)
-        #print(internal_sums)
+        # Calculate the internals sums from these appended columns
+        # Strip down the df to internals, then cumsum by layer
+    #     trunc = firsts_and_intv_df.loc[idxs['internals'].union(idxs['neutralaxis']), :]
+    #     internal_sums = trunc.groupby('layer')['intervals'].cumsum()   # 0.17.2 work around; backwards compat.
 
-        # Apply Internals to df
-        df.loc[internal_idx, column] = joined.loc[
-            internal_idx, 'firsts'] + internal_sums                  # although shorter, internals added to joined_df by index
-        if p % 2 != 0:
-            df.loc[df['label'] == 'neut. axis', column] = df[column].mean()
+        # Try pre-buildiing to reduce join calls
+        d = {'firsts': firsts_series, 'intervals': intervals}
+        firsts_intvs = pd.DataFrame(d)
+        firsts_and_intv_df = df.join(firsts_intvs, on='layer')
+        trunc = firsts_and_intv_df.loc[custom_idx, :]
+        internal_sums = trunc.groupby('layer')['intervals'].cumsum()   # 0.17.2 work around; backwards compat.
+
+        # Sum internals sums to first values and assign to cooresponding rows in main df
+    #     df.loc[idxs['internals'], column] = firsts_and_intv_df.loc[idxs['internals'], 'firsts'] + internal_sums
+        df.loc[idxs['internals'], column] = firsts_and_intv_df.loc[custom_idx, 'firsts'] + internal_sums
+
+        if self.nplies % 2 != 0 and p > 2 and idxs['neutralaxis'].all():
+            df.loc[idxs['neutralaxis'], column] = df[column].mean()
 
         return df
-    ###
+
 
     # These methods export data
     def to_csv(self, **kwargs):
