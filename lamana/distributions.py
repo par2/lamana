@@ -297,7 +297,7 @@ class Case(object):
                         model=self.model,
                         global_vars=None,
                     )
-                    '''Add to info?'''
+                    print('Building Geometry: {}'.format(Geometry))
                     _geo_cache.update([conv_geometry])     # make unique set of geo strings to skip if unique
                     self.Geometries.append(Geometry)
                     self.p = FeatureInput['Parameters']['p']
@@ -1358,13 +1358,14 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
     def cases_by_p():
         for i, p in enumerate(ps):
             '''raise exception if p is not int.'''
+            if verbose:
+                print('Creating a new case. p: {}'.format(p))
             load_params['p'] = p
             case = Case(load_params, mat_props)
             case.apply(geos)
             # Verbose printing
             if verbose:
-                print('A new case was created. '
-                      '# of LaminateModels: {}, p: {}'.format(len(geos), p))
+                print('A new case was created. {} of {} LaminateModels'.format(i, len(geos)))
                 #print('A new case was created. # LaminateModels: %s, ps: %s' % (len(geos), p))
             #yield p, case
             yield i, case
