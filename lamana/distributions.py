@@ -184,7 +184,7 @@ class Case(object):
         return df_properties
 
     # TODO: accept kwargs
-    def apply(self, geo_strings=None, model='Wilson_LT', unique=False):
+    def apply(self, geo_strings=None, model='Wilson_LT', unique=False, verbose=False):
         '''Apply geometries and laminate theory model to a `LaminateModel`.
 
         Convert user inputs general convention, then to `Geometry` objects
@@ -211,6 +211,8 @@ class Case(object):
             Selected model is a custom model found in `models` directory.
         unique : bool; default False
             Apply a set of unique geometry strings.
+        verbose: bool; default False
+            Toggle printed building details.
 
         Returns
         -------
@@ -297,13 +299,16 @@ class Case(object):
                         model=self.model,
                         global_vars=None,
                     )
-                    print('Building Geometry: {}'.format(Geometry))
+
                     _geo_cache.update([conv_geometry])     # make unique set of geo strings to skip if unique
                     self.Geometries.append(Geometry)
                     self.p = FeatureInput['Parameters']['p']
                     #print(conv_geometry)
                     #print(_geo_cache)
                     #print(FeatureInput)
+                    if verbose:
+                        print('Building Geometry: {}, p:{}'.format(Geometry, self.p))
+
                     '''Is there a way to save a general FI for the Case?'''
                     # TODO: accept kwargs
                     #yield la.constructs.Laminate(FeatureInput)

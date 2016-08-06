@@ -22,8 +22,6 @@ from lamana.utils.config import EXTENSIONS
 # STACK -----------------------------------------------------------------------
 # =============================================================================
 # Classes related to stack creation, layer ordering.  Precursor to Snapshot.
-
-
 class Stack(object):
     '''Build a StackTuple object containing stack-related methods.
 
@@ -443,7 +441,7 @@ class Laminate(Stack):
         # Laminate Objects
         self.Snapshot = self._build_snapshot()             # df object; stack
         self._primitive = self._build_primitive()          # phase 1
-        self._indicies = ut.get_indicies(self._primitive)
+        self._indexer = ut.get_indicies(self._primitive)
         self.LFrame = self._build_LFrame()                 # phase 1; df of IDs; formerly Laminate_
         self._frame = self.LFrame                          # general accessor
 
@@ -468,7 +466,7 @@ class Laminate(Stack):
             # Ignore pandas objects; check rest of __dict__ and build trimmed dicts
             # Important to blacklist the trimmed dict from looping in __dict__
             blacklisted.append('_dict_trim')                         # prevent infinite loop
-            blacklisted.append('_indicies')                          # added 0.4.13; comparing pandas index object throws error
+            blacklisted.append('_indexer')                           # added 0.4.13; comparing pandas index object throws error
             self._dict_trim = {
                 key: value
                 for key, value in self.__dict__.items()
@@ -918,7 +916,7 @@ class Laminate(Stack):
     ###
 
     # NOTE: Hard to do without pandas join; need pandas objects (vs. numpy arrays) to keep indicies
-    # Need different approach to get below 20 ms
+    # NOTE: Need different approach to get below 20 ms
     def _make_internals(self, df_mod, p, column):
         '''Return a DataFrame w computed internal values per group for a given column.
 
@@ -956,9 +954,8 @@ class Laminate(Stack):
 
         '''
         df = df_mod.copy()
-        idxs = self._indicies
-        #print(idxs)
-        custom_idx = idxs['internals'].union(idxs['neutralaxis'])
+        idxs = self._indexer.indicies.copy()
+        idxs['custom'] = idxs['internals'].union(idxs['neutralaxis'])
 
         # if p == 1:
         #     raise ZeroDivisionError('Unable to calculate interval.  Select p > 1.')
@@ -974,35 +971,23 @@ class Laminate(Stack):
         #print(firsts_series, lasts_series)
         #print(intervals)
 
-        #print(firsts_intvs)
-        #firsts_series['intervals'] = intervals
-        # Join the first and intervals columns to the main df along layer_ index (small to large column)
-        #firsts_and_intv_df = df.join(firsts_series, on='layer')
-        #firsts_and_intv_df = firsts_and_intv_df.join(intervals, on='layer')
-        #print(joined)
-
         # Calculate the internals sums from these appended columns
         # Strip down the df to internals, then cumsum by layer
-    #     trunc = firsts_and_intv_df.loc[idxs['internals'].union(idxs['neutralaxis']), :]
-    #     internal_sums = trunc.groupby('layer')['intervals'].cumsum()   # 0.17.2 work around; backwards compat.
-
         # Try pre-buildiing to reduce join calls
         d = {'firsts': firsts_series, 'intervals': intervals}
         firsts_intvs = pd.DataFrame(d)
         firsts_and_intv_df = df.join(firsts_intvs, on='layer')
-        trunc = firsts_and_intv_df.loc[custom_idx, :]
+        trunc = firsts_and_intv_df.loc[idxs['custom'], :]
         internal_sums = trunc.groupby('layer')['intervals'].cumsum()   # 0.17.2 work around; backwards compat.
 
         # Sum internals sums to first values and assign to cooresponding rows in main df
-    #     df.loc[idxs['internals'], column] = firsts_and_intv_df.loc[idxs['internals'], 'firsts'] + internal_sums
-        df.loc[idxs['internals'], column] = firsts_and_intv_df.loc[custom_idx, 'firsts'] + internal_sums
+        df.loc[idxs['internals'], column] = firsts_and_intv_df.loc[idxs['custom'], 'firsts'] + internal_sums
 
         # NOTE: Does not calucate middle values correctly.  Relies on post calculations.
         if self.nplies % 2 != 0 and p > 2 and idxs['neutralaxis'].all():
             df.loc[idxs['neutralaxis'], column] = df[column].mean()
 
         return df
-
 
     # These methods export data
     def to_csv(self, **kwargs):
