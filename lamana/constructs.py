@@ -3,6 +3,7 @@
 # Stack() : an dict of the order laminate layers.
 # Laminate() : pandas objects including laminate dimensions and calculations
 
+import sys
 import logging
 import itertools as it
 import collections as ct
@@ -750,6 +751,10 @@ class Laminate(Stack):
 
         sort_columns = ['layer', 'side', 'type', 'matl', 'label', 't(um)',
                         'h(m)', 'd(m)', 'intf', 'k', 'Z(m)', 'z(m)', 'z(m)*']
+
+        # Debug who is double calling this method
+        ut.inspect_callers(self)
+
         ##self.LFrame = ut.set_column_sequence(df, sort_columns)
         return ut.set_column_sequence(df, sort_columns)
 

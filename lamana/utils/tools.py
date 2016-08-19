@@ -15,6 +15,7 @@
 
 import os
 import re
+import sys
 import logging
 import tempfile
 import inspect
@@ -663,3 +664,11 @@ def natural_sort(data):
 
     # TODO: Need to complete; doesn't really do any sorting, just sets up the iterator.  Redo.
     return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
+
+
+def inspect_callers(x):
+    '''Print who is calling a function (REF 058).'''
+    callingframe = sys._getframe(1)
+    print('My caller is the %r function in a %r class' % (
+        callingframe.f_code.co_name,
+        callingframe.f_locals['self'].__class__.__name__))
