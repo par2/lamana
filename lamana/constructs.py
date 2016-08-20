@@ -753,7 +753,7 @@ class Laminate(Stack):
                         'h(m)', 'd(m)', 'intf', 'k', 'Z(m)', 'z(m)', 'z(m)*']
 
         # Debug who is double calling this method
-        ut.inspect_callers(self)
+        #ut.inspect_callers(self)
 
         ##self.LFrame = ut.set_column_sequence(df, sort_columns)
         return ut.set_column_sequence(df, sort_columns)
@@ -987,7 +987,7 @@ class Laminate(Stack):
 
         # Sum internals sums to first values and assign to cooresponding rows in main df
         df.loc[idxs['internals'], column] = firsts_and_intv_df.loc[idxs['custom'], 'firsts'] + internal_sums
-
+        
         # NOTE: Does not calucate middle values correctly.  Relies on post calculations.
         if self.nplies % 2 != 0 and p > 2 and idxs['neutralaxis'].all():
             df.loc[idxs['neutralaxis'], column] = df[column].mean()
