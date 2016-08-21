@@ -815,7 +815,7 @@ class BaseDefaults(object):
         }
         return FeatureInput
 
-    # Make generators of custom geometry strings or objects
+    # TODO: Make a static method
     def generate(self, selection=None, geo_inputs=False):
         '''Yield a generator of selected geometry strings or objects given a key.
 
