@@ -2,7 +2,7 @@ import glob
 import logging
 from os.path import dirname, basename, isfile
 
-# REF 055
+# Dynamically assign all modules in the current folder to __all__ (REF 055)
 #__all__ = ['Wilson_LT']
 modules = glob.glob(dirname(__file__) + '/*.py')
 filenames = [basename(f)[:-3] for f in modules if isfile(f)]

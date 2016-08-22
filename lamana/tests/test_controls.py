@@ -153,12 +153,14 @@ def test_apply_LaminateModels_cols_dimensions1():
         '''Bypassing z(m), z(m)*, intf and k for now'''
         # UPDATE: `k` added back in 0.4.4b
         ###
-        cols = ['layer', 'side', 'type', 'matl',
-        #        'label', 't(um)', 'h(m)', 'd(m)', 'intf', 'k', 'Z(m)', 'z(m)']
-        #        'label', 't(um)', 'h(m)', 'd(m)', 'intf', 'k', 'Z(m)', ]
-        #        'label', 't(um)', 'h(m)', 'd(m)', 'intf', 'Z(m)', ]      # removed; k redefined in 0.4.3c4d
-        #        'label', 't(um)', 'h(m)', 'd(m)', 'intf']
-        'label', 't(um)', 'h(m)', 'd(m)', 'intf', 'k']
+        cols = [
+            'layer', 'side', 'type', 'matl',
+                # 'label', 't(um)', 'h(m)', 'd(m)', 'intf', 'k', 'Z(m)', 'z(m)']
+                # 'label', 't(um)', 'h(m)', 'd(m)', 'intf', 'k', 'Z(m)', ]
+                # 'label', 't(um)', 'h(m)', 'd(m)', 'intf', 'Z(m)', ]      # removed; k redefined in 0.4.3c4d
+                # 'label', 't(um)', 'h(m)', 'd(m)', 'intf']
+                'label', 't(um)', 'h(m)', 'd(m)', 'intf', 'k'
+        ]
         print('A .csv file is being processed with the following dimensional properties:')
         print(' Number of plies: {} \n p: {} \n total \
                t (m): {} \n geometry: {} \n'.format(nplies, p, t_total, geometry))

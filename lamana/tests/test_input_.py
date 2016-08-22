@@ -107,6 +107,7 @@ def test_geo_inner1():
     nt.assert_equal(conv(geo1), expected)
     nt.assert_equal(conv(geo2), expected)
 
+
 # Test Exception Handling in _to_gen_convention()
 @nt.raises(TypeError)
 def test_geo_string1():
@@ -1126,7 +1127,7 @@ def test_BaseDefaults_generate_geo5():
 
 
 @nt.raises(KeyError)
-def test_BaseDefaults_generate_geo5():
+def test_BaseDefaults_generate_geo6():
     '''Check KeyError is raised is key is not found in geos_input dict.'''
     gen = bdft.generate(selection=['invalid-key'], geo_inputs=True)
     actual = list(gen)
