@@ -1336,7 +1336,7 @@ def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False
     if isinstance(geos, str):
         geos = [geos]
     elif (geos is not None) and not (isinstance(geos, list)):
-        # TODO: use custom Exception
+        # TODO: use custom Exception or TypeError
         raise Exception('geos must be a list of strings')
 
     if load_params is None:

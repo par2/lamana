@@ -49,61 +49,6 @@ mat_props = {
 # TOOLS -----------------------------------------------------------------------
 # =============================================================================
 # Laminator -------------------------------------------------------------------
-def test_laminator_consistency1():
-    '''Check laminator yields same LMFrame as classic case building.'''
-    case = distributions.laminator(geos=dft.geos_all, ps=[5])
-    for case_ in case.values():
-        case1 = case_
-    case2 = distributions.Case(load_params, mat_props)
-    case2.apply(dft.geos_all)
-    #print(case1)
-    #print(case2)
-    ##for actual, expected in zip(case1, case2.LMs):
-    for actual, expected in zip(case1.LMs, case2.LMs):
-        #print(actual)
-        #print(expected)
-        ut.assertFrameEqual(actual.LMFrame, expected.LMFrame)
-
-
-@nt.raises(Exception)
-def test_lamainator_type1():
-    '''Check raises Exception if geos is not a list.'''
-    actual = distributions.laminator(geos={'400-200-800'})
-
-
-def test_laminator_type2():
-    '''Check defaults to 400-200-800 nothing is passed in.'''
-    case1 = distributions.laminator(geos=['400-200-800'])
-    LM = case1[0]
-    actual = LM.frames[0]
-    case2 = distributions.Case(dft.load_params, dft.mat_props)
-    case2.apply(['400-200-800'])
-    expected = case2.frames[0]
-    ut.assertFrameEqual(actual, expected)
-
-
-def test_laminator_type3():
-    '''Check defaults triggerd if nothing is passed in.'''
-    case1 = distributions.laminator()
-    LM = case1[0]
-    actual = LM.frames[0]
-    case2 = distributions.Case(dft.load_params, dft.mat_props)
-    case2.apply(['400-200-800'])
-    expected = case2.frames[0]
-    ut.assertFrameEqual(actual, expected)
-
-
-# TODO: Move to input_
-def test_laminator_gencon1():
-    '''Check returns a geometry string in General Convention; converts 'S'.'''
-    case = distributions.laminator(['400-0-400S'])
-    for case_ in case.values():
-        for LM in case_.LMs:
-            actual = input_.get_special_geometry(LM.LMFrame)
-            ##expected = '400-[0]-800'                       # pre to_gen_convention()
-            expected = '400.0-[0.0]-800.0'
-            nt.assert_equal(actual, expected)
-
 
 # IO Tests -------------------------------------------------------------------
 # These tests create temporary files in the OS temp directory.
