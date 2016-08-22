@@ -720,7 +720,6 @@ def _multiplot(
             legend_kw.update(title=ltitle)
             sublabel_kw = dict(s=sublabel)
 
-
             # TODO: Refactor
             # Caselet could be a case or LM, but distribplot needs a list of LMs
             try:
@@ -813,6 +812,7 @@ class FigurePlot():
     '''
     #figsize = (ncols * size * aspect, nrows * size)
     pass
+
 
 # NOTE: Transferred from tools.utils in 0.4.13-dev
 def export(L_, overwrite=False, prefix=None, suffix=None, order=None,
@@ -1030,7 +1030,7 @@ def export(L_, overwrite=False, prefix=None, suffix=None, order=None,
                 if dict_df.size == 1:                      # assumes string strs are ordered first
                     dict_df.to_excel(writer, dash_sheetname, startrow=4**i)
                 else:
-                    dict_df.to_excel(writer, dash_sheetname, startcol=(i-1)*offset)
+                    dict_df.to_excel(writer, dash_sheetname, startcol=(i - 1) * offset)
 
             writer.save()
 

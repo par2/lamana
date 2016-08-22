@@ -519,7 +519,7 @@ class BaseDefaults(object):
             '10-ply': ['500-[50,50,50,50]-0'],
             '11-ply': ['400-[100,100,100,100]-800'],
             '13-ply': ['400-[100,100,100,100,100]-800'],
-            }
+        }
 
         # To add keys, first add logic to automate appending dict_ in groupify
         # This should add a key to geo_inputs.  Geo_objects will auto-mimic this logic.
@@ -673,7 +673,6 @@ class BaseDefaults(object):
                     dict_['sample'].append(sample)
 
         return dict_
-
 
     # HELPERS -------------------------------------------------------------
     # Material Manipulations
@@ -1104,6 +1103,7 @@ def get_frames(cases, name=None, nplies=None, ps=None):
     finally:
         print('\n')
         print('Finished getting DataFrames.')
+
 
 # TODO: Transferred from utils.tools
 def convert_featureinput(FI):
