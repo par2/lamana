@@ -1034,7 +1034,7 @@ class TestCaseExportMethods():
             actual2 = len([fname for fname in excel_file.sheet_names
                           if fname.startswith('Dash')])
             expected1 = 6
-            expected2 = actual1/2.
+            expected2 = actual1 / 2.
             nt.assert_equals(actual1, expected1)
             nt.assert_equals(actual2, expected2)
         finally:
@@ -1113,7 +1113,6 @@ cases4e = distributions.Cases(['400-[150,50]-800'])
 
 # Manual fixed length for slicing
 cases5a = distributions.Cases(['400-[200]-800', '400-[100,100]-400', '400-[400]-400'])
-
 
 
 # TESTS -----------------------------------------------------------------------
@@ -1375,7 +1374,7 @@ def test_Cases_mthd_select2():
     # Using a set expression to filter normal Case objects
     expected = {
         LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
-        cases2b4.LMs) if LM.p == 3
+                              cases2b4.LMs) if LM.p == 3
     }
     nt.assert_set_equal(actual, expected)
 
@@ -1385,7 +1384,7 @@ def test_Cases_mthd_select3():
     actual = cases2a.select(nplies=[2, 4])
     expected = {
         LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
-        cases2b4.LMs) if LM.nplies in (2, 4)
+                              cases2b4.LMs) if LM.nplies in (2, 4)
     }
     nt.assert_set_equal(actual, expected)
 
@@ -1395,7 +1394,7 @@ def test_Cases_mthd_select4():
     actual = cases2a.select(ps=[2, 4])
     expected = {
         LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
-        cases2b4.LMs) if LM.p in (2, 4)
+                              cases2b4.LMs) if LM.p in (2, 4)
     }
     nt.assert_set_equal(actual, expected)
 
@@ -1407,7 +1406,7 @@ def test_Cases_mthd_select_crossselect1():
     actual2 = cases2a.select(nplies=4, ps=3, how='union')
     expected = {
         LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
-        cases2b4.LMs) if (LM.nplies == 4) | (LM.p == 3)
+                              cases2b4.LMs) if (LM.nplies == 4) | (LM.p == 3)
     }
     nt.assert_set_equal(actual1, expected)
     nt.assert_set_equal(actual2, expected)
@@ -1418,7 +1417,7 @@ def test_Cases_mthd_select_crossselect2():
     actual = cases2a.select(nplies=4, ps=3, how='intersection')
     expected1 = {
         LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
-        cases2b4.LMs) if (LM.nplies == 4) & (LM.p == 3)
+                              cases2b4.LMs) if (LM.nplies == 4) & (LM.p == 3)
     }
     expected2 = {cases2b3.LMs[-1]}
     nt.assert_set_equal(actual, expected1)
@@ -1439,7 +1438,7 @@ def test_Cases_mthd_select_crossselect4():
     actual = cases2a.select(nplies=4, ps=3, how='symmetric difference')
     expected1 = {
         LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
-        cases2b4.LMs) if (LM.nplies == 4) ^ (LM.p == 3)
+                              cases2b4.LMs) if (LM.nplies == 4) ^ (LM.p == 3)
     }
     list_p3 = list(cases2b3.LMs[:-1])                      # copy list
     list_p3.append(cases2b2.LMs[-1])
@@ -1466,7 +1465,7 @@ def test_Cases_mthd_select_crossselect6():
     actual = cases2a.select(nplies=[2, 4], ps=[3, 4], how='intersection')
     expected1 = {
         LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
-        cases2b4.LMs) if (LM.nplies in (2, 4)) & (LM.p in (3, 4))
+                              cases2b4.LMs) if (LM.nplies in (2, 4)) & (LM.p in (3, 4))
     }
     nt.assert_set_equal(actual, expected1)
 
@@ -1486,7 +1485,7 @@ def test_Cases_mthd_select_crossselect8():
     actual = cases2a.select(nplies=4, ps=[3, 4], how='symmetric difference')
     expected1 = {
         LM for LM in it.chain(cases2b2.LMs, cases2b3.LMs,
-        cases2b4.LMs) if (LM.nplies == 4) ^ (LM.p in (3, 4))
+                              cases2b4.LMs) if (LM.nplies == 4) ^ (LM.p in (3, 4))
     }
     nt.assert_set_equal(actual, expected1)
 
@@ -1785,3 +1784,62 @@ def test_Cases_kw_unique4():
     expected = set(case.LMs)
     #print(actual, expected)
     nt.assert_set_equal(actual, expected)
+
+
+# -----------------------------------------------------------------------------
+#  Functions
+# -----------------------------------------------------------------------------
+# Laminator -------------------------------------------------------------------
+class TestLaminator:
+
+    dft = wlt.Defaults()
+
+    def test_laminator_consistency1(self):
+        '''Check laminator yields same LMFrame as classic case building.'''
+        case = distributions.laminator(geos=self.dft.geos_all, ps=[5])
+        for case_ in case.values():
+            case1 = case_
+        case2 = distributions.Case(self.dft.load_params, self.dft.mat_props)
+        case2.apply(self.dft.geos_all)
+        for actual, expected in zip(case1.LMs, case2.LMs):
+            try:
+                ut.assertFrameEqual(actual.LMFrame, expected.LMFrame)
+            except(AssertionError):
+                print('Actual DataFrame:', actual)
+                print('Expected DataFrame:', expected)
+
+    @nt.raises(Exception)
+    def test_laminator_type1(self):
+        '''Check raises Exception if geos is not a list.'''
+        actual = distributions.laminator(geos={'400-200-800'})
+
+    def test_laminator_type2(self):
+        '''Check defaults to 400-200-800 nothing is passed in.'''
+        case1 = distributions.laminator(geos=['400-200-800'])
+        LM = case1[0]
+        actual = LM.frames[0]
+        case2 = distributions.Case(self.dft.load_params, self.dft.mat_props)
+        case2.apply(['400-200-800'])
+        expected = case2.frames[0]
+        ut.assertFrameEqual(actual, expected)
+
+    def test_laminator_type3(self):
+        '''Check defaults triggered if nothing is passed in.'''
+        case1 = distributions.laminator()
+        LM = case1[0]
+        actual = LM.frames[0]
+        case2 = distributions.Case(self.dft.load_params, self.dft.mat_props)
+        case2.apply(['400-200-800'])
+        expected = case2.frames[0]
+        ut.assertFrameEqual(actual, expected)
+
+    # TODO: Move to input_
+    def test_laminator_gencon1(self):
+        '''Check returns a geometry string in General Convention; converts 'S'.'''
+        case = distributions.laminator(['400-0-400S'])
+        for case_ in case.values():
+            for LM in case_.LMs:
+                actual = input_.get_special_geometry(LM.LMFrame)
+                ##expected = '400-[0]-800'                       # pre to_gen_convention()
+                expected = '400.0-[0.0]-800.0'
+                nt.assert_equal(actual, expected)
