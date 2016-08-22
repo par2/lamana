@@ -45,7 +45,7 @@ class BaseModel(object):
         return '<{} Model object>'.format(self.__class__.__name__)
 
     # TODO: Find `_use_model_` more dynamically than forcing to search `Model._use_model`.
-	# NOTE: There is no self here
+    # NOTE: There is no self here
     @abc.abstractmethod
     def _use_model_():
         '''Hook method.
@@ -161,8 +161,10 @@ def get_hook_function(module, hookname):
 
     '''
     logging.debug("Given hookname: '{}'".format(hookname))
-    functions = [(name, func) for name, func in ut.find_functions(module)
-            if name == hookname]
+    functions = [
+        (name, func) for name, func in ut.find_functions(module)
+        if name == hookname
+    ]
     if not len(functions):
         raise AttributeError('No hook function found.')
     elif len(functions) != 1:
@@ -190,8 +192,10 @@ def get_hook_class(module, hookname):
         # Need to make sure we not looking in the parent class BaseModel
         if issubclass(kls, BaseModel) and not ut.isparent(kls):
             logging.debug('Sub-classes of BaseModel: {}'.format(kls))
-            methods = [(name, mthd) for name, mthd in ut.find_methods(kls)
-                if name == hookname]
+            methods = [
+                (name, mthd) for name, mthd in ut.find_methods(kls)
+                if name == hookname
+            ]
             class_obj = kls
             all_methods.extend(methods)
     logging.debug("All hook methods ({}) found in module {}: '{}'".format(

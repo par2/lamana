@@ -2,8 +2,7 @@
 '''A module that builds core objects, such as stacks and laminates.'''
 # Stack() : an dict of the order laminate layers.
 # Laminate() : pandas objects including laminate dimensions and calculations
-
-import sys
+##import sys
 import logging
 import itertools as it
 import collections as ct
@@ -456,8 +455,10 @@ class Laminate(Stack):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             # Auto check attrs if assigned to DataFrames/Series, then add to list
-            blacklisted = [attr for attr in self.__dict__ if
-                isinstance(getattr(self, attr), (pd.DataFrame, pd.Series))]
+            blacklisted = [
+                attr for attr in self.__dict__ if
+                isinstance(getattr(self, attr), (pd.DataFrame, pd.Series))
+            ]
 
             # Check DataFrames and Series
             for attrname in blacklisted:
@@ -511,7 +512,6 @@ class Laminate(Stack):
         Snapshot = self.stack_to_df(stack_extended)
         ##return self.__class__._set_stresses(Snapshot)
         return self._set_stresses(Snapshot)
-
 
     # PHASE 1
     def _build_primitive(self):
@@ -801,7 +801,7 @@ class Laminate(Stack):
         ##cols = ['layer', 'side', 'matl', 'type', 't(um)']
         # TODO: Add self.nrows to class attrs and nlayers
         n_rows = df.index.size
-        p = n_rows/self.nplies
+        p = n_rows / self.nplies
         nlayers = df['layer'].max()
         # TODO: better if grabs the middle index from _FrameExtension (beta)
         half_the_stack = n_rows // 2
@@ -826,7 +826,7 @@ class Laminate(Stack):
             side_loc = df.columns.get_loc('side')
 
             # Set middle value
-            if nlayers % 2 != 0 and (n_rows == 1 or p < 2) :
+            if nlayers % 2 != 0 and (n_rows == 1 or p < 2):
                 df.iat[half_the_stack, side_loc] = 'INDET'
             # For the neutral axis and side not present
             elif nlayers % 2 != 0:
@@ -987,7 +987,7 @@ class Laminate(Stack):
 
         # Sum internals sums to first values and assign to cooresponding rows in main df
         df.loc[idxs['internals'], column] = firsts_and_intv_df.loc[idxs['custom'], 'firsts'] + internal_sums
-        
+
         # NOTE: Does not calucate middle values correctly.  Relies on post calculations.
         if self.nplies % 2 != 0 and p > 2 and idxs['neutralaxis'].all():
             df.loc[idxs['neutralaxis'], column] = df[column].mean()

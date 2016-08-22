@@ -537,7 +537,7 @@ class Case(object):
                     if dict_df.size == 1:                  # assumes string strs are ordered first
                         dict_df.to_excel(writer, dash_sheetname, startrow=4**i)
                     else:
-                        dict_df.to_excel(writer, dash_sheetname, startcol=(i-1)*offset)
+                        dict_df.to_excel(writer, dash_sheetname, startcol=(i - 1) * offset)
 
             writer.save()
 
@@ -1197,11 +1197,13 @@ class Cases(ct.MutableMapping):
         # Uses internal code for suptitles.
         # Custom plt.text disallowed due to complexity, e.g. subtitles.
         '''Search for alternate keyword holders.'''
-        output_._multiplot(caselets, halfplot=halfplot, normalized=normalized,
-                              extrema=extrema, legend_on=legend_on,
-                              colorblind=colorblind, grayscale=grayscale,
-                              subplots_kw=subplots_kw, suptitle_kw=suptitle_kw,
-                              **kwargs)
+        output_._multiplot(
+            caselets, halfplot=halfplot, normalized=normalized,
+            extrema=extrema, legend_on=legend_on,
+            colorblind=colorblind, grayscale=grayscale,
+            subplots_kw=subplots_kw, suptitle_kw=suptitle_kw,
+            **kwargs
+        )
 
 # DEPRECATE: 0.4.11
     def to_csv(self, path=None, verbose=True, **kwargs):
@@ -1235,12 +1237,6 @@ class Cases(ct.MutableMapping):
             '`to_csv` will be removed in LamAna 0.4.12 and will not be replaced',
             DeprecationWarning
         )
-        # DEPRECATED 0.4.11.dev0
-#        if path is None:
-#            path = os.getcwd()                             # use for the test in the correct path
-#            path = path + r'\lamana\output'                # default
-        #for LM in self.LMs:
-            #ut.write_csv(LM, path=path, verbose=verbose, **kwargs)
 
         return list(ut.write_csv(LM, path=path, verbose=verbose, **kwargs)
             for LM in self.LMs)
