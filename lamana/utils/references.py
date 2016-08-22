@@ -74,3 +74,5 @@ class RegexLinks(object):
 
     # ----- ---------                           -------------
     # (001) Inners, not duples                  http://pythex.org/?regex=(%3F%3C!%5B(%5Cd%2B%5D)(%5Cd*%5C.*%5Cd*%20*%5C%2C*%3F)(%3F!%5B%5Cd%5C.)%5D)&test_string=0%0A1%0A1.%0A10%0A10.%0A100%0A10.0%0A100.0%0A1000.0%0A1S%0A1.S%0A1.0S%0A%5B100%5D%0A%5B100.%5D%0A%5B100.0%5D%0A%5B100%2C100%5D%0A%5B100.%2C100.%5D%0A%5B100.0%2C100.0%5D%0A%5B100.0%2C100%5D%0A%5B100%2C%20(100%2C100)%5D&ignorecase=0&multiline=0&dotall=0&verbose=0
+
+    pass

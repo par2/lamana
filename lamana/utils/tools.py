@@ -17,9 +17,9 @@ import os
 import re
 import sys
 import logging
-import tempfile
+##import tempfile
 import inspect
-import warnings
+##import warnings
 import collections as ct
 
 import pandas as pd
@@ -325,14 +325,13 @@ def get_path(filename=None, prefix=None, suffix=None, overwrite=True,
     if not os.path.isfile(os.path.join(PACKAGEPATH, 'setup.py')):
         raise OSError(
             'Package root path location is not correct: {}'
-            ' Verify working directory is ./lamana.'.format(packagepath)
+            ' Verify working directory is ./lamana.'.format(PACKAGEPATH)
         )
     # defaultpath = os.path.join(config.PACKAGEPATH, 'export')
     #
     # dirpath = defaultpath
 
     dirpath = DEFAULTPATH
-
 
     logging.debug('Root path: {}'.format(PACKAGEPATH))
     if not filename and (suffix or dashboard):
@@ -397,7 +396,7 @@ def get_indicies(prim_df):
     df['idx'] = df.index                                   # temp. index column for idxmin & idxmax
     n_rows = df.index.size
     nplies = df['layer'].max()
-    p = n_rows/nplies
+    p = n_rows / nplies
     groupby_layer = df.groupby('layer')
     length = len(df.index)
 
@@ -452,6 +451,7 @@ def get_indicies(prim_df):
     Indexer = ct.namedtuple('Indexer', 'indicies conditions')
 
     return Indexer(indicies=indicies, conditions=conditions)
+
 
 # Inspection Tools ------------------------------------------------------------
 # These tools are used by `theories.handshake` to search for hook functions
@@ -534,6 +534,7 @@ def set_column_sequence(df, seq):
     #remaining = [seq.append(col) for col in df.columns if col not in seq]
     #seq.extend(remaining)
     #return df[seq]
+
 
 def assertSeriesEqual(s1, s2, **kwds):
     '''Return True if two Series are equal (REF 014)?.

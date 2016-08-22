@@ -12,7 +12,7 @@ import numpy as np
 from lamana import input_
 from lamana import distributions
 from lamana import constructs
-from lamana.lt_exceptions import IndeterminateError
+##from lamana.lt_exceptions import IndeterminateError
 from lamana.lt_exceptions import ModelError
 from lamana.utils import tools as ut
 from lamana.models import Wilson_LT as wlt
@@ -978,7 +978,7 @@ def test_Laminate_sanity7():
                 #print(LM.Geometry)
                 df = LM.frame
                 # Select middle most indices, should be zero
-                halfidx = len(df.index)//2
+                halfidx = len(df.index) // 2
                 #print(halfidx)
                 actual = df.loc[halfidx - 1: halfidx, cols].values
                 expected = np.zeros((2, 1))
@@ -1274,8 +1274,8 @@ class TestLaminateExportMethods():
 #  assert even_LM.FeatureInput != standard[0].FeatureInput
 
 
-'''Unsure how to make the following faster since the constructs are built real-time.'''
-'''But these three take up 10 seconds.'''
+# NOTE: Unsure how to make the following faster since the constructs are built real-time.
+# NOTE: But these three take up 10 seconds.
 def test_Laminate_num_middle1():
     '''Check no more than one middle layer Lamina is in a Laminate.'''
     actual = []
@@ -1341,7 +1341,7 @@ def test_Laminate_laminae_order1():
 #------------------------------------------------------------------------------
 # LAMINATEMODEL
 #------------------------------------------------------------------------------
-'''Tests > 1s are here, likely due to calling constructors.'''
+# NOTE: Tests > 1s are here, likely due to calling constructors.
 # Added in 0.4.12; modified from previous Laminate test
 class TestLaminateModel():
     '''Contain LaminateModel related tests.'''
@@ -1350,7 +1350,7 @@ class TestLaminateModel():
     # to use bare constructs
     # TODO: Fix use of get_FeatureInput instead
     case = distributions.laminator(geos=dft.geos_standard)
-    cases = distributions.laminator(geos=dft.geos_all, ps=[2,3,4,5], verbose=True)
+    cases = distributions.laminator(geos=dft.geos_all, ps=[2, 3, 4, 5], verbose=True)
     ##cases = distributions.laminator(geos=dft.geos_all, ps=[1, 2, 3, 4, 5], verbose=True)
 
     # Tests for LaminateModel prints
