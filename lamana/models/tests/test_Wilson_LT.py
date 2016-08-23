@@ -8,15 +8,16 @@
 import pandas as pd
 import nose.tools as nt
 
-from ... import input_
-from ... import distributions
-#from ...models import Wilson_LT as wlt
-from ...models import Wilson_LT as wlt
-from ...utils import tools as ut
+# from ... import input_
+# from ... import distributions
+# #from ...models import Wilson_LT as wlt
+# from ...models import Wilson_LT as wlt
+# from ...utils import tools as ut
 
-# from lamana.input_ import BaseDefaults
-# from lamana.models import Wilson_LT as wlt
-# from lamana.utils import tools as ut
+from lamana import input_
+from lamana import distributions
+from lamana.models import Wilson_LT as wlt
+from lamana.utils import tools as ut
 
 # Global Cases
 bdft = input_.BaseDefaults()
