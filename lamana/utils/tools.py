@@ -1,10 +1,14 @@
 #------------------------------------------------------------------------------
 '''Handy tools for global use.
 
+NOTE: As a means to avoid circular imports, core modules are not imported here.
+Instead, these tools are only imported from other core modules.  Tools will:
+
 - build cases quickly
 - read geo_strings from DataFrames
 - write/read csv files to DataFrames
 - compare sets
+- compare test code results to source results
 - resequence columns in DataFrame
 - determine if brackets/parentheses match in a string
 - assert pandas Series/DataFrames
