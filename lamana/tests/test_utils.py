@@ -4,6 +4,7 @@
 
 
 import os
+import copy
 ##import sys
 ##import abc
 import logging
@@ -12,6 +13,7 @@ import difflib
 
 import nose.tools as nt
 import pandas as pd
+import numpy as np
 
 from lamana import input_
 from lamana import distributions
@@ -25,6 +27,7 @@ from lamana.models import Wilson_LT as wlt
 from lamana.utils import tools as ut
 ##from ..utils import config
 from lamana.utils.config import HOOKNAME, RANDOMCHARS, EXTENSIONS
+from lamana.utils import regressiontools as rt
 
 dft = wlt.Defaults()                                       # from inherited class in models; user
 
@@ -45,10 +48,234 @@ mat_props = {
     'PSu': [2.7e9, 0.33],
 }
 
+
 # =============================================================================
 # TOOLS -----------------------------------------------------------------------
 # =============================================================================
-# Laminator -------------------------------------------------------------------
+class TestEdgeCases(object):
+    '''Verify the LFrame builds correctly for basics edge cases.
+
+    An optional Laminate-like object can be given to be tested by all edge cases.
+    Alternatively, each method can be called seperataly to test a specific
+    LFrame/LMFrame.
+
+    Edge cases
+    ----------
+    - Odd ply: has neutral axis and 'None' in the stress side_
+    - Even ply: no neutral axis
+    - Bilayer: has discontinuities, but lacks bound (non-surface) interfaces
+    - Monolith: no discontinuities and lack bound (non-surface) interfaces
+    - p is even: no neutral axis
+    - p = 1, mono-/Trilayer: have INDET, lack disconts & bound (non-surface) interfaces
+    - p = 1, odd ply: INDET instead stress side_; no disconts
+    - p = 1, bilayer: lacks discontinuities
+
+    Parameters
+    ----------
+    constructor : Laminate/-Model object, default None
+        Optionally pass in a construct to initialize instance vars.
+        Acts on a FeatureInput.
+
+    '''
+    dft = wlt.Defaults()
+
+    def get_Laminate(self, FI):
+        if self.constructor:
+            return self.constructor(FI)
+        return constructs.Laminate(FI)
+
+    def __init__(self, constructor=None):
+
+        self.constructor = constructor
+        FeatureInput_src = dft.FeatureInput
+
+        # Build default Laminate objects
+        # nplies
+        FeatureInput = FeatureInput_src.copy()
+        self.L_ply_odd = self.get_Laminate(FeatureInput)
+        assert FeatureInput['Parameters']['p'] == 5
+
+        FeatureInput['Geometry'] = input_.Geometry('400.0-[200.0]-0.0')
+        self.L_ply_even = self.get_Laminate(FeatureInput)
+
+        FeatureInput['Geometry'] = input_.Geometry('1000.0-[0.0]-0.0')
+        self.L_ply_bi = self.get_Laminate(FeatureInput)
+
+        FeatureInput['Geometry'] = input_.Geometry('0.0-[0.0]-2000.0')
+        self.L_ply_mono = self.get_Laminate(FeatureInput)
+
+        # ps
+        FeatureInput = copy.deepcopy(FeatureInput_src)
+        self.L_ply_odd_p_5 = self.get_Laminate(FeatureInput)
+
+        FeatureInput['Parameters']['p'] = 2
+        self.L_ply_odd_p_2 = self.get_Laminate(FeatureInput)
+
+        FeatureInput['Parameters']['p'] = 1
+        self.L_ply_odd_p_1 = self.get_Laminate(FeatureInput)
+
+        # INDET and no bound interfaces
+        FeatureInput = copy.deepcopy(FeatureInput_src)
+        FeatureInput['Parameters']['p'] = 1
+        self.L_ply_odd_p_1 = self.get_Laminate(FeatureInput)
+
+        FeatureInput['Geometry'] = input_.Geometry('0.0-[0.0]-2000.0')
+        self.L_ply_mono_p_1 = self.get_Laminate(FeatureInput)
+
+        FeatureInput['Geometry'] = input_.Geometry('500.0-[0.0]-1000.0')
+        self.L_ply_tri_p_1 = self.get_Laminate(FeatureInput)
+
+        FeatureInput['Geometry'] = input_.Geometry('1000.0-[0.0]-0.0')
+        self.L_ply_bi_p_1 = self.get_Laminate(FeatureInput)
+
+    @staticmethod
+    def has_neutralaxis(df):
+        '''Return True if neutral axis row exists.
+
+        Confirm DataFrame has 'neut. axis' row in the label_ column
+
+        '''
+        return df['label'].str.contains('neut. axis').any()
+
+    @staticmethod
+    def has_discontinuity(df):
+        '''Return True if discontunity rows exist.
+
+        Confirm DataFrame has 'discont.' rows in the label_ column
+
+        '''
+        return df['label'].str.contains('discont.').any()
+
+    @staticmethod
+    def has_INDET(df):
+        '''Return True if indeterminate row exists.
+
+        Confirm DataFrame has 'INDET' row in the side_ column.
+
+        '''
+        return df['side'].str.contains('INDET').any()
+
+    @staticmethod
+    def has_bound_interfaces(df):
+        '''Return True if non-surface interface rows exists.
+
+        Confirm DataFrame has 'INDET' row in the side_ column.
+
+        '''
+        return df['label'][1:-1].str.contains('interface').any()
+
+    # Tests -------------------------------------------------------------------
+    def test_Laminate_frame_odd(self, df=None):
+        '''Verify characteristics on an odd-ply laminate DataFrame.'''
+        def verify(df):
+            actual1 = self.has_neutralaxis(df)
+            actual2 = df['side'].str.contains('None').any()
+            nt.assert_true(actual1)
+            nt.assert_true(actual2)
+
+        verify(self.L_ply_odd.LFrame)
+        verify(self.L_ply_odd.frame)
+        if df is not None: verify(df)
+
+    def test_Laminate_frame_even(self, df=None):
+        '''Verify characteristics of an even-ply laminate DataFrame.'''
+        def verify(df):
+            actual = not self.has_neutralaxis(df)
+            nt.assert_true(actual)
+
+        verify(self.L_ply_even.LFrame)
+        verify(self.L_ply_even.frame)
+        if df is not None: verify(df)
+
+    def test_Laminate_frame_bi(self, df=None):
+        '''Verify characteristics of an bilayer laminate DataFrame.'''
+        def verify(df):
+            actual1 = not self.has_bound_interfaces(df)
+            actual2 = self.has_discontinuity(df)
+            nt.assert_true(actual1)
+            nt.assert_true(actual2)
+
+        verify(self.L_ply_bi.LFrame)
+        verify(self.L_ply_bi.frame)
+        if df is not None: verify(df)
+
+    def test_Laminate_frame_monolith(self, df=None):
+        '''Verify a monolith DataFrame lacks disconts and bound intfs.'''
+        def verify(df):
+            actual1 = not self.has_discontinuity(df)
+            actual2 = not self.has_bound_interfaces(df)
+            nt.assert_true(actual1)
+            nt.assert_true(actual2)
+
+        verify(self.L_ply_mono.LFrame)
+        verify(self.L_ply_mono.frame)
+        if df is not None: verify(df)
+
+    def test_Laminate_frame_p1(self, df=None):
+        '''Verify an odd-ply DataFrame with even rows (p) lacks a neutral axis.'''
+        def verify(df):
+            actual = not self.has_neutralaxis(df)
+            nt.assert_true(actual)
+
+        # We test above for even-ply; let's confirm for odd-ply
+        assert self.L_ply_odd_p_2.nplies % 2 != 0
+
+        verify(self.L_ply_odd_p_2.LFrame)
+        verify(self.L_ply_odd_p_2.frame)
+        if df is not None: verify(df)
+
+    def test_Laminate_frame_p2(self, df=None):
+        '''Verify mono- & trilayer, p = 1 yield INDET, lack discont. & bound intface.'''
+        def verify(df):
+            actual1 = self.has_INDET(df)
+            actual2 = not self.has_discontinuity(df)
+            actual3 = not self.has_bound_interfaces(df)
+            nt.assert_true(actual1)
+            nt.assert_true(actual2)
+            nt.assert_true(actual3)
+        assert self.L_ply_mono_p_1.nplies % 2 != 0
+        assert self.L_ply_odd_p_1.nplies % 2 != 0
+        assert self.L_ply_tri_p_1.nplies % 2 != 0
+
+        verify(self.L_ply_mono_p_1.LFrame)
+        verify(self.L_ply_mono_p_1.frame)
+        verify(self.L_ply_tri_p_1.LFrame)
+        verify(self.L_ply_tri_p_1.frame)
+        if df is not None: verify(df)
+
+    def test_Laminate_frame_p3(self, df=None):
+        '''Verify odd-ply, p = 1 yield INDET and lack discontinuities.'''
+        def verify(df):
+            actual1 = self.has_INDET(df)
+            actual2 = not self.has_discontinuity(df)
+            nt.assert_true(actual1)
+            nt.assert_true(actual2)
+        assert self.L_ply_mono_p_1.nplies % 2 != 0
+        assert self.L_ply_odd_p_1.nplies % 2 != 0
+        assert self.L_ply_tri_p_1.nplies % 2 != 0
+
+        verify(self.L_ply_odd_p_1.LFrame)
+        verify(self.L_ply_odd_p_1.frame)
+        verify(self.L_ply_mono_p_1.LFrame)
+        verify(self.L_ply_mono_p_1.frame)
+        verify(self.L_ply_tri_p_1.LFrame)
+        verify(self.L_ply_tri_p_1.frame)
+        if df is not None: verify(df)
+
+    def test_Laminate_frame_p4(self, df=None):
+        '''Verify bilayer, p = 1  lacks discontinuities.'''
+        def verify(df):
+            actual = not self.has_discontinuity(df)
+            nt.assert_true(actual)
+        assert self.L_ply_bi_p_1.nplies % 2 == 0
+
+        verify(self.L_ply_bi_p_1.LFrame)
+        verify(self.L_ply_bi_p_1.frame)
+        if df is not None: verify(df)
+
+    # TODO: now apply these tests to all defaults for full coverage.
+    # TODO: make separate test suites for odds, evens and monoliths.
+
 
 # IO Tests -------------------------------------------------------------------
 # These tests create temporary files in the OS temp directory.
@@ -1041,3 +1268,46 @@ class TestHookTools:
         # Assumes no hook classes in the fixture containing hook functions
         ##actual = ut.get_hook_class(self.many_hook_module, self.hookname)
         actual = ut.get_hook_class(self.many_hook_module, HOOKNAME)
+
+
+# =============================================================================
+# REGRESSION TOOLS ------------------------------------------------------------
+# =============================================================================
+# NOTE: This class increased test time from 3 to 21 secs
+class TestUtilsComparetoSource(object):
+    '''Verify the a given class compares with source classes.
+
+    See Also
+    --------
+    - Performance.ipynb: beta code
+
+    '''
+    # Inside of test source to expected results, this tests the opposite:
+    # - actual == beta code
+    # - expected == source code
+
+    class BadClass(object):
+        '''Accepts an expected FeatureInput.'''
+        def __init__(self, FI):
+            self.bad_df()
+
+        def bad_df(self):
+            return pd.DataFrame(np.nan, index=[0, 1, 2], columns=['A'])
+
+    def test_control(self):
+        '''Verify test is True when comparing the same source.'''
+        rt.compare_to_source(
+            constructs.Laminate, constructs.Laminate, '_build_LFrame',
+            ps=list(range(1, 6)), Geo_keys=['most'], verbose=False
+        )
+
+    @nt.raises(AssertionError)
+    def test_negative(self):
+        '''Verify test raises AssertionError when comparing source df to bad df.'''
+        # This will print the violating DataFrame
+        rt.compare_to_source(
+            constructs.Laminate, self.BadClass, 'bad_df',
+            Geo_keys=['most'], verbose=False
+        )
+
+    # TODO: Add advances inspect functions to verify DataFrame characteristics
