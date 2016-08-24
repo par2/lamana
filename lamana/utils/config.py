@@ -20,6 +20,9 @@ EXTENSIONS = ('.csv', '.xlsx')
 # Random characters
 RANDOMCHARS = 'xZ(1-)[]'
 
+# Number of plies obove which iteration is efficient of computing internals.
+# An auxillary algorithm is then used.  DEV: See Performance.ipynb for details.
+EFFICIENCY_THRESHOLD = 7
 
 # Default layer colors
 # colorblind palette from seaborn; grayscale is web-safe
