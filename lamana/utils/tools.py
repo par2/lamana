@@ -363,8 +363,101 @@ def get_path(filename=None, prefix=None, suffix=None, overwrite=True,
     return dirpath
 
 
+# def get_indicies(prim_df):
+#     '''Return a namedtuple comprising a dict of indicies parsed by layer.
+#
+#     Grabs indicies of layers based on categories.
+#
+#     Parameters
+#     ----------
+#     prim_df : DataFrame
+#         Expects a primitivate DataFrame at minimum.
+#
+#     Notes
+#     -----
+#     The following categories list pandas index objects comprising the `indicies` dict:
+#
+#     - interfaces: outside-in, peri-superficial indicies of all layers
+#     - disconts: outside-in, final indicies of all layers
+#     - internals: all indicies between interfaces and disconts
+#     - surfaces: first and last indicies, i.e. the top and bottom of the laminate
+#     - middles: central row (or two rows if even plies) proximal to the neutral axis
+#     - neutralaxis: the row representing the middle of an odd-ply laminate
+#     - firsts: top-down first (smallest) index per layer
+#     - lasts: top-down last (largest) index per layer
+#
+#     Since the laminate is mirrored, the indicies are built conditionally based
+#     on tensile or compressive side and merged by set operations.  All indicies
+#     per category are presented; booleane tests are left to the user.
+#
+#     Returns
+#     -------
+#     namedtuple
+#         Dict of panada Index objects, dict of booleans
+#
+#     '''
+#     df = prim_df
+#     df['idx'] = df.index                                   # temp. index column for idxmin & idxmax
+#     n_rows = df.index.size
+#     nplies = df['layer'].max()
+#     p = n_rows / nplies
+#     groupby_layer = df.groupby('layer')
+#     length = len(df.index)
+#
+#     # Conditionals
+#     conditions = {
+#         'tensile': df['side'] == 'Tens.',
+#         'compressive': df['side'] == 'Comp.',
+#         'middle': df['type'] == 'middle',
+#     }
+#
+#     tensile = conditions.get('tensile')
+#     compressive = conditions.get('compressive')
+#     middle = conditions.get('middle')
+#
+#     # Pandas Index Objects
+#     # Groupby layer, apply mix/max to indicies, store as pandas Index
+#     interf_tens_idx = pd.Index(df[tensile].groupby('layer')['idx'].idxmin())
+#     discont_tens_idx = pd.Index(df[tensile &~ middle].groupby('layer')['idx'].idxmax())
+#     discont_comp_idx = pd.Index(df[compressive &~ middle].groupby('layer')['idx'].idxmin())
+#     interf_comp_idx = pd.Index(df[compressive].groupby('layer')['idx'].idxmax())
+#     if nplies != 1:
+#         pseudo_middle_idx = pd.Index([discont_tens_idx.values[-1], discont_comp_idx.values[0]], name='idx')
+#     else:
+#         pseudo_middle_idx = pd.Index({})
+#     middle_idx = pd.Index([len(df.index) // 2], name='idx')
+#     internals_idx = df.index.difference(interf_tens_idx | discont_tens_idx | discont_comp_idx | interf_comp_idx)
+#     if p % 2 != 0: internals_idx = internals_idx.difference(middle_idx)
+#     surfaces_idx = pd.Index([0, length - 1], name='idx')
+#     firsts_idx = pd.Index(groupby_layer.first()['idx'], name='idx')
+#     lasts_idx = pd.Index(groupby_layer.last()['idx'], name='idx')
+#
+#     # DataFrame indicies
+#     indicies = {
+#         'interfaces': interf_tens_idx.union(interf_comp_idx).sort_values(),
+#         'disconts': discont_tens_idx.union(discont_comp_idx).sort_values(),
+#         'internals': internals_idx,
+#         'surfaces': surfaces_idx,
+#         'firsts': firsts_idx,
+#         'lasts': lasts_idx,
+#     }
+#
+#     if nplies % 2 == 0 or p % 2 == 0:
+#         indicies['middles'] = pseudo_middle_idx
+#         indicies['neutralaxis'] = pd.Index({})
+#     else:
+#         indicies['middles'] = middle_idx
+#         indicies['neutralaxis'] = middle_idx
+#
+#     logging.debug('Indices: {}'.format(indicies))
+#
+#     # Setup a namedtuple
+#     Indexer = ct.namedtuple('Indexer', 'indicies conditions')
+#
+#     return Indexer(indicies=indicies, conditions=conditions)
+
 def get_indicies(prim_df):
-    '''Return a namedtuple comprising a dict of indicies parsed by layer.
+    '''Return a dict of pandas Index objects parsed by layer.
 
     Grabs indicies of layers based on categories.
 
@@ -382,18 +475,16 @@ def get_indicies(prim_df):
     - internals: all indicies between interfaces and disconts
     - surfaces: first and last indicies, i.e. the top and bottom of the laminate
     - middles: central row (or two rows if even plies) proximal to the neutral axis
-    - neutralaxis: the row representing the middle of an odd-ply laminate
+    - pseudomids: two center-most rows for an even-ply laminate
+    - neutralaxis: the row representing the middle of an odd-ply laminate; absent for even plies
     - firsts: top-down first (smallest) index per layer
     - lasts: top-down last (largest) index per layer
+    - tensiles: all tensile rows
+    - compressives: all compressive rows
 
     Since the laminate is mirrored, the indicies are built conditionally based
     on tensile or compressive side and merged by set operations.  All indicies
     per category are presented; booleane tests are left to the user.
-
-    Returns
-    -------
-    namedtuple
-        Dict of panada Index objects, dict of booleans
 
     '''
     df = prim_df
@@ -405,32 +496,40 @@ def get_indicies(prim_df):
     length = len(df.index)
 
     # Conditionals
-    conditions = {
-        'tensile': df['side'] == 'Tens.',
-        'compressive': df['side'] == 'Comp.',
-        'middle': df['type'] == 'middle',
-    }
-
-    tensile = conditions.get('tensile')
-    compressive = conditions.get('compressive')
-    middle = conditions.get('middle')
+    tensile_idx = df[df['side'] == 'Tens.'].index
+    compressive_idx = df[df['side'] == 'Comp.'].index
+    middle_idx = df[df['type'] == 'middle'].index
+    _is_even_ply = (nplies % 2 == 0)
+    _is_even_p = (p % 2 == 0)
+    _is_odd_ply = not _is_even_ply
+    _is_odd_p = not _is_even_p
 
     # Pandas Index Objects
     # Groupby layer, apply mix/max to indicies, store as pandas Index
-    interf_tens_idx = pd.Index(df[tensile].groupby('layer')['idx'].idxmin())
-    discont_tens_idx = pd.Index(df[tensile &~ middle].groupby('layer')['idx'].idxmax())
-    discont_comp_idx = pd.Index(df[compressive &~ middle].groupby('layer')['idx'].idxmin())
-    interf_comp_idx = pd.Index(df[compressive].groupby('layer')['idx'].idxmax())
-    if nplies != 1:
-        pseudo_middle_idx = pd.Index([discont_tens_idx.values[-1], discont_comp_idx.values[0]], name='idx')
+    df_t = df.iloc[tensile_idx, :]
+    df_c = df.iloc[compressive_idx, :]
+    interf_tens_idx = pd.Index(df_t.groupby('layer')['idx'].idxmin())
+    interf_comp_idx = pd.Index(df_c.groupby('layer')['idx'].idxmax())
+
+    df_disc_t = df.iloc[tensile_idx.difference(middle_idx | interf_tens_idx), :]
+    df_disc_c = df.iloc[compressive_idx.difference(middle_idx | interf_comp_idx), :]
+    discont_tens_idx = pd.Int64Index(df_disc_t.groupby('layer')['idx'].idxmax())
+    discont_comp_idx = pd.Int64Index(df_disc_c.groupby('layer')['idx'].idxmin())
+
+    if _is_even_ply:
+        pseudo_middle_idx = pd.Int64Index([((length-1)//2.), round((length-1)/2.)])
     else:
-        pseudo_middle_idx = pd.Index({})
-    middle_idx = pd.Index([len(df.index) // 2], name='idx')
+        pseudo_middle_idx = pd.Int64Index([])
+
+    if _is_odd_ply and _is_odd_p:
+        neutralaxis_idx = pd.Int64Index([length // 2])
+    else:
+        neutralaxis_idx = pd.Int64Index([])
+
     internals_idx = df.index.difference(interf_tens_idx | discont_tens_idx | discont_comp_idx | interf_comp_idx)
-    if p % 2 != 0: internals_idx = internals_idx.difference(middle_idx)
-    surfaces_idx = pd.Index([0, length - 1], name='idx')
-    firsts_idx = pd.Index(groupby_layer.first()['idx'], name='idx')
-    lasts_idx = pd.Index(groupby_layer.last()['idx'], name='idx')
+    surfaces_idx = pd.Index([0, length - 1])
+    firsts_idx = pd.Index(groupby_layer.first()['idx'])
+    lasts_idx = pd.Index(groupby_layer.last()['idx'])
 
     # DataFrame indicies
     indicies = {
@@ -440,21 +539,20 @@ def get_indicies(prim_df):
         'surfaces': surfaces_idx,
         'firsts': firsts_idx,
         'lasts': lasts_idx,
+        'tensiles': tensile_idx,
+        'compressives': compressive_idx,
+        'middles': middle_idx,
+        'neutralaxis': neutralaxis_idx,
+        'pseudomids': pseudo_middle_idx,
     }
 
-    if nplies % 2 == 0 or p % 2 == 0:
-        indicies['middles'] = pseudo_middle_idx
-        indicies['neutralaxis'] = pd.Index({})
-    else:
-        indicies['middles'] = middle_idx
-        indicies['neutralaxis'] = middle_idx
+    # Set the name for all indicies
+    for idx in indicies.values():
+        idx.name = 'idx'
 
-    logging.debug('Indices: {}'.format(indicies))
+    logging.debug('Orig. Indices: {}'.format(indicies))
 
-    # Setup a namedtuple
-    Indexer = ct.namedtuple('Indexer', 'indicies conditions')
-
-    return Indexer(indicies=indicies, conditions=conditions)
+    return indicies
 
 
 # Inspection Tools ------------------------------------------------------------
