@@ -959,7 +959,7 @@ class Laminate(Stack):
 
         '''
         df = df_mod.copy()
-        idxs = self._indexer.indicies.copy()
+        idxs = self._indexer.copy()
         idxs['custom'] = idxs['internals'].union(idxs['neutralaxis'])
 
         # if p == 1:
