@@ -870,6 +870,8 @@ class BaseDefaults(object):
             return it.chain(*nested_lists)                 # flattened
 
 
+# NOTE: Transferred from utils
+# TODO: consider moving following to an "influx" utils module like regressiontools; imports core; not imported by core
 def get_multi_geometry(Frame):
     '''Return geometry string parsed from a multi-plied laminate DataFrame.
 

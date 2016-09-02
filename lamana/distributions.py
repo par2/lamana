@@ -1263,7 +1263,8 @@ class Cases(ct.MutableMapping):
         return list(LM.frame for case in cases for LM in case.LMs)
 
 
-# Transferred from utils
+# NOTE: Transferred from utils
+# TODO: consider moving to an "influx" utils module like regressiontools; imports core; not imported by core
 def laminator(geos=None, load_params=None, mat_props=None, ps=[5], verbose=False):
     '''Return a dict of Cases; quickly build and encase a suite of Case objects.
 
