@@ -609,11 +609,22 @@ functions help to build DataFrames for any p, i.e. the number
 of replicated rows within each layer.'''
 
 
-def replicate_values(dict_, dict_keys=[], multiplier=1):
+# NOTE: Replace keyword default with sentinel value
+##def replicate_values(dict_, dict_keys=[], multiplier=1):
+def replicate_values(dict_, dict_keys=None, multiplier=1):
     '''Read starter dict values and returns a dict with p replicated values.
 
-    Example
-    =======
+    Parameters
+    ----------
+    dict_ : dict_
+        Primitive information for laminates; list values.
+    dict_keys : list, default None
+        Order of keys.
+    multiplier : int
+        Number of time to repeat items in values.
+
+    Examples
+    --------
     >>> d1 = {'layer' : [1,],
               'matl'  : ['HA',],
               'type'  : ['middle'],
@@ -626,6 +637,9 @@ def replicate_values(dict_, dict_keys=[], multiplier=1):
      {'t(um)': [2000.0, 2000.0]}]
 
     '''
+    if dict_keys is None:
+        dict_keys = []
+
     # Repeats items in a list p times; hacker trick
     result = [{key: [val for val in value for _ in [value] * multiplier]}
               for key, value in dict_.items() for _ in [value]]
