@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="geometry strings.svg">
+   sodipodi:docname="geometry_strings.svg">
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -22,17 +22,19 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.49497475"
-     inkscape:cx="477.63736"
-     inkscape:cy="291.21058"
+     inkscape:zoom="0.35"
+     inkscape:cx="293.73456"
+     inkscape:cy="-200.38543"
      inkscape:document-units="px"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="layer2"
      showgrid="false"
-     inkscape:window-width="1011"
-     inkscape:window-height="632"
-     inkscape:window-x="218"
-     inkscape:window-y="60"
-     inkscape:window-maximized="0" />
+     inkscape:window-width="1366"
+     inkscape:window-height="716"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true" />
   <defs
      id="defs4">
     <marker
@@ -100,6 +102,90 @@
          style="stroke-linejoin:round;stroke:#808080;stroke-width:0.62500000;fill:#808080;fill-rule:evenodd"
          id="path5195" />
     </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow2MendE-8"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2MendE">
+      <path
+         inkscape:connector-curvature="0"
+         transform="scale(-0.6,-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#808080;fill-rule:evenodd;stroke:#808080;stroke-width:0.625;stroke-linejoin:round"
+         id="path5195-8" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow2MendE-4"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2MendE">
+      <path
+         inkscape:connector-curvature="0"
+         transform="scale(-0.6,-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#808080;fill-rule:evenodd;stroke:#808080;stroke-width:0.625;stroke-linejoin:round"
+         id="path5195-5" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow2MendE-1"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2MendE">
+      <path
+         inkscape:connector-curvature="0"
+         transform="scale(-0.6,-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#808080;fill-rule:evenodd;stroke:#808080;stroke-width:0.625;stroke-linejoin:round"
+         id="path5195-1" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow2MendE-11"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2MendE">
+      <path
+         inkscape:connector-curvature="0"
+         transform="scale(-0.6,-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#808080;fill-rule:evenodd;stroke:#808080;stroke-width:0.625;stroke-linejoin:round"
+         id="path5195-3" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow2MendE-7"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2MendE">
+      <path
+         inkscape:connector-curvature="0"
+         transform="scale(-0.6,-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#808080;fill-rule:evenodd;stroke:#808080;stroke-width:0.625;stroke-linejoin:round"
+         id="path5195-4" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow2MendE-17"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2MendE">
+      <path
+         inkscape:connector-curvature="0"
+         transform="scale(-0.6,-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#808080;fill-rule:evenodd;stroke:#808080;stroke-width:0.625;stroke-linejoin:round"
+         id="path5195-40" />
+    </marker>
   </defs>
   <metadata
      id="metadata7">
@@ -109,7 +195,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -117,51 +203,80 @@
      transform="translate(0,-308.2677)"
      id="layer1"
      inkscape:groupmode="layer"
-     inkscape:label="highlights">
+     inkscape:label="highlights"
+     style="display:inline">
     <rect
        ry="0"
-       y="589.05249"
-       x="117.18284"
+       y="590.95386"
+       x="117.67305"
        height="56.639484"
        width="264.7309"
        id="rect2989"
-       style="opacity:0.44711537;color:#000000;fill:#ff2a2a;stroke:#000000;stroke-width:0.92906088;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:5.57436547, 5.57436547;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       style="color:#000000;fill:#0067ff;fill-opacity:0.44705882;stroke:none;stroke-width:0.92906088;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
        ry="0"
-       y="589.10553"
-       x="408.11923"
+       y="591.0069"
+       x="408.60947"
        height="56.533367"
        width="329.27454"
        id="rect2989-1"
-       style="opacity:0.44711537;color:#000000;fill:#0066ff;stroke:#000000;stroke-width:1.03517497;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:6.2110496, 6.2110496;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       style="color:#000000;fill:#ff2b2b;fill-opacity:0.44705882;stroke:none;stroke-width:1.03517497;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
        ry="0"
-       y="588.89838"
-       x="764.48065"
+       y="590.79974"
+       x="764.97083"
        height="56.94775"
        width="117.55689"
        id="rect2989-7"
-       style="opacity:0.44711537;color:#000000;fill:#00d400;stroke:#000000;stroke-width:0.62078989;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3.72473892, 3.72473892;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       style="color:#000000;fill:#00d400;fill-opacity:0.44705882;stroke:none;stroke-width:0.62078989;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
        ry="0"
-       y="588.73138"
-       x="882.45007"
+       y="590.63275"
+       x="883.95038"
        height="57.28167"
        width="24.956779"
        id="rect2989-7-4"
-       style="opacity:0.44711537;color:#000000;fill:#3737c8;stroke:#000000;stroke-width:0.28686953;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.72121691, 1.72121691;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       style="color:#000000;fill:#3838c7;fill-opacity:0.44705883;stroke:none;stroke-width:0.28686952999999998;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
+    <rect
+       style="color:#000000;fill:#0067ff;fill-opacity:0.44705882;fill-rule:nonzero;stroke:none;stroke-width:5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect6153"
+       width="80"
+       height="68.571426"
+       x="-131.42857"
+       y="486.64789" />
+    <rect
+       style="color:#000000;fill:#ff2b2b;fill-opacity:0.44705882;fill-rule:nonzero;stroke:none;stroke-width:5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect6153-7"
+       width="80"
+       height="68.571426"
+       x="-131.42857"
+       y="612.36218" />
+    <rect
+       style="color:#000000;fill:#00d400;fill-opacity:0.44705882;fill-rule:nonzero;stroke:none;stroke-width:5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect6153-79"
+       width="80"
+       height="68.571426"
+       x="-131.42857"
+       y="738.07648" />
+    <rect
+       style="color:#000000;fill:#3838c7;fill-opacity:0.44705882;fill-rule:nonzero;stroke:none;stroke-width:5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect6153-79-3"
+       width="80"
+       height="68.571426"
+       x="-131.42857"
+       y="863.79077" />
   </g>
   <g
      inkscape:label="arrows"
@@ -170,66 +285,97 @@
     <path
        inkscape:connector-curvature="0"
        id="path3881"
-       d="m 248.22427,363.43765 0,40.12402 281.09753,-1.433 0,-40.12401"
+       d="m 248.71448,365.33901 0,40.12402 281.09753,-1.433 0,-40.12401"
        style="fill:none;stroke:#808080;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none;marker-end:none"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
        inkscape:connector-curvature="0"
        id="path3883"
-       d="m 691.76686,447.8581 1.85735,-121.29383"
+       d="m 692.25707,449.75946 1.85735,-121.29383"
        style="fill:none;stroke:#808080;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2MendE)"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
        inkscape:connector-curvature="0"
        id="path3887"
-       d="m 894.97019,414.11939 0,-69.33343"
-       style="fill:none;stroke:#808080;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Mendn)"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       d="m 895.4604,416.02075 0,-69.33343"
+       style="fill:none;stroke:#808080;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Mendn);opacity:1"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
        inkscape:connector-curvature="0"
        id="path3889"
-       d="m 823.29792,451.69264 0,-104.85642"
+       d="m 823.78813,453.594 0,-104.85642"
        style="fill:none;stroke:#808080;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2MendL)"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
        inkscape:connector-curvature="0"
        id="path3881-5"
-       d="m 123.78823,330.32734 0,32.13876 251.4795,-1.14781 0,-32.13876"
+       d="m 124.27844,332.2287 0,32.13876 251.4795,-1.14781 0,-32.13876"
        style="fill:none;stroke:#808080;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none;marker-end:none"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
        inkscape:connector-curvature="0"
        id="path3881-5-1"
-       d="m 435.73671,330.1706 0,32.46385 179.08522,-1.15942 0,-32.46385"
+       d="m 436.22692,332.07196 0,32.46385 179.08522,-1.15942 0,-32.46385"
        style="fill:none;stroke:#808080;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none;marker-end:none"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:xkcd;-inkscape-font-specification:xkcd"
-       x="86.873116"
-       y="129.92174"
+       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:xkcd;-inkscape-font-specification:xkcd"
+       x="87.363319"
+       y="131.8231"
        id="text5269"
        sodipodi:linespacing="125%"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan5271"
-         x="86.873116"
-         y="129.92174"
-         style="font-size:28px">Generic Geometry String</tspan></text>
+         x="87.363319"
+         y="131.8231"
+         style="font-size:36px">Generic Geometry String</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:xkcd;-inkscape-font-specification:xkcd"
+       x="51.287323"
+       y="832.95013"
+       id="text5269-4"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan5271-0"
+         x="51.287323"
+         y="832.95013"
+         style="font-size:36px">Geometry String Processing</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       id="path3883-2"
+       d="m 627.52997,1000.445 1.85735,121.2938"
+       style="fill:none;stroke:#808080;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2MendE)"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path3883-2-9"
+       d="m 627.52997,1262.7665 1.85735,121.2938"
+       style="fill:none;stroke:#808080;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2MendE)"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
   </g>
   <g
      style="display:inline"
@@ -239,118 +385,480 @@
     <text
        sodipodi:linespacing="125%"
        id="text2985"
-       y="317.7135"
-       x="92.934029"
+       y="319.61487"
+       x="93.424232"
        style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        xml:space="preserve"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
          style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace"
-         y="317.7135"
-         x="92.934029"
+         y="319.61487"
+         x="93.424232"
          id="tspan2987"
          sodipodi:role="line">&quot;(300, 100.)-[(25, 75), 50]-400.0S&quot;</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text3805"
-       y="221.77625"
-       x="189.87332"
-       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff2b2b;fill-opacity:0.44705882;stroke:#791414;stroke-opacity:0.30588235;font-family:Sans"
+       y="223.6776"
+       x="190.36353"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#0067ff;fill-opacity:0.44705883000000002;stroke:#0067ff;stroke-opacity:0.44705883;font-family:Sans"
        xml:space="preserve"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
-         style="font-size:40px;fill:#ff2b2b;fill-opacity:0.44705882;stroke:#791414;stroke-opacity:0.30588235"
-         y="221.77625"
-         x="189.87332"
+         style="font-size:40px;fill:#0067ff;fill-opacity:0.44705883000000002;stroke:#0067ff;stroke-opacity:0.44705883"
+         y="223.6776"
+         x="190.36353"
          id="tspan3807"
          sodipodi:role="line">outer</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text3805-0"
-       y="222.09851"
-       x="533.16608"
-       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#0067ff;fill-opacity:0.44705882;stroke:#0067ff;stroke-opacity:0.44705882;font-family:Sans"
+       y="223.99986"
+       x="533.65625"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff2b2b;fill-opacity:0.44705883000000002;stroke:#ff2b2b;stroke-opacity:0.44705883;font-family:Sans"
        xml:space="preserve"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
-         style="font-size:40px;fill:#0067ff;fill-opacity:0.44705882;stroke:#0067ff;stroke-opacity:0.44705882"
-         y="222.09851"
-         x="533.16608"
+         style="font-size:40px;fill:#ff2b2b;fill-opacity:0.44705883000000002;stroke:#ff2b2b;stroke-opacity:0.44705883"
+         y="223.99986"
+         x="533.65625"
          id="tspan3807-9"
          sodipodi:role="line">inners</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text3805-0-4"
-       y="222.09851"
-       x="763.7962"
+       y="223.99986"
+       x="764.28638"
        style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00d400;fill-opacity:0.44705882;stroke:#00d400;stroke-opacity:0.44705882;font-family:Sans"
        xml:space="preserve"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
          style="font-size:40px;fill:#00d400;fill-opacity:0.44705882;stroke:#00d400;stroke-opacity:0.44705882"
-         y="222.09851"
-         x="763.7962"
+         y="223.99986"
+         x="764.28638"
          id="tspan3807-9-8"
          sodipodi:role="line">middle</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4335"
-       y="439.80615"
-       x="873.30927"
+       y="441.70752"
+       x="873.79944"
        style="font-size:28px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;font-family:Sans"
        xml:space="preserve"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
-         y="439.80615"
-         x="873.30927"
+         y="441.70752"
+         x="873.79944"
          id="tspan4337"
          sodipodi:role="line">flag</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4339"
-       y="477.81799"
-       x="789.18549"
+       y="479.71936"
+       x="789.67566"
        style="font-size:28px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;font-family:Sans"
        xml:space="preserve"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
-         y="477.81799"
-         x="789.18549"
+         y="479.71936"
+         x="789.67566"
          id="tspan4341"
          sodipodi:role="line">layer_</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4347"
-       y="439.79932"
-       x="364.35898"
+       y="441.70068"
+       x="364.84921"
        style="font-size:28px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;font-family:Sans"
        xml:space="preserve"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
-         y="439.79932"
-         x="364.35898"
+         y="441.70068"
+         x="364.84921"
          id="tspan4349"
          sodipodi:role="line">duple</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4347-4"
-       y="477.98206"
-       x="628.28662"
+       y="479.88342"
+       x="628.77679"
        style="font-size:28px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;font-family:Sans"
        xml:space="preserve"
-       inkscape:export-filename="C:\Users\Paul\Desktop\geometry_string.png"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\geometry_string.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
-         y="477.98206"
-         x="628.28662"
+         y="479.88342"
+         x="628.77679"
          id="tspan4349-5"
          sodipodi:role="line">non-duple</tspan></text>
-  </g>
+    <rect
+       ry="0"
+       y="1161.2537"
+       x="312.70804"
+       height="56.639484"
+       width="123.87919"
+       id="rect2989-2-2"
+       style="color:#000000;fill:#0067ff;fill-opacity:0.44705882;stroke:none;stroke-width:0.92906088;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="0"
+       y="1161.0996"
+       x="699.72717"
+       height="56.94775"
+       width="117.55689"
+       id="rect2989-7-7-9"
+       style="color:#000000;fill:#00d400;fill-opacity:0.44705882;stroke:none;stroke-width:0.62078989;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="0"
+       y="1161.3068"
+       x="486.53967"
+       height="56.533367"
+       width="161.08414"
+       id="rect2989-1-9-4"
+       style="color:#000000;fill:#ff2b2b;fill-opacity:0.44705882;stroke:none;stroke-width:1.03517497;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="0"
+       y="1160.9326"
+       x="865.73029"
+       height="57.28167"
+       width="72.433952"
+       id="rect2989-7-4-6-8-4"
+       style="color:#000000;fill:#3838c7;fill-opacity:0.44705882;stroke:none;stroke-width:0.28686953;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text2985-1"
+       y="1199.1926"
+       x="289.77679"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace"
+         y="1199.1926"
+         x="289.77679"
+         id="tspan2987-7"
+         sodipodi:role="line">(400.0, [200.0], 400.0, &quot;S&quot;)</tspan></text>
+    <rect
+       ry="0"
+       y="910.0614"
+       x="420.47934"
+       height="56.639484"
+       width="73.879189"
+       id="rect2989-2"
+       style="color:#000000;fill:#0067ff;fill-opacity:0.44705882;stroke:none;stroke-width:0.92906088;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="0"
+       y="909.90723"
+       x="686.51654"
+       height="56.94775"
+       width="117.55689"
+       id="rect2989-7-7"
+       style="color:#000000;fill:#00d400;fill-opacity:0.44705882;stroke:none;stroke-width:0.62078989;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="0"
+       y="909.7403"
+       x="805.49609"
+       height="57.28167"
+       width="24.956779"
+       id="rect2989-7-4-6"
+       style="color:#000000;fill:#3838c7;fill-opacity:0.44705882;stroke:none;stroke-width:0.28686953;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="0"
+       y="910.11444"
+       x="518.49725"
+       height="56.533367"
+       width="141.89124"
+       id="rect2989-1-9"
+       style="color:#000000;fill:#ff2b2b;fill-opacity:0.44705882;stroke:none;stroke-width:1.03517497;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text2985-9"
+       y="948.40063"
+       x="397.8725"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace"
+         y="948.40063"
+         x="397.8725"
+         id="tspan2987-4"
+         sodipodi:role="line">&quot;400-[200.]-400.0S&quot;</tspan></text>
+    <rect
+       ry="0"
+       y="1131.5538"
+       x="1574.7947"
+       height="56.639484"
+       width="123.87919"
+       id="rect2989-2-1"
+       style="color:#000000;fill:#0067ff;fill-opacity:0.44705882;stroke:none;stroke-width:0.92906088;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="0"
+       y="1131.2328"
+       x="2130.3423"
+       height="57.28167"
+       width="72.433952"
+       id="rect2989-7-4-6-8"
+       style="color:#000000;fill:#3838c7;fill-opacity:0.44705882;stroke:none;stroke-width:0.28686953;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="0"
+       y="1131.3998"
+       x="1962.824"
+       height="56.94775"
+       width="117.55689"
+       id="rect2989-7-7-2"
+       style="color:#000000;fill:#00d400;fill-opacity:0.44705882;stroke:none;stroke-width:0.62078989;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="0"
+       y="1131.6069"
+       x="1748.1212"
+       height="56.533367"
+       width="161.08414"
+       id="rect2989-1-9-4-3"
+       style="color:#000000;fill:#ff2b2b;fill-opacity:0.44705882;stroke:none;stroke-width:1.03517497;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text2985-1-1"
+       y="1168.653"
+       x="1242.0292"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace"
+         y="1168.653"
+         x="1242.0292"
+         id="tspan2987-7-7"
+         sodipodi:role="line">GeometryTuple(400.0, [200.0], 400.0, &quot;S&quot;)</tspan></text>
+    <rect
+       ry="0"
+       y="1429.0466"
+       x="225.83495"
+       height="56.639484"
+       width="123.87919"
+       id="rect2989-2-6"
+       style="color:#000000;fill:#0067ff;fill-opacity:0.44705882;stroke:none;stroke-width:0.92906088;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="0"
+       y="1429.0466"
+       x="897.58636"
+       height="56.639484"
+       width="123.87919"
+       id="rect2989-2-8"
+       style="color:#000000;fill:#0067ff;fill-opacity:0.44705882;stroke:none;stroke-width:0.92906088;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="0"
+       y="1428.8926"
+       x="566.38702"
+       height="56.94775"
+       width="117.55689"
+       id="rect2989-7-7-7"
+       style="color:#000000;fill:#00d400;fill-opacity:0.44705882;stroke:none;stroke-width:0.62078989;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="0"
+       y="1429.0997"
+       x="397.64621"
+       height="56.533367"
+       width="117.64758"
+       id="rect2989-1-9-4-3-3"
+       style="color:#000000;fill:#ff2b2b;fill-opacity:0.44705882;stroke:none;stroke-width:1.03517497;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="0"
+       y="1429.0997"
+       x="734.02704"
+       height="56.533367"
+       width="117.64758"
+       id="rect2989-1-9-4-3-3-3"
+       style="color:#000000;fill:#ff2b2b;fill-opacity:0.44705882;stroke:none;stroke-width:1.03517497;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text2985-1-1-2"
+       y="1466.9855"
+       x="205.83147"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace"
+         y="1466.9855"
+         x="205.83147"
+         id="tspan2987-7-7-7"
+         sodipodi:role="line">(400.0, 200.0, 800.0, 200.0, 400.0)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:32px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="685.71423"
+       y="1075.0037"
+       id="text5453"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         x="685.71423"
+         y="1075.0037"
+         style="font-size:32px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Sans;-inkscape-font-specification:Sans"
+         id="tspan5478"><tspan
+   style="font-size:32px;fill:#0000ff"
+   id="tspan5506">Lex/Parse </tspan>&amp; consume</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:32px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+       x="688.41473"
+       y="1337.3252"
+       id="text5453-4"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         x="688.41473"
+         y="1337.3252"
+         style="font-size:32px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Sans;-inkscape-font-specification:Sans"
+         id="tspan5478-3"><tspan
+   style="font-size:32px;fill:#0000ff"
+   id="tspan5504">Resolve</tspan> &amp; consume</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text2985-9-1"
+       y="952.7561"
+       x="83.731033"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans;-inkscape-font-specification:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Sans;-inkscape-font-specification:Sans"
+         y="952.7561"
+         x="83.731033"
+         id="tspan2987-4-9"
+         sodipodi:role="line">I.</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text2985-9-1-8"
+       y="1203.9485"
+       x="85.89901"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans;-inkscape-font-specification:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Sans;-inkscape-font-specification:Sans"
+         y="1203.9485"
+         x="85.89901"
+         id="tspan2987-4-9-6"
+         sodipodi:role="line">II.</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text2985-9-1-2"
+       y="1471.4874"
+       x="85.39119"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans;-inkscape-font-specification:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\Paul\Documents\IPython Notebooks\gitrepos\lamana\docs\_images\string_processing.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Sans;-inkscape-font-specification:Sans"
+         y="1471.4874"
+         x="85.39119"
+         id="tspan2987-4-9-8"
+         sodipodi:role="line">III.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="1225.7144"
+       y="921.23737"
+       id="text6283"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan6285"
+         x="1225.7144"
+         y="921.23737"
+         style="font-size:32px">I. Geometry string</tspan><tspan
+         sodipodi:role="line"
+         x="1225.7144"
+         y="965.05865"
+         style="font-size:32px"
+         id="tspan6287">II. Consumed <tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace"
+   id="tspan6293">Parser</tspan> stream</tspan><tspan
+         sodipodi:role="line"
+         x="1225.7144"
+         y="1010.5783"
+         style="font-size:32px"
+         id="tspan6291">III. Consumed <tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace"
+   id="tspan6297">Resolver</tspan> stream; unfolded parser</tspan></text>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3115"
+       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Sans;font-style:normal;font-weight:normal;font-size:20px;line-height:125%;letter-spacing:0px;word-spacing:0px"><flowRegion
+         id="flowRegion3117"><rect
+           id="rect3119"
+           width="857.14288"
+           height="28.571428"
+           x="1068.5714"
+           y="981.23737" /></flowRegion><flowPara
+         id="flowPara3121" /></flowRoot>  </g>
 </svg>
