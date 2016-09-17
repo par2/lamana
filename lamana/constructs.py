@@ -440,9 +440,9 @@ class Laminate(Stack):
 
         # Laminate Objects
         self.Snapshot = self._build_snapshot()             # df object; stack
-        self._primitive = self._build_primitive()          # phase 1
+        self._primitive = self._build_primitive()          # stage 1
         self._indexer = ut.get_indicies(self._primitive)
-        self.LFrame = self._build_LFrame()                 # phase 1; df of IDs; formerly Laminate_
+        self.LFrame = self._build_LFrame()                 # stage 1; df of IDs; formerly Laminate_
         self._frame = self.LFrame                          # general accessor
 
         # FIX: how is self.p getting assigned?
@@ -513,7 +513,7 @@ class Laminate(Stack):
         ##return self.__class__._set_stresses(Snapshot)
         return self._set_stresses(Snapshot)
 
-    # PHASE 1
+    # STAGE 1
     def _build_primitive(self):
         '''Build a primitive laminate from a stack.
 
@@ -550,7 +550,7 @@ class Laminate(Stack):
 
         return df
 
-    # PHASE 2
+    # STAGE 2
     def _build_LFrame(self):
         '''Update Laminate DataFrame with new dimensional columns.
 
@@ -759,7 +759,7 @@ class Laminate(Stack):
         return ut.set_column_sequence(df, sort_columns)
 
     # Methods+ ----------------------------------------------------------------
-    # These methods support Phase 1
+    # These methods support Stage 1
     def _check_layer_order(self):
         '''Cross-check stacking order with layers of the snapshot object.
         Returns an abbreviated list of layer orders.
@@ -1187,7 +1187,7 @@ class LaminateModel(Laminate):
         self.compressive = self.LMFrame[self.LMFrame['side'] == 'Comp.']
         self.tensile = self.LMFrame[self.LMFrame['side'] == 'Tens.']
 
-    # PHASE 3
+    # STAGE 3
     def _build_LMFrame(self, **kwargs):
         '''Update `LaminateModel` DataFrame and `FeatureInput`.
 

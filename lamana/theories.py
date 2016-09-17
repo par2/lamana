@@ -22,7 +22,7 @@ class BaseModel(object):
     -----
     This class helps centralize common attributes associated with a custom
     model.  A model is selected in by the `Case.apply()` method and is applied in
-    Phase 3 of `constructs.Laminate()`.  It is idiomatic to subclass `BaseModel`
+    Stage 3 of `constructs.Laminate()`.  It is idiomatic to subclass `BaseModel`
     when making custom models.
 
     Uses an abstractmethod to enforce implementation of a hook method.  It also
