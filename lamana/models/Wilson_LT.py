@@ -164,8 +164,10 @@ class Model(BaseModel):                                    # in 0.4.11, can have
         else:
             z = df['z(m)*']
         bending = ct.namedtuple('bending', ['d_11', 'd_12'])
-        d_11 = ((q_11 * (h**3)) / 12.) + (q_11 * h * (z**2))
-        d_12 = ((q_12 * (h**3)) / 12.) + (q_12 * h * (z**2))
+        # d_11 = ((q_11 * (h**3)) / 12.) + (q_11 * h * (z**2))
+        # d_12 = ((q_12 * (h**3)) / 12.) + (q_12 * h * (z**2))
+        d_11 = q_11 * (((h**3) / 12.) + (h * (z**2)))
+        d_12 = q_12 * (((h**3) / 12.) + (h * (z**2)))
         return bending(d_11, d_12)
 
     def calc_moment(self, df, load_params, v_eq):
