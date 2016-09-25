@@ -80,7 +80,7 @@ pip-delete-this-directory.txt
 # Folders
 # =======
 _archive
-
+_inventory
 
 # Profiling
 # =========
