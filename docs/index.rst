@@ -19,6 +19,7 @@ analysis and visualization.
    - Shippable (unpinned CI builds)
    - Decoupled LaminateModel class
    - nbval Regression Test (unpinned)
+   - Dropped Python 3.3 support
 
 LamAna enables users to **calculate**/**export**/**analyze** data and
 **author** custom models based on laminate theory.  *Feature modules*  are used to plot stress distributions, analyze thickessness effects and
