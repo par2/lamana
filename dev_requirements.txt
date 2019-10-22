@@ -38,7 +38,7 @@ nbconvert==4.2.0
 nbformat==4.0.1
 nbsphinx==0.2.2
 nose==1.3.7
-notebook==4.2.0
+notebook==5.7.8
 numpy==1.10.4                                             # try for py27, py34 BUG on travis (build T264, A1.0.192, S33)
 numpydoc==0.5
 openpyxl==2.3.2                                            # for pandas to_excel()
