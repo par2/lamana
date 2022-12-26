@@ -65,7 +65,7 @@ tornado==4.4
 traitlets==4.2.2
 twine==1.6.5                                               #+? needs update to >=1.7.4
 wcwidth==0.1.7
-wheel==0.24.0                                              #+? needs update to >=0.29.0
+wheel==0.38.1                                              #+? needs update to >=0.29.0
 win-unicode-console==0.5
 xlrd==0.9.3                                                # for pandas ExcelFile
 
