@@ -7,7 +7,7 @@
 [![codecov.io](https://codecov.io/github/par2/lamana/coverage.svg?branch=develop)](https://codecov.io/github/par2/lamana?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/lamana/badge/?version=latest)](http://lamana.readthedocs.io/en/latest/?badge=latest)
 
-An extensible Python package for laminate analysis
+An extensible Python package for laminate analysis.
 
 
 ![lamana](./docs/_images/demo_plot2.png)
@@ -18,7 +18,7 @@ An extensible Python package for laminate analysis
 
 Install [Anaconda](https://www.continuum.io/downloads), then simply run:
 
-    > conda install numpy pandas matplolib
+    > conda install numpy pandas matplotlib
     > pip install lamana
 
 See the [documentation](http://lamana.readthedocs.io/en/stable/installation2.html) for alternative installation methods.
