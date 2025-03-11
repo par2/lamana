@@ -18,7 +18,7 @@ ipykernel==4.2.2
 numpydoc==0.5
 
 # Pandas requirements
-openpyxl==2.3.2                                            # for pandas to_excel()
+openpyxl==2.4.2                                            # for pandas to_excel()
 xlrd==1.0.0                                                # for pandas to_excel() in tests
 
 # Py2/3
